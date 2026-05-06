@@ -9,7 +9,7 @@
         - Register (TR/TS, SBH/SPT, Harian/Periode)
         - Integrasi dengan Petani, KUD, Wilayah dari modul KA Tanaman
     """,
-    'author': 'KA Development',
+    'author': 'PDE KBA',
     'depends': ['base', 'mail', 'ka_user_management', 'ka_tanaman'],
     'data': [
         'security/ir.model.access.csv',

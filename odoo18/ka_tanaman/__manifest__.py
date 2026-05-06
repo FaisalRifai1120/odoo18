@@ -10,7 +10,7 @@
         - Master Data KUD
         - Master Data Petani
     """,
-    'author': 'KA Development',
+    'author': 'PDE KBA',
     'depends': ['base', 'mail', 'ka_user_management'],
     'data': [
         'security/ir.model.access.csv',

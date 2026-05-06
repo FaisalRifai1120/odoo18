@@ -13,7 +13,7 @@
         - Administrator
         - Operator
     """,
-    'author': 'KA Development',
+    'author': 'PDE KBA',
     'depends': ['base', 'mail'],
     'data': [
         'security/ka_user_groups.xml',
