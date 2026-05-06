@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════════
+         FORM VIEW
+    ══════════════════════════════════════════════ -->
+    <record id="view_ka_register_form" model="ir.ui.view">
+        <field name="name">ka.sita.register.form</field>
+        <field name="model">ka.sita.register</field>
+        <field name="arch" type="xml">
+            <form string="Register SITA">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="nama_register" string="Nama Register"/>
+                        <h1>
+                            <field name="nama_register"
+                                   placeholder="Nama Register..."/>
+                        </h1>
+                        <h3 class="text-muted">
+                            <field name="kode_register"
+                                   placeholder="Kode Register..."/>
+                        </h3>
+                    </div>
+
+                    <!-- Baris 1: Jenis & Metode -->
+                    <group>
+                        <group string="Klasifikasi">
+                            <field name="jenis_register"/>
+                            <field name="metode"/>
+                            <field name="jenis_pembayaran"/>
+                        </group>
+                        <group string="Lokasi">
+                            <field name="kud_id"/>
+                            <field name="desa_id"/>
+                            <field name="kecamatan_id"/>
+                        </group>
+                    </group>
+
+                    <!-- Baris 2: Petani -->
+                    <group string="Data Petani">
+                        <group>
+                            <field name="petani_id"
+                                   options="{'no_create': False}"/>
+                            <field name="account_petani_id"
+                                   string="Account Petani (Kode - Nama)"
+                                   options="{'no_create': False}"/>
+                            <field name="no_ktp"/>
+                        </group>
+                        <group>
+                            <field name="is_transfer" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <!-- Baris 3: Rekening (tampil jika is_transfer = True) -->
+                    <group string="Informasi Transfer"
+                           invisible="not is_transfer">
+                        <group>
+                            <field name="no_rekening"/>
+                            <field name="nama_rekening"/>
+                        </group>
+                        <group>
+                            <field name="nama_bank"/>
+                        </group>
+                    </group>
+
+                </sheet>
+
+                <!-- Chatter: hanya muncul setelah record tersimpan (id sudah ada) -->
+                <div class="oe_chatter" invisible="not id">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════
+         LIST VIEW
+    ══════════════════════════════════════════════ -->
+    <record id="view_ka_register_list" model="ir.ui.view">
+        <field name="name">ka.sita.register.list</field>
+        <field name="model">ka.sita.register</field>
+        <field name="arch" type="xml">
+            <list string="Daftar Register SITA"
+                  decoration-info="jenis_register == 'TR'"
+                  decoration-success="jenis_register == 'TS'">
+                <field name="kode_register"/>
+                <field name="nama_register"/>
+                <field name="jenis_register"/>
+                <field name="metode"/>
+                <field name="jenis_pembayaran"/>
+                <field name="kud_id"/>
+                <field name="desa_id" optional="hide"/>
+                <field name="kecamatan_id" optional="hide"/>
+                <field name="petani_id"/>
+                <field name="is_transfer" optional="show"
+                       widget="boolean_toggle"/>
+                <field name="no_rekening" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════
+         SEARCH VIEW
+    ══════════════════════════════════════════════ -->
+    <record id="view_ka_register_search" model="ir.ui.view">
+        <field name="name">ka.sita.register.search</field>
+        <field name="model">ka.sita.register</field>
+        <field name="arch" type="xml">
+            <search string="Cari Register">
+                <field name="kode_register" string="Kode"/>
+                <field name="nama_register" string="Nama"/>
+                <field name="kud_id" string="KUD"/>
+                <field name="petani_id" string="Petani"/>
+                <field name="kecamatan_id" string="Kecamatan"/>
+                <field name="desa_id" string="Desa"/>
+
+                <filter name="filter_tr" string="TR"
+                        domain="[('jenis_register','=','TR')]"/>
+                <filter name="filter_ts" string="TS"
+                        domain="[('jenis_register','=','TS')]"/>
+                <separator/>
+                <filter name="filter_sbh" string="SBH"
+                        domain="[('metode','=','SBH')]"/>
+                <filter name="filter_spt" string="SPT"
+                        domain="[('metode','=','SPT')]"/>
+                <separator/>
+                <filter name="filter_transfer" string="Transfer"
+                        domain="[('is_transfer','=',True)]"/>
+
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_jenis" string="Jenis Register"
+                            context="{'group_by': 'jenis_register'}"/>
+                    <filter name="group_metode" string="Metode"
+                            context="{'group_by': 'metode'}"/>
+                    <filter name="group_kud" string="KUD"
+                            context="{'group_by': 'kud_id'}"/>
+                    <filter name="group_kecamatan" string="Kecamatan"
+                            context="{'group_by': 'kecamatan_id'}"/>
+                    <filter name="group_petani" string="Petani"
+                            context="{'group_by': 'petani_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════════
+         ACTION
+    ══════════════════════════════════════════════ -->
+    <record id="action_ka_register" model="ir.actions.act_window">
+        <field name="name">Register</field>
+        <field name="res_model">ka.sita.register</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_register_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Buat Register SITA Pertama!
+            </p>
+            <p>
+                Lengkapi data register: jenis, metode, KUD, wilayah, dan petani.
+            </p>
+        </field>
+    </record>
+
+</odoo>

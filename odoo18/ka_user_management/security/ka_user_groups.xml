@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ══════════════════════════════════════════════
+             Kategori Grup
+        ══════════════════════════════════════════════ -->
+        <record id="module_category_ka" model="ir.module.category">
+            <field name="name">KA Modules</field>
+            <field name="description">Grup akses untuk seluruh modul KA</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <!-- ══════════════════════════════════════════════
+             Grup Berdasarkan Jabatan
+        ══════════════════════════════════════════════ -->
+
+        <!-- PPL -->
+        <record id="group_ka_ppl" model="res.groups">
+            <field name="name">PPL (Penyuluh Pertanian Lapangan)</field>
+            <field name="category_id" ref="module_category_ka"/>
+            <field name="comment">Akses PPL: hanya melihat data yang menjadi tanggung jawabnya.</field>
+        </record>
+
+        <!-- KASUBSI -->
+        <record id="group_ka_kasubsi" model="res.groups">
+            <field name="name">KASUBSI (Kepala Sub Seksi)</field>
+            <field name="category_id" ref="module_category_ka"/>
+            <field name="implied_ids" eval="[(4, ref('group_ka_ppl'))]"/>
+            <field name="comment">Akses KASUBSI: mencakup semua hak akses PPL.</field>
+        </record>
+
+        <!-- KASI -->
+        <record id="group_ka_kasi" model="res.groups">
+            <field name="name">KASI (Kepala Seksi)</field>
+            <field name="category_id" ref="module_category_ka"/>
+            <field name="implied_ids" eval="[(4, ref('group_ka_kasubsi'))]"/>
+            <field name="comment">Akses KASI: mencakup semua hak akses KASUBSI.</field>
+        </record>
+
+        <!-- KABAG -->
+        <record id="group_ka_kabag" model="res.groups">
+            <field name="name">KABAG (Kepala Bagian)</field>
+            <field name="category_id" ref="module_category_ka"/>
+            <field name="implied_ids" eval="[(4, ref('group_ka_kasi'))]"/>
+            <field name="comment">Akses KABAG: mencakup semua hak akses KASI.</field>
+        </record>
+
+        <!-- Operator -->
+        <record id="group_ka_operator" model="res.groups">
+            <field name="name">Operator</field>
+            <field name="category_id" ref="module_category_ka"/>
+            <field name="comment">Operator: dapat input dan edit data.</field>
+        </record>
+
+        <!-- Administrator -->
+        <record id="group_ka_admin" model="res.groups">
+            <field name="name">Administrator KA</field>
+            <field name="category_id" ref="module_category_ka"/>
+            <field name="implied_ids" eval="[
+                (4, ref('group_ka_kabag')),
+                (4, ref('group_ka_operator'))
+            ]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Administrator KA: akses penuh ke semua modul KA.</field>
+        </record>
+
+    </data>
+</odoo>

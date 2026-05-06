@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ka_user_profile_admin,ka.user.profile admin,model_ka_user_profile,group_ka_admin,1,1,1,1
+access_ka_user_profile_operator,ka.user.profile operator,model_ka_user_profile,group_ka_operator,1,1,1,0
+access_ka_user_profile_kabag,ka.user.profile kabag,model_ka_user_profile,group_ka_kabag,1,0,0,0
+access_ka_user_profile_kasi,ka.user.profile kasi,model_ka_user_profile,group_ka_kasi,1,0,0,0
+access_ka_user_profile_kasubsi,ka.user.profile kasubsi,model_ka_user_profile,group_ka_kasubsi,1,0,0,0
+access_ka_user_profile_ppl,ka.user.profile ppl,model_ka_user_profile,group_ka_ppl,1,0,0,0

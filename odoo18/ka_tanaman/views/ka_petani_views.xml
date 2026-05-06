@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_petani_form" model="ir.ui.view">
+        <field name="name">ka.petani.form</field>
+        <field name="model">ka.petani</field>
+        <field name="arch" type="xml">
+            <form string="Data Petani">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="nama" string="Nama Petani"/>
+                        <h1><field name="nama" placeholder="Nama Petani..."/></h1>
+                        <h3 class="text-muted">
+                            <field name="kode_akun" placeholder="Kode Akun..."/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group string="Identitas">
+                            <field name="no_ktp"/>
+                            <field name="nomor_hp"/>
+                            <field name="ppl_id"/>
+                        </group>
+                        <group string="Rekening">
+                            <field name="no_rekening"/>
+                            <field name="nama_rekening"/>
+                            <field name="nama_bank"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="jumlah_register" readonly="1"/>
+                    </group>
+                </sheet>
+                <!-- Chatter: muncul setelah record tersimpan -->
+                <div class="oe_chatter" invisible="not id">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_petani_list" model="ir.ui.view">
+        <field name="name">ka.petani.list</field>
+        <field name="model">ka.petani</field>
+        <field name="arch" type="xml">
+            <list string="Daftar Petani">
+                <field name="kode_akun"/>
+                <field name="nama"/>
+                <field name="no_ktp"/>
+                <field name="nomor_hp"/>
+                <field name="no_rekening" optional="hide"/>
+                <field name="nama_bank" optional="hide"/>
+                <field name="ppl_id"/>
+                <field name="jumlah_register"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_petani_search" model="ir.ui.view">
+        <field name="name">ka.petani.search</field>
+        <field name="model">ka.petani</field>
+        <field name="arch" type="xml">
+            <search string="Cari Petani">
+                <field name="nama"/>
+                <field name="kode_akun"/>
+                <field name="no_ktp"/>
+                <field name="ppl_id"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_ppl" string="PPL"
+                            context="{'group_by': 'ppl_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_petani" model="ir.actions.act_window">
+        <field name="name">Petani</field>
+        <field name="res_model">ka.petani</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_petani_search"/>
+    </record>
+
+</odoo>

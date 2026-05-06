@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════
+         PROVINSI
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_provinsi_form" model="ir.ui.view">
+        <field name="name">ka.wilayah.provinsi.form</field>
+        <field name="model">ka.wilayah.provinsi</field>
+        <field name="arch" type="xml">
+            <form string="Provinsi">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kode"/>
+                            <field name="nama"/>
+                        </group>
+                        <group>
+                            <field name="kota_count" string="Jumlah Kota/Kabupaten"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Daftar Kota/Kabupaten">
+                            <field name="kota_ids">
+                                <list>
+                                    <field name="kode"/>
+                                    <field name="nama"/>
+                                    <field name="kecamatan_count"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_provinsi_tree" model="ir.ui.view">
+        <field name="name">ka.wilayah.provinsi.tree</field>
+        <field name="model">ka.wilayah.provinsi</field>
+        <field name="arch" type="xml">
+            <list string="Provinsi">
+                <field name="kode"/>
+                <field name="nama"/>
+                <field name="kota_count" string="Jml Kota/Kab"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ka_provinsi" model="ir.actions.act_window">
+        <field name="name">Provinsi</field>
+        <field name="res_model">ka.wilayah.provinsi</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         KOTA / KABUPATEN
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_kota_form" model="ir.ui.view">
+        <field name="name">ka.wilayah.kota.form</field>
+        <field name="model">ka.wilayah.kota</field>
+        <field name="arch" type="xml">
+            <form string="Kota / Kabupaten">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kode"/>
+                            <field name="nama"/>
+                            <field name="provinsi_id"/>
+                        </group>
+                        <group>
+                            <field name="kecamatan_count" string="Jumlah Kecamatan"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Daftar Kecamatan">
+                            <field name="kecamatan_ids">
+                                <list>
+                                    <field name="kode"/>
+                                    <field name="nama"/>
+                                    <field name="desa_count"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_kota_tree" model="ir.ui.view">
+        <field name="name">ka.wilayah.kota.tree</field>
+        <field name="model">ka.wilayah.kota</field>
+        <field name="arch" type="xml">
+            <list string="Kota / Kabupaten">
+                <field name="kode"/>
+                <field name="nama"/>
+                <field name="provinsi_id"/>
+                <field name="kecamatan_count" string="Jml Kecamatan"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ka_kota" model="ir.actions.act_window">
+        <field name="name">Kota / Kabupaten</field>
+        <field name="res_model">ka.wilayah.kota</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         KECAMATAN
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_kecamatan_form" model="ir.ui.view">
+        <field name="name">ka.wilayah.kecamatan.form</field>
+        <field name="model">ka.wilayah.kecamatan</field>
+        <field name="arch" type="xml">
+            <form string="Kecamatan">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kode"/>
+                            <field name="nama"/>
+                            <field name="kota_id"/>
+                            <field name="provinsi_id"/>
+                        </group>
+                        <group>
+                            <field name="desa_count" string="Jumlah Desa"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Daftar Desa">
+                            <field name="desa_ids">
+                                <list>
+                                    <field name="kode"/>
+                                    <field name="nama"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_kecamatan_tree" model="ir.ui.view">
+        <field name="name">ka.wilayah.kecamatan.tree</field>
+        <field name="model">ka.wilayah.kecamatan</field>
+        <field name="arch" type="xml">
+            <list string="Kecamatan">
+                <field name="kode"/>
+                <field name="nama"/>
+                <field name="kota_id"/>
+                <field name="provinsi_id"/>
+                <field name="desa_count" string="Jml Desa"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ka_kecamatan" model="ir.actions.act_window">
+        <field name="name">Kecamatan</field>
+        <field name="res_model">ka.wilayah.kecamatan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         DESA
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_desa_form" model="ir.ui.view">
+        <field name="name">ka.wilayah.desa.form</field>
+        <field name="model">ka.wilayah.desa</field>
+        <field name="arch" type="xml">
+            <form string="Desa / Kelurahan">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kode"/>
+                            <field name="nama"/>
+                            <field name="kecamatan_id"/>
+                        </group>
+                        <group>
+                            <field name="kota_id" readonly="1"/>
+                            <field name="provinsi_id" readonly="1"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_desa_tree" model="ir.ui.view">
+        <field name="name">ka.wilayah.desa.tree</field>
+        <field name="model">ka.wilayah.desa</field>
+        <field name="arch" type="xml">
+            <list string="Desa / Kelurahan">
+                <field name="kode"/>
+                <field name="nama"/>
+                <field name="kecamatan_id"/>
+                <field name="kota_id"/>
+                <field name="provinsi_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ka_desa" model="ir.actions.act_window">
+        <field name="name">Desa / Kelurahan</field>
+        <field name="res_model">ka.wilayah.desa</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_kud_form" model="ir.ui.view">
+        <field name="name">ka.kud.form</field>
+        <field name="model">ka.kud</field>
+        <field name="arch" type="xml">
+            <form string="KUD">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="nama" string="Nama KUD"/>
+                        <h1><field name="nama" placeholder="Nama KUD..."/></h1>
+                    </div>
+                    <group>
+                        <group string="Identitas KUD">
+                            <field name="kode"/>
+                            <field name="no_telepon"/>
+                        </group>
+                        <group string="Alamat">
+                            <field name="kota_id"/>
+                            <field name="provinsi_id" readonly="1"/>
+                            <field name="kota_nama"
+                                   placeholder="Nama kota jika berbeda..."/>
+                        </group>
+                    </group>
+                    <group string="Alamat Lengkap">
+                        <field name="alamat" nolabel="1"
+                               placeholder="Isi alamat lengkap KUD..."/>
+                    </group>
+                </sheet>
+                <!-- Chatter: muncul setelah record tersimpan -->
+                <div class="oe_chatter" invisible="not id">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_kud_tree" model="ir.ui.view">
+        <field name="name">ka.kud.tree</field>
+        <field name="model">ka.kud</field>
+        <field name="arch" type="xml">
+            <list string="Daftar KUD">
+                <field name="kode"/>
+                <field name="nama"/>
+                <field name="kota_id"/>
+                <field name="provinsi_id"/>
+                <field name="no_telepon"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_kud_search" model="ir.ui.view">
+        <field name="name">ka.kud.search</field>
+        <field name="model">ka.kud</field>
+        <field name="arch" type="xml">
+            <search string="Cari KUD">
+                <field name="nama"/>
+                <field name="kode"/>
+                <field name="kota_id"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_kota" string="Kota/Kabupaten"
+                            context="{'group_by': 'kota_id'}"/>
+                    <filter name="group_provinsi" string="Provinsi"
+                            context="{'group_by': 'provinsi_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_kud" model="ir.actions.act_window">
+        <field name="name">KUD</field>
+        <field name="res_model">ka.kud</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_kud_search"/>
+    </record>
+
+</odoo>

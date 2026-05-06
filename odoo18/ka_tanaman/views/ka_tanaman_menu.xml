@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Root Menu -->
+    <menuitem id="menu_ka_tanaman_root"
+              name="KA Tanaman"
+              sequence="10"
+              web_icon="ka_tanaman,static/description/icon.png"
+              groups="ka_user_management.group_ka_operator,ka_user_management.group_ka_admin"/>
+
+    <!-- Master Data -->
+    <menuitem id="menu_ka_tanaman_master"
+              name="Master Data"
+              parent="menu_ka_tanaman_root"
+              sequence="10"/>
+
+    <!-- Wilayah submenu -->
+    <menuitem id="menu_ka_wilayah"
+              name="Wilayah"
+              parent="menu_ka_tanaman_master"
+              sequence="10"/>
+
+    <menuitem id="menu_ka_provinsi"
+              name="Provinsi"
+              parent="menu_ka_wilayah"
+              action="action_ka_provinsi"
+              sequence="10"/>
+
+    <menuitem id="menu_ka_kota"
+              name="Kota / Kabupaten"
+              parent="menu_ka_wilayah"
+              action="action_ka_kota"
+              sequence="20"/>
+
+    <menuitem id="menu_ka_kecamatan"
+              name="Kecamatan"
+              parent="menu_ka_wilayah"
+              action="action_ka_kecamatan"
+              sequence="30"/>
+
+    <menuitem id="menu_ka_desa"
+              name="Desa / Kelurahan"
+              parent="menu_ka_wilayah"
+              action="action_ka_desa"
+              sequence="40"/>
+
+    <!-- KUD -->
+    <menuitem id="menu_ka_kud"
+              name="KUD"
+              parent="menu_ka_tanaman_master"
+              action="action_ka_kud"
+              sequence="20"/>
+
+    <!-- Petani -->
+    <menuitem id="menu_ka_petani"
+              name="Petani"
+              parent="menu_ka_tanaman_master"
+              action="action_ka_petani"
+              sequence="30"/>
+
+</odoo>
