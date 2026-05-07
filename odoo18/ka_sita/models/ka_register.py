@@ -33,7 +33,7 @@ class KaSitaRegister(models.Model):
 
     # ── KUD & Wilayah ──────────────────────────────────────────
     kud_id = fields.Many2one(
-        'ka.kud', string='KUD', required=True,
+        'ka.kud', string='KUD', required=False,
         ondelete='restrict', tracking=True
     )
     desa_id = fields.Many2one(
