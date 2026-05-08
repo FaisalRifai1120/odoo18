@@ -19,14 +19,13 @@
                         <group string="Alamat">
                             <field name="kota_id"/>
                             <field name="provinsi_id" readonly="1"/>
-                            <field name="kota_nama"
-                                   placeholder="Nama kota jika berbeda..."/>
+                            <field name="kota_nama" placeholder="Nama kota jika berbeda..."/>
                         </group>
                     </group>
                     <group string="Alamat Lengkap">
-                        <field name="alamat" nolabel="1"
-                               placeholder="Isi alamat lengkap KUD..."/>
+                        <field name="alamat" nolabel="1" placeholder="Isi alamat lengkap KUD..."/>
                     </group>
+
                     <!-- Chatter di dalam sheet agar lebar mengikuti form -->
                     <div invisible="not id" style="margin-top: 16px;">
                         <div class="oe_chatter">
@@ -35,13 +34,12 @@
                         </div>
                     </div>
                 </sheet>
-                
             </form>
         </field>
     </record>
 
-    <record id="view_ka_kud_tree" model="ir.ui.view">
-        <field name="name">ka.kud.tree</field>
+    <record id="view_ka_kud_list" model="ir.ui.view">
+        <field name="name">ka.kud.list</field>
         <field name="model">ka.kud</field>
         <field name="arch" type="xml">
             <list string="Daftar KUD">

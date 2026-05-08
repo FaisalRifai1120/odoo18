@@ -13,6 +13,7 @@
     'depends': ['base', 'mail', 'ka_user_management', 'ka_tanaman'],
     'data': [
         'security/ir.model.access.csv',
+        'security/ka_sita_record_rules.xml',
         'views/ka_register_views.xml',
         'views/ka_sita_menu.xml',
     ],

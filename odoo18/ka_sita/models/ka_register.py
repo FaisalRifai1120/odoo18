@@ -32,6 +32,14 @@ class KaSitaRegister(models.Model):
     petani_id = fields.Many2one('ka.petani', string='Petani', ondelete='restrict', tracking=True)
     account_petani_id = fields.Many2one('ka.petani', string='Account Petani', ondelete='restrict', tracking=True)
 
+    ppl_id = fields.Many2one(
+        'ka.user.profile',
+        string='PPL',
+        domain="[('role', '=', 'ppl')]",
+        tracking=True,
+        ondelete='set null'
+    )
+
     is_transfer = fields.Boolean(string='Transfer', default=False, tracking=True)
     no_rekening = fields.Char(string='No. Rekening', tracking=True)
     nama_bank = fields.Char(string='Nama Bank', tracking=True)
@@ -48,11 +56,13 @@ class KaSitaRegister(models.Model):
     def _onchange_petani_id(self):
         if self.petani_id:
             p = self.petani_id
-            self.no_rekening   = p.no_rekening   or self.no_rekening
-            self.nama_bank     = p.nama_bank     or self.nama_bank
-            self.nama_rekening = p.nama_rekening or self.nama_rekening
-            self.no_ktp        = p.no_ktp        or self.no_ktp
+            self.no_rekening       = p.no_rekening   or self.no_rekening
+            self.nama_bank         = p.nama_bank     or self.nama_bank
+            self.nama_rekening     = p.nama_rekening or self.nama_rekening
+            self.no_ktp            = p.no_ktp        or self.no_ktp
             self.account_petani_id = p.id
+            if p.ppl_id:
+                self.ppl_id = p.ppl_id
 
     @api.onchange('account_petani_id')
     def _onchange_account_petani_id(self):
@@ -63,6 +73,8 @@ class KaSitaRegister(models.Model):
             self.nama_rekening = p.nama_rekening or self.nama_rekening
             if not self.petani_id:
                 self.petani_id = p.id
+            if p.ppl_id and not self.ppl_id:
+                self.ppl_id = p.ppl_id
 
     @api.onchange('desa_id')
     def _onchange_desa_id(self):
@@ -75,8 +87,19 @@ class KaSitaRegister(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-        records._update_petani_jumlah_register()
+        # Update jumlah_register di petani terkait
+        petani_ids = records.mapped('petani_id')
+        petani_ids._recompute_jumlah_register()
         return records
+
+    def write(self, vals):
+        # Jika petani berubah, update keduanya (lama & baru)
+        old_petani = self.mapped('petani_id')
+        res = super().write(vals)
+        if 'petani_id' in vals:
+            new_petani = self.mapped('petani_id')
+            (old_petani | new_petani)._recompute_jumlah_register()
+        return res
 
     def unlink(self):
         petani_ids = self.mapped('petani_id')
@@ -84,22 +107,24 @@ class KaSitaRegister(models.Model):
         petani_ids._recompute_jumlah_register()
         return res
 
-    def _update_petani_jumlah_register(self):
-        for rec in self:
-            if rec.petani_id:
-                rec.petani_id._recompute_jumlah_register()
-
 
 class KaPetaniInherit(models.Model):
     _inherit = 'ka.petani'
 
-    register_ids = fields.One2many('ka.sita.register', 'petani_id', string='Daftar Register')
+    register_ids = fields.One2many(
+        'ka.sita.register', 'petani_id', string='Daftar Register'
+    )
 
     def _recompute_jumlah_register(self):
         for rec in self:
             rec.jumlah_register = self.env['ka.sita.register'].search_count(
                 [('petani_id', '=', rec.id)]
             )
+
+    def action_recompute_all_register(self):
+        """Tombol untuk recompute semua petani sekaligus (dari menu)."""
+        all_petani = self.search([])
+        all_petani._recompute_jumlah_register()
 
 
 class KaMailMessageInherit(models.Model):

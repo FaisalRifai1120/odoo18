@@ -12,10 +12,10 @@
                 <header>
                     <button name="action_set_active" string="Aktifkan"
                             type="object" class="btn-success"
-                            invisible="not state == 'inactive'"/>
+                            invisible="state == 'active'"/>
                     <button name="action_set_inactive" string="Nonaktifkan"
                             type="object" class="btn-warning"
-                            invisible="not state == 'active'"/>
+                            invisible="state == 'inactive'"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="active,inactive"/>
                 </header>
@@ -26,15 +26,13 @@
                             <field name="name" placeholder="Nama Lengkap..."/>
                         </h1>
                         <h3>
-                            <field name="role_label" readonly="1"
-                                   class="text-muted"/>
+                            <field name="role_label" readonly="1" class="text-muted"/>
                         </h3>
                     </div>
 
                     <group>
                         <group string="Informasi Akun">
-                            <field name="user_id"
-                                   options="{'no_create': False}"/>
+                            <field name="user_id" options="{'no_create': False}"/>
                             <field name="email"/>
                             <field name="phone"/>
                         </group>
@@ -43,9 +41,11 @@
                             <field name="nip"/>
                             <field name="employee_code"/>
                             <field name="atasan_id"
-                                   invisible="not role in ['ppl','kasubsi','kasi']"/>
+                                   invisible="role not in ['ppl','kasubsi','kasi']"
+                                   required="role == 'ppl'"/>
                         </group>
                     </group>
+
                     <!-- Chatter di dalam sheet agar lebar mengikuti form -->
                     <div invisible="not id" style="margin-top: 16px;">
                         <div class="oe_chatter">
@@ -54,16 +54,15 @@
                         </div>
                     </div>
                 </sheet>
-                
             </form>
         </field>
     </record>
 
     <!-- ══════════════════════════════════════════════
-         TREE VIEW
+         LIST VIEW
     ══════════════════════════════════════════════ -->
-    <record id="view_ka_user_profile_tree" model="ir.ui.view">
-        <field name="name">ka.user.profile.tree</field>
+    <record id="view_ka_user_profile_list" model="ir.ui.view">
+        <field name="name">ka.user.profile.list</field>
         <field name="model">ka.user.profile</field>
         <field name="arch" type="xml">
             <list string="Daftar User KA"
@@ -97,31 +96,20 @@
                 <field name="role" string="Jabatan"/>
                 <field name="atasan_id" string="Atasan"/>
 
-                <filter name="filter_ppl" string="PPL"
-                        domain="[('role','=','ppl')]"/>
-                <filter name="filter_kasubsi" string="KASUBSI"
-                        domain="[('role','=','kasubsi')]"/>
-                <filter name="filter_kasi" string="KASI"
-                        domain="[('role','=','kasi')]"/>
-                <filter name="filter_kabag" string="KABAG"
-                        domain="[('role','=','kabag')]"/>
-                <filter name="filter_operator" string="Operator"
-                        domain="[('role','=','operator')]"/>
-                <filter name="filter_admin" string="Administrator"
-                        domain="[('role','=','admin')]"/>
+                <filter name="filter_ppl" string="PPL" domain="[('role','=','ppl')]"/>
+                <filter name="filter_kasubsi" string="KASUBSI" domain="[('role','=','kasubsi')]"/>
+                <filter name="filter_kasi" string="KASI" domain="[('role','=','kasi')]"/>
+                <filter name="filter_kabag" string="KABAG" domain="[('role','=','kabag')]"/>
+                <filter name="filter_operator" string="Operator" domain="[('role','=','operator')]"/>
+                <filter name="filter_admin" string="Administrator" domain="[('role','=','admin')]"/>
                 <separator/>
-                <filter name="filter_active" string="Aktif"
-                        domain="[('state','=','active')]"/>
-                <filter name="filter_inactive" string="Tidak Aktif"
-                        domain="[('state','=','inactive')]"/>
+                <filter name="filter_active" string="Aktif" domain="[('state','=','active')]"/>
+                <filter name="filter_inactive" string="Tidak Aktif" domain="[('state','=','inactive')]"/>
 
                 <group expand="0" string="Kelompokkan Berdasarkan">
-                    <filter name="group_role" string="Jabatan"
-                            context="{'group_by': 'role'}"/>
-                    <filter name="group_atasan" string="Atasan"
-                            context="{'group_by': 'atasan_id'}"/>
-                    <filter name="group_state" string="Status"
-                            context="{'group_by': 'state'}"/>
+                    <filter name="group_role" string="Jabatan" context="{'group_by': 'role'}"/>
+                    <filter name="group_atasan" string="Atasan" context="{'group_by': 'atasan_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                 </group>
             </search>
         </field>

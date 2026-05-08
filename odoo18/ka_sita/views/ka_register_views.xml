@@ -39,6 +39,8 @@
                             <field name="no_ktp"/>
                         </group>
                         <group>
+                            <!-- PPL: otomatis dari petani, masih bisa diedit -->
+                            <field name="ppl_id" options="{'no_create': True}"/>
                             <field name="is_transfer" widget="boolean_toggle"/>
                         </group>
                     </group>
@@ -53,6 +55,7 @@
                         </group>
                     </group>
 
+                    <!-- Chatter di dalam sheet agar lebar mengikuti form -->
                     <div invisible="not id" style="margin-top: 16px;">
                         <div class="oe_chatter">
                             <field name="message_follower_ids" widget="mail_followers"/>
@@ -81,6 +84,7 @@
                 <field name="desa_id" optional="hide"/>
                 <field name="kecamatan_id" optional="hide"/>
                 <field name="petani_id"/>
+                <field name="ppl_id" optional="show"/>
                 <field name="is_transfer" optional="show" widget="boolean_toggle"/>
                 <field name="no_rekening" optional="hide"/>
             </list>
@@ -96,6 +100,7 @@
                 <field name="nama_register" string="Nama"/>
                 <field name="kud_id" string="KUD"/>
                 <field name="petani_id" string="Petani"/>
+                <field name="ppl_id" string="PPL"/>
                 <field name="kecamatan_id" string="Kecamatan"/>
                 <field name="desa_id" string="Desa"/>
                 <filter name="filter_tr" string="TR" domain="[('jenis_register','=','TR')]"/>
@@ -111,6 +116,7 @@
                     <filter name="group_kud" string="KUD" context="{'group_by': 'kud_id'}"/>
                     <filter name="group_kecamatan" string="Kecamatan" context="{'group_by': 'kecamatan_id'}"/>
                     <filter name="group_petani" string="Petani" context="{'group_by': 'petani_id'}"/>
+                    <filter name="group_ppl" string="PPL" context="{'group_by': 'ppl_id'}"/>
                 </group>
             </search>
         </field>
