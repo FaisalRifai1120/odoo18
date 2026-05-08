@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Root Menu -->
+    <!-- Root Menu: tampil untuk semua role KA -->
     <menuitem id="menu_ka_sita_root"
               name="KA SITA"
               sequence="20"
               web_icon="ka_sita,static/description/icon.png"
-              groups="ka_user_management.group_ka_operator,ka_user_management.group_ka_admin"/>
+              groups="ka_user_management.group_ka_ppl,ka_user_management.group_ka_operator,ka_user_management.group_ka_admin"/>
 
     <!-- Register -->
     <menuitem id="menu_ka_sita_register"

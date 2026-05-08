@@ -2,52 +2,96 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- PPL: hanya read -->
+        <!-- ══════════════════════════════════════════
+             PPL: hanya lihat register milik sendiri
+        ══════════════════════════════════════════ -->
         <record id="rule_register_ppl" model="ir.rule">
-            <field name="name">Register: PPL read only</field>
+            <field name="name">Register: PPL hanya lihat milik sendiri</field>
             <field name="model_id" ref="model_ka_sita_register"/>
             <field name="groups" eval="[(4, ref('ka_user_management.group_ka_ppl'))]"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="domain_force">
+                [('ppl_id.user_id', '=', user.id)]
+            </field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- KASUBSI: hanya read -->
+        <!-- ══════════════════════════════════════════
+             KASUBSI: lihat register PPL bawahannya
+        ══════════════════════════════════════════ -->
         <record id="rule_register_kasubsi" model="ir.rule">
-            <field name="name">Register: KASUBSI read only</field>
+            <field name="name">Register: KASUBSI lihat register PPL bawahannya</field>
             <field name="model_id" ref="model_ka_sita_register"/>
             <field name="groups" eval="[(4, ref('ka_user_management.group_ka_kasubsi'))]"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="domain_force">
+                [('ppl_id.atasan_id.user_id', '=', user.id)]
+            </field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- KASI: hanya read -->
+        <!-- ══════════════════════════════════════════
+             KASI: lihat register PPL bawahan KASUBSInya
+        ══════════════════════════════════════════ -->
         <record id="rule_register_kasi" model="ir.rule">
-            <field name="name">Register: KASI read only</field>
+            <field name="name">Register: KASI lihat register bawahan KASUBSInya</field>
             <field name="model_id" ref="model_ka_sita_register"/>
             <field name="groups" eval="[(4, ref('ka_user_management.group_ka_kasi'))]"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="domain_force">
+                [('ppl_id.atasan_id.atasan_id.user_id', '=', user.id)]
+            </field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- KABAG: hanya read -->
+        <!-- ══════════════════════════════════════════
+             KABAG: lihat register semua hierarki bawahnya
+        ══════════════════════════════════════════ -->
         <record id="rule_register_kabag" model="ir.rule">
-            <field name="name">Register: KABAG read only</field>
+            <field name="name">Register: KABAG lihat semua hierarki bawahnya</field>
             <field name="model_id" ref="model_ka_sita_register"/>
             <field name="groups" eval="[(4, ref('ka_user_management.group_ka_kabag'))]"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="domain_force">
+                [('ppl_id.atasan_id.atasan_id.atasan_id.user_id', '=', user.id)]
+            </field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- ══════════════════════════════════════════
+             OPERATOR: akses semua register (CRUD)
+        ══════════════════════════════════════════ -->
+        <record id="rule_register_operator" model="ir.rule">
+            <field name="name">Register: Operator akses semua</field>
+            <field name="model_id" ref="model_ka_sita_register"/>
+            <field name="groups" eval="[(4, ref('ka_user_management.group_ka_operator'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- ══════════════════════════════════════════
+             ADMINISTRATOR: akses penuh semua register
+        ══════════════════════════════════════════ -->
+        <record id="rule_register_admin" model="ir.rule">
+            <field name="name">Register: Administrator akses penuh</field>
+            <field name="model_id" ref="model_ka_sita_register"/>
+            <field name="groups" eval="[(4, ref('ka_user_management.group_ka_admin'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
         </record>
 
     </data>
