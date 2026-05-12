@@ -15,27 +15,31 @@ class KaUserProfile(models.Model):
         ondelete='cascade', tracking=True,
         domain=[('share', '=', False)]
     )
-    name = fields.Char(
-        string='Nama Lengkap', required=True, tracking=True
-    )
-    nip = fields.Char(
-        string='NIP', tracking=True
-    )
-    employee_code = fields.Char(
-        string='Kode Pegawai', tracking=True
-    )
+    name = fields.Char(string='Nama Lengkap', required=True, tracking=True)
+    nip = fields.Char(string='NIP', tracking=True)
+    employee_code = fields.Char(string='Kode Pegawai', tracking=True)
     phone = fields.Char(string='No. Telepon', tracking=True)
     email = fields.Char(
         string='Email',
         related='user_id.email', store=True, readonly=False
     )
 
+    # ── Bagian ─────────────────────────────────────────────────
+    bagian = fields.Selection([
+        ('tanaman',    'Tanaman'),
+        ('tuk',        'TUK'),
+        ('teknik',     'Teknik'),
+        ('pabrikasi',  'Pabrikasi'),
+        ('qc',         'QC'),
+    ], string='Bagian', tracking=True)
+
     # ── Jabatan / Peran ────────────────────────────────────────
     role = fields.Selection([
-        ('ppl',       'PPL (Penyuluh Pertanian Lapangan)'),
-        ('kasubsi',   'KASUBSI (Kepala Sub Seksi)'),
-        ('kasi',      'KASI (Kepala Seksi)'),
+        ('pimpinan',  'Pemimpin Pabrik'),
         ('kabag',     'KABAG (Kepala Bagian)'),
+        ('kasi',      'KASI (Kepala Seksi)'),
+        ('kasubsi',   'KASUBSI (Kepala Sub Seksi)'),
+        ('ppl',       'PPL (Penyuluh Pertanian Lapangan)'),
         ('operator',  'Operator'),
         ('admin',     'Administrator'),
     ], string='Jabatan / Peran', required=True, tracking=True)
@@ -43,7 +47,7 @@ class KaUserProfile(models.Model):
     # ── Struktur Atasan ────────────────────────────────────────
     atasan_id = fields.Many2one(
         'ka.user.profile', string='Atasan Langsung',
-        domain="[('role', 'in', ['kasubsi','kasi','kabag','admin'])]",
+        domain="[('role', 'in', ['kabag','kasi','kasubsi','pimpinan','admin'])]",
         tracking=True
     )
 
@@ -58,19 +62,35 @@ class KaUserProfile(models.Model):
     role_label = fields.Char(
         string='Label Jabatan', compute='_compute_role_label', store=True
     )
+    bagian_label = fields.Char(
+        string='Label Bagian', compute='_compute_bagian_label', store=True
+    )
 
     @api.depends('role')
     def _compute_role_label(self):
         role_map = {
-            'ppl':      'PPL',
-            'kasubsi':  'KASUBSI',
-            'kasi':     'KASI',
+            'pimpinan': 'Pemimpin Pabrik',
             'kabag':    'KABAG',
+            'kasi':     'KASI',
+            'kasubsi':  'KASUBSI',
+            'ppl':      'PPL',
             'operator': 'Operator',
             'admin':    'Administrator',
         }
         for rec in self:
             rec.role_label = role_map.get(rec.role, '')
+
+    @api.depends('bagian')
+    def _compute_bagian_label(self):
+        bagian_map = {
+            'tanaman':   'Tanaman',
+            'tuk':       'TUK',
+            'teknik':    'Teknik',
+            'pabrikasi': 'Pabrikasi',
+            'qc':        'QC',
+        }
+        for rec in self:
+            rec.bagian_label = bagian_map.get(rec.bagian, '')
 
     # ── Constraint ────────────────────────────────────────────
     _sql_constraints = [
@@ -80,14 +100,27 @@ class KaUserProfile(models.Model):
          'Kode Pegawai harus unik!'),
     ]
 
-    @api.constrains('role', 'atasan_id')
-    def _check_atasan_role(self):
-        """PPL wajib memiliki atasan."""
+    @api.constrains('role', 'atasan_id', 'bagian')
+    def _check_role_constraints(self):
         for rec in self:
-            if rec.role == 'ppl' and not rec.atasan_id:
+            # PPL wajib di bagian Tanaman
+            if rec.role == 'ppl':
+                if rec.bagian != 'tanaman':
+                    raise ValidationError(
+                        _('PPL hanya boleh ada di Bagian Tanaman.')
+                    )
+                if not rec.atasan_id:
+                    raise ValidationError(
+                        _('PPL harus memiliki Atasan Langsung.')
+                    )
+            # Operator hanya boleh di Tanaman atau TUK
+            if rec.role == 'operator' and rec.bagian not in ['tanaman', 'tuk', False]:
                 raise ValidationError(
-                    _('PPL harus memiliki Atasan Langsung (KASUBSI/KASI/KABAG).')
+                    _('Operator hanya boleh di Bagian Tanaman atau TUK.')
                 )
+            # Pimpinan tidak perlu bagian
+            if rec.role == 'pimpinan':
+                pass
 
     # ── Sync groups Odoo ──────────────────────────────────────
     @api.model_create_multi
@@ -99,7 +132,7 @@ class KaUserProfile(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if 'role' in vals:
+        if 'role' in vals or 'bagian' in vals:
             self._sync_odoo_groups()
         return res
 
@@ -108,6 +141,7 @@ class KaUserProfile(models.Model):
         group_map = {
             'admin':    'ka_user_management.group_ka_admin',
             'operator': 'ka_user_management.group_ka_operator',
+            'pimpinan': 'ka_user_management.group_ka_pimpinan',
             'kabag':    'ka_user_management.group_ka_kabag',
             'kasi':     'ka_user_management.group_ka_kasi',
             'kasubsi':  'ka_user_management.group_ka_kasubsi',
@@ -116,7 +150,6 @@ class KaUserProfile(models.Model):
         all_groups = list(group_map.values())
         for rec in self:
             user = rec.user_id
-            # Hapus semua grup KA dulu
             for xml_id in all_groups:
                 try:
                     grp = self.env.ref(xml_id)
@@ -124,7 +157,6 @@ class KaUserProfile(models.Model):
                         grp.write({'users': [(3, user.id)]})
                 except Exception:
                     pass
-            # Tambahkan grup sesuai peran
             target_xml = group_map.get(rec.role)
             if target_xml:
                 try:

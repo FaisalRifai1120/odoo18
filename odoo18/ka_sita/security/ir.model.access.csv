@@ -1,6 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ka_register_admin,ka.sita.register admin,model_ka_sita_register,ka_user_management.group_ka_admin,1,1,1,1
 access_ka_register_operator,ka.sita.register operator,model_ka_sita_register,ka_user_management.group_ka_operator,1,1,1,0
+access_ka_register_pimpinan,ka.sita.register pimpinan,model_ka_sita_register,ka_user_management.group_ka_pimpinan,1,0,0,0
 access_ka_register_kabag,ka.sita.register kabag,model_ka_sita_register,ka_user_management.group_ka_kabag,1,0,0,0
 access_ka_register_kasi,ka.sita.register kasi,model_ka_sita_register,ka_user_management.group_ka_kasi,1,0,0,0
 access_ka_register_kasubsi,ka.sita.register kasubsi,model_ka_sita_register,ka_user_management.group_ka_kasubsi,1,0,0,0
