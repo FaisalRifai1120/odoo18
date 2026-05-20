@@ -7,6 +7,11 @@
         <field name="arch" type="xml">
             <form string="Profil User KA">
                 <header>
+                    <button name="action_recompute_all_groups"
+                            string="Sync Ulang Semua Grup"
+                            type="object"
+                            class="btn-secondary"
+                            groups="ka_user_management.group_ka_admin"/>
                     <button name="action_set_active" string="Aktifkan"
                             type="object" class="btn-success"
                             invisible="state == 'active'"/>

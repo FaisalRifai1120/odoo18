@@ -14,36 +14,36 @@
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- KASUBSI: lihat register PPL bawahannya -->
+        <!-- KASUBSI: lihat register PPL bawahannya saja -->
         <record id="rule_register_kasubsi" model="ir.rule">
-            <field name="name">Register: KASUBSI lihat hierarki</field>
+            <field name="name">Register: KASUBSI lihat hierarki bawahan</field>
             <field name="model_id" ref="model_ka_sita_register"/>
             <field name="groups" eval="[(4, ref('ka_user_management.group_ka_kasubsi'))]"/>
-            <field name="domain_force">['|', ('ppl_id.atasan_id.user_id', '=', user.id), ('ppl_id.user_id', '=', user.id)]</field>
+            <field name="domain_force">[('ppl_id.atasan_id.user_id', '=', user.id)]</field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- KASI: lihat hierarki bawahan KASUBSInya -->
+        <!-- KASI: lihat register PPL bawahan KASUBSInya -->
         <record id="rule_register_kasi" model="ir.rule">
-            <field name="name">Register: KASI lihat hierarki</field>
+            <field name="name">Register: KASI lihat hierarki bawahan</field>
             <field name="model_id" ref="model_ka_sita_register"/>
             <field name="groups" eval="[(4, ref('ka_user_management.group_ka_kasi'))]"/>
-            <field name="domain_force">['|', '|', ('ppl_id.atasan_id.atasan_id.user_id', '=', user.id), ('ppl_id.atasan_id.user_id', '=', user.id), ('ppl_id.user_id', '=', user.id)]</field>
+            <field name="domain_force">[('ppl_id.atasan_id.atasan_id.user_id', '=', user.id)]</field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- KABAG: lihat semua hierarki bawahnya -->
+        <!-- KABAG: lihat register semua hierarki bawahnya -->
         <record id="rule_register_kabag" model="ir.rule">
-            <field name="name">Register: KABAG lihat hierarki</field>
+            <field name="name">Register: KABAG lihat hierarki bawahan</field>
             <field name="model_id" ref="model_ka_sita_register"/>
             <field name="groups" eval="[(4, ref('ka_user_management.group_ka_kabag'))]"/>
-            <field name="domain_force">['|', '|', '|', ('ppl_id.atasan_id.atasan_id.atasan_id.user_id', '=', user.id), ('ppl_id.atasan_id.atasan_id.user_id', '=', user.id), ('ppl_id.atasan_id.user_id', '=', user.id), ('ppl_id.user_id', '=', user.id)]</field>
+            <field name="domain_force">[('ppl_id.atasan_id.atasan_id.atasan_id.user_id', '=', user.id)]</field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>

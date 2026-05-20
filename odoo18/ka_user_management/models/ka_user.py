@@ -170,3 +170,19 @@ class KaUserProfile(models.Model):
 
     def action_set_active(self):
         self.write({'state': 'active', 'active': True})
+
+    def action_recompute_all_groups(self):
+        """Recompute grup Odoo untuk semua profil user KA."""
+        all_profiles = self.search([])
+        for profile in all_profiles:
+            profile._sync_odoo_groups()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Selesai',
+                'message': f'{len(all_profiles)} profil user berhasil di-sync ulang.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
