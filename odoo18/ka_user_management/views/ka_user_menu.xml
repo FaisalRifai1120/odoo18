@@ -1,25 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- Root Menu -->
-    <menuitem id="menu_ka_user_root"
-              name="KA User"
-              sequence="5"
-              web_icon="ka_user_management,static/description/icon.png"
-              groups="ka_user_management.group_ka_admin"/>
-
-    <!-- User Management -->
-    <menuitem id="menu_ka_user_management"
-              name="Manajemen User"
-              parent="menu_ka_user_root"
-              sequence="10"
-              groups="ka_user_management.group_ka_admin"/>
-
-    <menuitem id="menu_ka_user_profile"
-              name="Profil User KA"
-              parent="menu_ka_user_management"
-              action="action_ka_user_profile"
-              sequence="10"
-              groups="ka_user_management.group_ka_admin"/>
-
+    <menuitem id="menu_ka_user_root" name="KA User" sequence="5" groups="ka_user_management.group_ka_admin"/>
+    <menuitem id="menu_ka_user_management" name="Manajemen User" parent="menu_ka_user_root" sequence="10" groups="ka_user_management.group_ka_admin"/>
+    <menuitem id="menu_ka_user_profile" name="Profil User KA" parent="menu_ka_user_management" action="action_ka_user_profile" sequence="10" groups="ka_user_management.group_ka_admin"/>
 </odoo>

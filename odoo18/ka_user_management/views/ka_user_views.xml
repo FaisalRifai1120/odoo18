@@ -7,33 +7,21 @@
         <field name="arch" type="xml">
             <form string="Profil User KA">
                 <header>
-                    <button name="action_recompute_all_groups"
-                            string="Sync Ulang Semua Grup"
-                            type="object"
-                            class="btn-secondary"
-                            groups="ka_user_management.group_ka_admin"/>
-                    <button name="action_set_active" string="Aktifkan"
-                            type="object" class="btn-success"
-                            invisible="state == 'active'"/>
-                    <button name="action_set_inactive" string="Nonaktifkan"
-                            type="object" class="btn-warning"
-                            invisible="state == 'inactive'"/>
-                    <field name="state" widget="statusbar"
-                           statusbar_visible="active,inactive"/>
+                    <button name="action_recompute_all_groups" string="Sync Ulang Semua Grup" type="object" class="btn-secondary" groups="ka_user_management.group_ka_admin"/>
+                    <button name="action_set_active" string="Aktifkan" type="object" class="btn-success" invisible="state == 'active'"/>
+                    <button name="action_set_inactive" string="Nonaktifkan" type="object" class="btn-warning" invisible="state == 'inactive'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,inactive"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
                         <label for="name" string="Nama Lengkap"/>
-                        <h1>
-                            <field name="name" placeholder="Nama Lengkap..."/>
-                        </h1>
+                        <h1><field name="name" placeholder="Nama Lengkap..."/></h1>
                         <h3 class="text-muted">
                             <field name="role_label" readonly="1"/>
                             <span invisible="not bagian"> — </span>
                             <field name="bagian_label" readonly="1"/>
                         </h3>
                     </div>
-
                     <group>
                         <group string="Informasi Akun">
                             <field name="user_id" options="{'no_create': False}"/>
@@ -42,16 +30,12 @@
                         </group>
                         <group string="Informasi Jabatan">
                             <field name="role"/>
-                            <field name="bagian"
-                                   invisible="role in ['pimpinan', 'admin']"
-                                   required="role not in ['pimpinan', 'admin']"/>
+                            <field name="bagian" invisible="role in ['pimpinan', 'admin']" required="role not in ['pimpinan', 'admin']"/>
                             <field name="nip"/>
                             <field name="employee_code"/>
-                            <field name="atasan_id"
-                                   invisible="role in ['pimpinan', 'admin']"/>
+                            <field name="atasan_id" invisible="role in ['pimpinan', 'admin']"/>
                         </group>
                     </group>
-
                     <div invisible="not id" style="margin-top: 16px;">
                         <div class="oe_chatter">
                             <field name="message_follower_ids" widget="mail_followers"/>
@@ -67,10 +51,7 @@
         <field name="name">ka.user.profile.list</field>
         <field name="model">ka.user.profile</field>
         <field name="arch" type="xml">
-            <list string="Daftar User KA"
-                  decoration-muted="state == 'inactive'"
-                  decoration-info="role == 'ppl'"
-                  decoration-success="role == 'admin'">
+            <list string="Daftar User KA" decoration-muted="state == 'inactive'" decoration-info="role == 'ppl'" decoration-success="role == 'admin'">
                 <field name="employee_code" optional="show"/>
                 <field name="name"/>
                 <field name="role"/>
@@ -80,7 +61,6 @@
                 <field name="nip" optional="hide"/>
                 <field name="atasan_id" optional="show"/>
                 <field name="phone" optional="hide"/>
-                <field name="email" optional="hide"/>
                 <field name="state"/>
             </list>
         </field>
@@ -97,7 +77,6 @@
                 <field name="role" string="Jabatan"/>
                 <field name="bagian" string="Bagian"/>
                 <field name="atasan_id" string="Atasan"/>
-
                 <filter name="filter_pimpinan" string="Pemimpin Pabrik" domain="[('role','=','pimpinan')]"/>
                 <filter name="filter_kabag" string="KABAG" domain="[('role','=','kabag')]"/>
                 <filter name="filter_kasi" string="KASI" domain="[('role','=','kasi')]"/>
@@ -108,18 +87,12 @@
                 <separator/>
                 <filter name="filter_tanaman" string="Bagian Tanaman" domain="[('bagian','=','tanaman')]"/>
                 <filter name="filter_tuk" string="Bagian TUK" domain="[('bagian','=','tuk')]"/>
-                <filter name="filter_teknik" string="Bagian Teknik" domain="[('bagian','=','teknik')]"/>
-                <filter name="filter_pabrikasi" string="Bagian Pabrikasi" domain="[('bagian','=','pabrikasi')]"/>
-                <filter name="filter_qc" string="Bagian QC" domain="[('bagian','=','qc')]"/>
-                <separator/>
                 <filter name="filter_active" string="Aktif" domain="[('state','=','active')]"/>
                 <filter name="filter_inactive" string="Tidak Aktif" domain="[('state','=','inactive')]"/>
-
                 <group expand="0" string="Kelompokkan Berdasarkan">
                     <filter name="group_role" string="Jabatan" context="{'group_by': 'role'}"/>
                     <filter name="group_bagian" string="Bagian" context="{'group_by': 'bagian'}"/>
                     <filter name="group_atasan" string="Atasan" context="{'group_by': 'atasan_id'}"/>
-                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                 </group>
             </search>
         </field>
@@ -130,11 +103,6 @@
         <field name="res_model">ka.user.profile</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_ka_user_profile_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Tambahkan Profil User KA Pertama!
-            </p>
-        </field>
     </record>
 
 </odoo>

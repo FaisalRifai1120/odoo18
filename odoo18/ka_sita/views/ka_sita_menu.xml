@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <menuitem id="menu_ka_sita_root" name="KA SITA" sequence="20" web_icon="ka_sita,static/description/icon.png" groups="ka_user_management.group_ka_ppl,ka_user_management.group_ka_kasubsi,ka_user_management.group_ka_kasi,ka_user_management.group_ka_kabag,ka_user_management.group_ka_pimpinan,ka_user_management.group_ka_operator,ka_user_management.group_ka_admin"/>
-
     <menuitem id="menu_ka_sita_register" name="Register" parent="menu_ka_sita_root" action="action_ka_register" sequence="10"/>
-
 </odoo>

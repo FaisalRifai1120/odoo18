@@ -7,11 +7,7 @@
         <field name="arch" type="xml">
             <form string="Data Petani">
                 <header>
-                    <button name="action_recompute_all_register"
-                            string="Recompute Jumlah Register"
-                            type="object"
-                            class="btn-secondary"
-                            groups="ka_user_management.group_ka_admin"/>
+                    <button name="action_recompute_all_register" string="Recompute Jumlah Register" type="object" class="btn-secondary" groups="ka_user_management.group_ka_admin"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -21,7 +17,6 @@
                             <field name="kode_akun" placeholder="Kode Akun..."/>
                         </h3>
                     </div>
-
                     <group>
                         <group string="Identitas">
                             <field name="no_ktp"/>
@@ -34,12 +29,9 @@
                             <field name="nama_bank"/>
                         </group>
                     </group>
-
                     <group>
                         <field name="jumlah_register" readonly="1"/>
                     </group>
-
-                    <!-- Chatter di dalam sheet agar lebar mengikuti form -->
                     <div invisible="not id" style="margin-top: 16px;">
                         <div class="oe_chatter">
                             <field name="message_follower_ids" widget="mail_followers"/>
@@ -78,8 +70,7 @@
                 <field name="no_ktp"/>
                 <field name="ppl_id"/>
                 <group expand="0" string="Kelompokkan">
-                    <filter name="group_ppl" string="PPL"
-                            context="{'group_by': 'ppl_id'}"/>
+                    <filter name="group_ppl" string="PPL" context="{'group_by': 'ppl_id'}"/>
                 </group>
             </search>
         </field>

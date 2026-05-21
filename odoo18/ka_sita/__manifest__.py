@@ -4,11 +4,6 @@
     'version': '18.0.1.0',
     'category': 'Agriculture',
     'summary': 'Modul SITA: Sistem Informasi Tanaman - Register',
-    'description': """
-        Modul KA SITA mencakup:
-        - Register (TR/TS, SBH/SPT, Harian/Periode)
-        - Integrasi dengan Petani, KUD, Wilayah dari modul KA Tanaman
-    """,
     'author': 'PDE KBA',
     'depends': ['base', 'mail', 'ka_user_management', 'ka_tanaman'],
     'data': [

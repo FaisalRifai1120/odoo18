@@ -4,12 +4,6 @@
     'version': '18.0.1.0',
     'category': 'Agriculture',
     'summary': 'Modul Master Data Tanaman: Wilayah, KUD, dan Petani',
-    'description': """
-        Modul KA Tanaman mencakup:
-        - Master Data Wilayah (Provinsi, Kota/Kabupaten, Kecamatan, Desa)
-        - Master Data KUD
-        - Master Data Petani
-    """,
     'author': 'PDE KBA',
     'depends': ['base', 'mail', 'ka_user_management'],
     'data': [

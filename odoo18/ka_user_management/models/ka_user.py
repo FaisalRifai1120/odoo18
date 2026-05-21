@@ -9,120 +9,67 @@ class KaUserProfile(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
 
-    # ── Identitas ──────────────────────────────────────────────
-    user_id = fields.Many2one(
-        'res.users', string='User Odoo', required=True,
-        ondelete='cascade', tracking=True,
-        domain=[('share', '=', False)]
-    )
+    user_id = fields.Many2one('res.users', string='User Odoo', required=True, ondelete='cascade', tracking=True, domain=[('share', '=', False)])
     name = fields.Char(string='Nama Lengkap', required=True, tracking=True)
     nip = fields.Char(string='NIP', tracking=True)
     employee_code = fields.Char(string='Kode Pegawai', tracking=True)
     phone = fields.Char(string='No. Telepon', tracking=True)
-    email = fields.Char(
-        string='Email',
-        related='user_id.email', store=True, readonly=False
-    )
+    email = fields.Char(string='Email', related='user_id.email', store=True, readonly=False)
 
-    # ── Bagian ─────────────────────────────────────────────────
     bagian = fields.Selection([
-        ('tanaman',    'Tanaman'),
-        ('tuk',        'TUK'),
-        ('teknik',     'Teknik'),
-        ('pabrikasi',  'Pabrikasi'),
-        ('qc',         'QC'),
+        ('tanaman',   'Tanaman'),
+        ('tuk',       'TUK'),
+        ('teknik',    'Teknik'),
+        ('pabrikasi', 'Pabrikasi'),
+        ('qc',        'QC'),
     ], string='Bagian', tracking=True)
 
-    # ── Jabatan / Peran ────────────────────────────────────────
     role = fields.Selection([
-        ('pimpinan',  'Pemimpin Pabrik'),
-        ('kabag',     'KABAG (Kepala Bagian)'),
-        ('kasi',      'KASI (Kepala Seksi)'),
-        ('kasubsi',   'KASUBSI (Kepala Sub Seksi)'),
-        ('ppl',       'PPL (Penyuluh Pertanian Lapangan)'),
-        ('operator',  'Operator'),
-        ('admin',     'Administrator'),
+        ('pimpinan', 'Pemimpin Pabrik'),
+        ('kabag',    'KABAG (Kepala Bagian)'),
+        ('kasi',     'KASI (Kepala Seksi)'),
+        ('kasubsi',  'KASUBSI (Kepala Sub Seksi)'),
+        ('ppl',      'PPL (Penyuluh Pertanian Lapangan)'),
+        ('operator', 'Operator'),
+        ('admin',    'Administrator'),
     ], string='Jabatan / Peran', required=True, tracking=True)
 
-    # ── Struktur Atasan ────────────────────────────────────────
-    atasan_id = fields.Many2one(
-        'ka.user.profile', string='Atasan Langsung',
-        domain="[('role', 'in', ['kabag','kasi','kasubsi','pimpinan','admin'])]",
-        tracking=True
-    )
+    atasan_id = fields.Many2one('ka.user.profile', string='Atasan Langsung', domain="[('role', 'in', ['kabag','kasi','kasubsi','pimpinan','admin'])]", tracking=True)
 
-    # ── Status ─────────────────────────────────────────────────
     active = fields.Boolean(default=True, tracking=True)
-    state = fields.Selection([
-        ('active',   'Aktif'),
-        ('inactive', 'Tidak Aktif'),
-    ], string='Status', default='active', tracking=True)
+    state = fields.Selection([('active', 'Aktif'), ('inactive', 'Tidak Aktif')], string='Status', default='active', tracking=True)
 
-    # ── Computed ───────────────────────────────────────────────
-    role_label = fields.Char(
-        string='Label Jabatan', compute='_compute_role_label', store=True
-    )
-    bagian_label = fields.Char(
-        string='Label Bagian', compute='_compute_bagian_label', store=True
-    )
+    role_label = fields.Char(string='Label Jabatan', compute='_compute_role_label', store=True)
+    bagian_label = fields.Char(string='Label Bagian', compute='_compute_bagian_label', store=True)
 
     @api.depends('role')
     def _compute_role_label(self):
-        role_map = {
-            'pimpinan': 'Pemimpin Pabrik',
-            'kabag':    'KABAG',
-            'kasi':     'KASI',
-            'kasubsi':  'KASUBSI',
-            'ppl':      'PPL',
-            'operator': 'Operator',
-            'admin':    'Administrator',
-        }
+        role_map = {'pimpinan': 'Pemimpin Pabrik', 'kabag': 'KABAG', 'kasi': 'KASI', 'kasubsi': 'KASUBSI', 'ppl': 'PPL', 'operator': 'Operator', 'admin': 'Administrator'}
         for rec in self:
             rec.role_label = role_map.get(rec.role, '')
 
     @api.depends('bagian')
     def _compute_bagian_label(self):
-        bagian_map = {
-            'tanaman':   'Tanaman',
-            'tuk':       'TUK',
-            'teknik':    'Teknik',
-            'pabrikasi': 'Pabrikasi',
-            'qc':        'QC',
-        }
+        bagian_map = {'tanaman': 'Tanaman', 'tuk': 'TUK', 'teknik': 'Teknik', 'pabrikasi': 'Pabrikasi', 'qc': 'QC'}
         for rec in self:
             rec.bagian_label = bagian_map.get(rec.bagian, '')
 
-    # ── Constraint ────────────────────────────────────────────
     _sql_constraints = [
-        ('user_id_uniq', 'unique(user_id)',
-         'Satu akun Odoo hanya boleh memiliki satu profil KA!'),
-        ('employee_code_uniq', 'UNIQUE(employee_code)',
-         'Kode Pegawai harus unik!'),
+        ('user_id_uniq', 'unique(user_id)', 'Satu akun Odoo hanya boleh memiliki satu profil KA!'),
+        ('employee_code_uniq', 'UNIQUE(employee_code)', 'Kode Pegawai harus unik!'),
     ]
 
     @api.constrains('role', 'atasan_id', 'bagian')
     def _check_role_constraints(self):
         for rec in self:
-            # PPL wajib di bagian Tanaman
             if rec.role == 'ppl':
                 if rec.bagian != 'tanaman':
-                    raise ValidationError(
-                        _('PPL hanya boleh ada di Bagian Tanaman.')
-                    )
+                    raise ValidationError(_('PPL hanya boleh ada di Bagian Tanaman.'))
                 if not rec.atasan_id:
-                    raise ValidationError(
-                        _('PPL harus memiliki Atasan Langsung.')
-                    )
-            # Operator hanya boleh di Tanaman atau TUK
+                    raise ValidationError(_('PPL harus memiliki Atasan Langsung.'))
             if rec.role == 'operator' and rec.bagian not in ['tanaman', 'tuk', False]:
-                raise ValidationError(
-                    _('Operator hanya boleh di Bagian Tanaman atau TUK.')
-                )
-            # Pimpinan tidak perlu bagian
-            if rec.role == 'pimpinan':
-                pass
+                raise ValidationError(_('Operator hanya boleh di Bagian Tanaman atau TUK.'))
 
-    # ── Sync groups Odoo ──────────────────────────────────────
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
@@ -137,7 +84,6 @@ class KaUserProfile(models.Model):
         return res
 
     def _sync_odoo_groups(self):
-        """Sinkronisasi grup Odoo berdasarkan peran."""
         group_map = {
             'admin':    'ka_user_management.group_ka_admin',
             'operator': 'ka_user_management.group_ka_operator',
@@ -172,7 +118,6 @@ class KaUserProfile(models.Model):
         self.write({'state': 'active', 'active': True})
 
     def action_recompute_all_groups(self):
-        """Recompute grup Odoo untuk semua profil user KA."""
         all_profiles = self.search([])
         for profile in all_profiles:
             profile._sync_odoo_groups()

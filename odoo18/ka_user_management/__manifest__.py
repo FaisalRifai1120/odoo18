@@ -3,16 +3,7 @@
     'name': 'KA User Management',
     'version': '18.0.1.0',
     'category': 'Administration',
-    'summary': 'Manajemen User berdasarkan Struktur Organisasi (PPL, KASUBSI, KASI, KABAG)',
-    'description': """
-        Modul manajemen user yang mengacu pada struktur organisasi:
-        - PPL (Penyuluh Pertanian Lapangan)
-        - KASUBSI (Kepala Sub Seksi)
-        - KASI (Kepala Seksi)
-        - KABAG (Kepala Bagian)
-        - Administrator
-        - Operator
-    """,
+    'summary': 'Manajemen User berdasarkan Struktur Organisasi',
     'author': 'PDE KBA',
     'depends': ['base', 'mail'],
     'data': [

@@ -9,9 +9,7 @@
                 <sheet>
                     <div class="oe_title">
                         <label for="nama_register" string="Nama Register"/>
-                        <h1>
-                            <field name="nama_register" placeholder="Nama Register..."/>
-                        </h1>
+                        <h1><field name="nama_register" placeholder="Nama Register..."/></h1>
                         <h3 class="text-muted">
                             <field name="kode_register" placeholder="Kode Register..."/>
                         </h3>
@@ -33,13 +31,10 @@
                     <group string="Data Petani">
                         <group>
                             <field name="petani_id" options="{'no_create': True}"/>
-                            <field name="account_petani_id"
-                                   string="Account Petani (Kode - Nama)"
-                                   options="{'no_create': True}"/>
+                            <field name="account_petani_id" string="Account Petani (Kode - Nama)" options="{'no_create': True}"/>
                             <field name="no_ktp"/>
                         </group>
                         <group>
-                            <!-- PPL: otomatis dari petani, masih bisa diedit -->
                             <field name="ppl_id" options="{'no_create': True}"/>
                             <field name="is_transfer" widget="boolean_toggle"/>
                         </group>
@@ -55,14 +50,12 @@
                         </group>
                     </group>
 
-                    <!-- Chatter di dalam sheet agar lebar mengikuti form -->
                     <div invisible="not id" style="margin-top: 16px;">
                         <div class="oe_chatter">
                             <field name="message_follower_ids" widget="mail_followers"/>
                             <field name="message_ids" widget="mail_thread"/>
                         </div>
                     </div>
-
                 </sheet>
             </form>
         </field>
