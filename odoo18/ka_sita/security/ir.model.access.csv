@@ -6,3 +6,5 @@ access_ka_register_kabag,ka.sita.register kabag,model_ka_sita_register,ka_user_m
 access_ka_register_kasi,ka.sita.register kasi,model_ka_sita_register,ka_user_management.group_ka_kasi,1,0,0,0
 access_ka_register_kasubsi,ka.sita.register kasubsi,model_ka_sita_register,ka_user_management.group_ka_kasubsi,1,0,0,0
 access_ka_register_ppl,ka.sita.register ppl,model_ka_sita_register,ka_user_management.group_ka_ppl,1,0,0,0
+access_ka_sync_config_admin,ka.sync.config admin,model_ka_sync_config,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_sync_config_operator,ka.sync.config operator,model_ka_sync_config,ka_user_management.group_ka_operator,1,0,0,0
