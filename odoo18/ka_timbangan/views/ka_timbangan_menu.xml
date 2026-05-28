@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ka_timbangan_root" name="KA Timbangan" sequence="30" web_icon="ka_timbangan,static/description/icon.png" groups="ka_user_management.group_ka_ppl,ka_user_management.group_ka_kasubsi,ka_user_management.group_ka_kasi,ka_user_management.group_ka_kabag,ka_user_management.group_ka_pimpinan,ka_user_management.group_ka_operator,ka_user_management.group_ka_admin"/>
+
+    <!-- Tebu -->
+    <menuitem id="menu_ka_timbang_tebu" name="Tebu" parent="menu_ka_timbangan_root" action="action_ka_timbang_tebu" sequence="10"/>
+
+    <!-- Sinkronisasi -->
+    <menuitem id="menu_ka_timbangan_sync" name="Sinkronisasi" parent="menu_ka_timbangan_root" sequence="90" groups="ka_user_management.group_ka_admin"/>
+
+    <menuitem id="menu_ka_timbang_sync_config" name="Konfigurasi Sinkronisasi" parent="menu_ka_timbangan_sync" action="action_ka_timbang_sync" sequence="10" groups="ka_user_management.group_ka_admin"/>
+
+</odoo>

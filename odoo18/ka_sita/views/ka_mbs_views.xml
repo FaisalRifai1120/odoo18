@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_mbs_form" model="ir.ui.view">
+        <field name="name">ka.mbs.form</field>
+        <field name="model">ka.mbs</field>
+        <field name="arch" type="xml">
+            <form string="Master MBS">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="label" string="Label MBS"/>
+                        <h1><field name="label" placeholder="Label MBS..."/></h1>
+                        <h3 class="text-muted">
+                            <span>Kode: </span>
+                            <field name="kode" placeholder="0"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="kode"/>
+                            <field name="label"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="keterangan"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_mbs_list" model="ir.ui.view">
+        <field name="name">ka.mbs.list</field>
+        <field name="model">ka.mbs</field>
+        <field name="arch" type="xml">
+            <list string="Daftar MBS" editable="bottom">
+                <field name="kode"/>
+                <field name="label"/>
+                <field name="keterangan" optional="hide"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_mbs_search" model="ir.ui.view">
+        <field name="name">ka.mbs.search</field>
+        <field name="model">ka.mbs</field>
+        <field name="arch" type="xml">
+            <search string="Cari MBS">
+                <field name="kode" string="Kode"/>
+                <field name="label" string="Label"/>
+                <filter name="filter_active" string="Aktif" domain="[('active','=',True)]"/>
+                <filter name="filter_inactive" string="Tidak Aktif" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_mbs" model="ir.actions.act_window">
+        <field name="name">Master MBS</field>
+        <field name="res_model">ka.mbs</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_mbs_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tambahkan Master MBS Pertama!
+            </p>
+            <p>
+                Mapping kode angka MBS dari sistem timbangan ke label yang mudah dipahami.
+                Contoh: Kode 1 → MBS *, Kode 10 → Tebu Terbakar
+            </p>
+        </field>
+    </record>
+
+</odoo>

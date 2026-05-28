@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_timbang_tebu_form" model="ir.ui.view">
+        <field name="name">ka.timbang.tebu.form</field>
+        <field name="model">ka.timbang.tebu</field>
+        <field name="arch" type="xml">
+            <form string="Data Timbang Tebu">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="spta_id" string="Nomor Timbangan"/>
+                        <h1><field name="spta_id" readonly="1"/></h1>
+                        <h3 class="text-muted">
+                            <field name="truck_id" readonly="1"/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group string="Identitas">
+                            <field name="no_spta" readonly="1"/>
+                            <field name="kd_antrian" readonly="1"/>
+                            <field name="register" readonly="1"/>
+                            <field name="register_id" readonly="1"/>
+                            <field name="petani_id" readonly="1"/>
+                            <field name="state" readonly="1"/>
+                        </group>
+                        <group string="Lokasi &amp; Varietas">
+                            <field name="petak" readonly="1"/>
+                            <field name="varietas" readonly="1"/>
+                            <field name="jenis_tebu" readonly="1"/>
+                            <field name="mbs_kode" readonly="1"/>
+                            <field name="mbs_id" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Berat">
+                            <field name="weight_in" readonly="1"/>
+                            <field name="weight_out" readonly="1"/>
+                            <field name="weight_net" readonly="1"/>
+                            <field name="weight_kw" readonly="1"/>
+                            <field name="rafaksi" readonly="1"/>
+                            <field name="bobot_tebu" readonly="1"/>
+                        </group>
+                        <group string="Tanggal">
+                            <field name="date_in" readonly="1"/>
+                            <field name="date_out" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <div invisible="not id" style="margin-top: 16px;">
+                        <div class="oe_chatter">
+                            <field name="message_follower_ids" widget="mail_followers"/>
+                            <field name="message_ids" widget="mail_thread"/>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_timbang_tebu_list" model="ir.ui.view">
+        <field name="name">ka.timbang.tebu.list</field>
+        <field name="model">ka.timbang.tebu</field>
+        <field name="arch" type="xml">
+            <list string="Data Timbang Tebu" default_order="date_out desc">
+                <field name="spta_id" string="Nomor Timbangan"/>
+                <field name="no_spta" string="No. SPTA"/>
+                <field name="kd_antrian" string="Nomor Antrian"/>
+                <field name="register" string="Register"/>
+                <field name="petani_id" string="Petani"/>
+                <field name="truck_id" string="No. Polisi"/>
+                <field name="weight_in" string="Masuk (Kg)" sum="Total Masuk"/>
+                <field name="weight_out" string="Keluar (Kg)" sum="Total Keluar"/>
+                <field name="weight_net" string="Netto (Kg)" sum="Total Netto"/>
+                <field name="weight_kw" string="Netto (Kw)" sum="Total Netto Kw"/>
+                <field name="rafaksi" string="Rafaksi" optional="show"/>
+                <field name="bobot_tebu" string="Bobot Tebu" sum="Total Bobot" optional="show"/>
+                <field name="mbs_id" string="MBS" optional="show"/>
+                <field name="date_in" string="Tgl. Masuk" optional="hide"/>
+                <field name="date_out" string="Tgl. Keluar"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_timbang_tebu_search" model="ir.ui.view">
+        <field name="name">ka.timbang.tebu.search</field>
+        <field name="model">ka.timbang.tebu</field>
+        <field name="arch" type="xml">
+            <search string="Cari Data Timbang Tebu">
+                <field name="spta_id" string="Nomor Timbangan"/>
+                <field name="no_spta" string="No. SPTA"/>
+                <field name="kd_antrian" string="Nomor Antrian"/>
+                <field name="register" string="Register"/>
+                <field name="petani_id" string="Petani"/>
+                <field name="truck_id" string="No. Polisi"/>
+                <field name="mbs_id" string="MBS"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_register" string="Register" context="{'group_by': 'register'}"/>
+                    <filter name="group_petani" string="Petani" context="{'group_by': 'petani_id'}"/>
+                    <filter name="group_mbs" string="MBS" context="{'group_by': 'mbs_id'}"/>
+                    <filter name="group_date_out" string="Tgl. Keluar" context="{'group_by': 'date_out:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_timbang_tebu" model="ir.actions.act_window">
+        <field name="name">Timbang Tebu</field>
+        <field name="res_model">ka.timbang.tebu</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_timbang_tebu_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Belum ada data timbang tebu!</p>
+            <p>Data akan otomatis tersinkronisasi dari database PostgreSQL.</p>
+        </field>
+    </record>
+
+</odoo>

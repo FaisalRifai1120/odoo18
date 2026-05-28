@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ka_timbang_tebu_admin,ka.timbang.tebu admin,model_ka_timbang_tebu,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_timbang_tebu_operator,ka.timbang.tebu operator,model_ka_timbang_tebu,ka_user_management.group_ka_operator,1,1,1,0
+access_ka_timbang_tebu_pimpinan,ka.timbang.tebu pimpinan,model_ka_timbang_tebu,ka_user_management.group_ka_pimpinan,1,0,0,0
+access_ka_timbang_tebu_kabag,ka.timbang.tebu kabag,model_ka_timbang_tebu,ka_user_management.group_ka_kabag,1,0,0,0
+access_ka_timbang_tebu_kasi,ka.timbang.tebu kasi,model_ka_timbang_tebu,ka_user_management.group_ka_kasi,1,0,0,0
+access_ka_timbang_tebu_kasubsi,ka.timbang.tebu kasubsi,model_ka_timbang_tebu,ka_user_management.group_ka_kasubsi,1,0,0,0
+access_ka_timbang_tebu_ppl,ka.timbang.tebu ppl,model_ka_timbang_tebu,ka_user_management.group_ka_ppl,1,0,0,0
+access_ka_timbang_sync_admin,ka.timbang.sync admin,model_ka_timbang_sync,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_timbang_sync_operator,ka.timbang.sync operator,model_ka_timbang_sync,ka_user_management.group_ka_operator,1,0,0,0

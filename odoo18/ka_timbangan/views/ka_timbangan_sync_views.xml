@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_timbang_sync_form" model="ir.ui.view">
+        <field name="name">ka.timbang.sync.form</field>
+        <field name="model">ka.timbang.sync</field>
+        <field name="arch" type="xml">
+            <form string="Sinkronisasi Timbangan">
+                <header>
+                    <button name="action_sync_manual"
+                            string="Sync Manual (Rentang Tanggal)"
+                            type="object"
+                            class="btn-primary"
+                            confirm="Sync data timbang tebu sesuai rentang tanggal yang dipilih. Lanjutkan?"
+                            invisible="not date_from or not date_to"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Nama Konfigurasi Sync..."/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Koneksi">
+                            <field name="sync_config_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Status Sinkronisasi (Cron: data tahun 2025+)">
+                            <field name="last_sync" readonly="1"/>
+                            <field name="last_sync_status" readonly="1"
+                                   decoration-success="last_sync_status == 'success'"
+                                   decoration-danger="last_sync_status == 'failed'"/>
+                            <field name="total_synced" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Filter Sync Manual">
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+
+                    <group string="Pesan Terakhir" invisible="not last_sync_message">
+                        <field name="last_sync_message" nolabel="1" readonly="1"/>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_timbang_sync_list" model="ir.ui.view">
+        <field name="name">ka.timbang.sync.list</field>
+        <field name="model">ka.timbang.sync</field>
+        <field name="arch" type="xml">
+            <list string="Sinkronisasi Timbangan">
+                <field name="name"/>
+                <field name="sync_config_id"/>
+                <field name="last_sync"/>
+                <field name="last_sync_status"
+                       decoration-success="last_sync_status == 'success'"
+                       decoration-danger="last_sync_status == 'failed'"/>
+                <field name="total_synced"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ka_timbang_sync" model="ir.actions.act_window">
+        <field name="name">Sinkronisasi Timbangan</field>
+        <field name="res_model">ka.timbang.sync</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
