@@ -45,7 +45,7 @@ class KaTimbangSync(models.Model):
             raise UserError(_('Tanggal Dari tidak boleh lebih besar dari Tanggal Sampai.'))
 
         _logger.info('[KA-TIMBANG] ════════════════════════════════════════')
-        _logger.info(
+        _logger.debug(
             '[KA-TIMBANG] Sync MANUAL dimulai | Range: %s s/d %s',
             self.date_from, self.date_to
         )
@@ -81,7 +81,7 @@ class KaTimbangSync(models.Model):
         conn = None
         try:
             cfg = self.sync_config_id
-            _logger.info(
+            _logger.debug(
                 '[KA-TIMBANG] Menghubungkan ke: %s@%s:%s/%s',
                 cfg.db_user, cfg.db_host, cfg.db_port, cfg.db_name
             )
@@ -93,7 +93,7 @@ class KaTimbangSync(models.Model):
                 password=cfg.db_password,
                 connect_timeout=10,
             )
-            _logger.info('[KA-TIMBANG] ✓ Koneksi database berhasil')
+            _logger.debug('[KA-TIMBANG] ✓ Koneksi database berhasil')
             cur = conn.cursor()
 
             select_cols = """
@@ -107,7 +107,7 @@ class KaTimbangSync(models.Model):
 
             if date_from and date_to:
                 # Sync manual → rentang bebas
-                _logger.info(
+                _logger.debug(
                     '[KA-TIMBANG] Mode: MANUAL | date_out: %s s/d %s',
                     date_from, date_to
                 )
@@ -118,7 +118,7 @@ class KaTimbangSync(models.Model):
             elif cron_mode:
                 # Cron → hanya tahun CRON_SYNC_FROM_YEAR ke atas
                 cron_start = date(CRON_SYNC_FROM_YEAR, 1, 1)
-                _logger.info(
+                _logger.debug(
                     '[KA-TIMBANG] Mode: CRON | date_out >= %s (tahun %d ke atas)',
                     cron_start, CRON_SYNC_FROM_YEAR
                 )
@@ -127,11 +127,11 @@ class KaTimbangSync(models.Model):
                     (cron_start,)
                 )
             else:
-                _logger.info('[KA-TIMBANG] Mode: FULL | Semua data')
+                _logger.debug('[KA-TIMBANG] Mode: FULL | Semua data')
                 cur.execute(select_cols + " ORDER BY date_out DESC")
 
             rows = cur.fetchall()
-            _logger.info('[KA-TIMBANG] ✓ Data ditemukan: %d record', len(rows))
+            _logger.debug('[KA-TIMBANG] ✓ Data ditemukan: %d record', len(rows))
 
             # Konversi ke list of dicts agar tidak ada referensi ke cursor
             result = []
@@ -167,7 +167,7 @@ class KaTimbangSync(models.Model):
             if conn:
                 try:
                     conn.close()
-                    _logger.info('[KA-TIMBANG] ✓ Koneksi PostgreSQL ditutup')
+                    _logger.debug('[KA-TIMBANG] ✓ Koneksi PostgreSQL ditutup')
                 except Exception:
                     pass
 
@@ -202,7 +202,7 @@ class KaTimbangSync(models.Model):
         petani_cache = {}
         mbs_cache = {}
 
-        _logger.info('[KA-TIMBANG] Memproses %d record ke Odoo...', total_rows)
+        _logger.debug('[KA-TIMBANG] Memproses %d record ke Odoo...', total_rows)
 
         for idx, row in enumerate(rows, start=1):
             spta_id  = row['spta_id']
@@ -268,7 +268,7 @@ class KaTimbangSync(models.Model):
                 action = 'INSERT'
 
             if idx % 100 == 0 or idx == total_rows:
-                _logger.info(
+                _logger.debug(
                     '[KA-TIMBANG] Progress [%s]: %d/%d | Insert: %d | Update: %d',
                     sync_type, idx, total_rows, count_insert, count_update
                 )

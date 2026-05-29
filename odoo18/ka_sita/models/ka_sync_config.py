@@ -109,16 +109,16 @@ class KaSyncConfig(models.Model):
             _logger.info('[KA-SITA] ════════════════════════════════════════')
             sync_type = 'MANUAL' if limit else 'CRON'
             _logger.info('[KA-SITA] Sync %s dimulai | Config: %s', sync_type, self.name)
-            _logger.info(
+            _logger.debug(
                 '[KA-SITA] Menghubungkan ke: %s@%s:%s/%s',
                 self.db_user, self.db_host, self.db_port, self.db_name
             )
             conn = self._get_connection()
-            _logger.info('[KA-SITA] ✓ Koneksi database berhasil')
+            _logger.debug('[KA-SITA] ✓ Koneksi database berhasil')
             cur = conn.cursor()
 
             if limit:
-                _logger.info('[KA-SITA] Query: register | Limit: %d terbaru', limit)
+                _logger.debug('[KA-SITA] Query: register | Limit: %d terbaru', limit)
                 cur.execute("""
                     SELECT kode, nama, nik, norek, bank, atas_nama
                     FROM public.register
@@ -127,7 +127,7 @@ class KaSyncConfig(models.Model):
                     LIMIT %s
                 """, (limit,))
             else:
-                _logger.info('[KA-SITA] Query: register | Tanpa limit')
+                _logger.debug('[KA-SITA] Query: register | Tanpa limit')
                 cur.execute("""
                     SELECT kode, nama, nik, norek, bank, atas_nama
                     FROM public.register
@@ -136,7 +136,7 @@ class KaSyncConfig(models.Model):
                 """)
 
             rows = cur.fetchall()
-            _logger.info('[KA-SITA] ✓ Data ditemukan: %d record', len(rows))
+            _logger.debug('[KA-SITA] ✓ Data ditemukan: %d record', len(rows))
 
             # Konversi ke list of dicts
             result = [
@@ -162,7 +162,7 @@ class KaSyncConfig(models.Model):
             if conn:
                 try:
                     conn.close()
-                    _logger.info('[KA-SITA] ✓ Koneksi PostgreSQL ditutup')
+                    _logger.debug('[KA-SITA] ✓ Koneksi PostgreSQL ditutup')
                 except Exception:
                     pass
 
@@ -185,7 +185,7 @@ class KaSyncConfig(models.Model):
         count_insert = 0
         count_update = 0
 
-        _logger.info('[KA-SITA] Memproses %d record ke Odoo...', total_rows)
+        _logger.debug('[KA-SITA] Memproses %d record ke Odoo...', total_rows)
 
         for idx, row in enumerate(rows, start=1):
             kode = row['kode']
@@ -212,7 +212,7 @@ class KaSyncConfig(models.Model):
             count += 1
 
             if idx % 50 == 0 or idx == total_rows:
-                _logger.info(
+                _logger.debug(
                     '[KA-SITA] Progress [%s]: %d/%d | Insert: %d | Update: %d',
                     sync_type, idx, total_rows, count_insert, count_update
                 )
@@ -220,7 +220,7 @@ class KaSyncConfig(models.Model):
                 _logger.debug('[KA-SITA] [%s] kode: %s | nama: %s', action, kode, row['nama'])
 
         elapsed = (datetime.now() - start_time).total_seconds()
-        _logger.info(
+        _logger.debug(
             '[KA-SITA] ✓ Sync %s selesai | Total: %d | Insert: %d | Update: %d | Waktu: %.2fs',
             sync_type, total_rows, count_insert, count_update, elapsed
         )
