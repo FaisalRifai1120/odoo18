@@ -87,8 +87,7 @@ class KaSitaRegister(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-        petani_ids = records.mapped('petani_id')
-        petani_ids._recompute_jumlah_register()
+        records._update_petani_jumlah_register()
         return records
 
     def write(self, vals):
@@ -105,6 +104,11 @@ class KaSitaRegister(models.Model):
         petani_ids._recompute_jumlah_register()
         return res
 
+    def _update_petani_jumlah_register(self):
+        for rec in self:
+            if rec.petani_id:
+                rec.petani_id._recompute_jumlah_register()
+
 
 class KaPetaniInherit(models.Model):
     _inherit = 'ka.petani'
@@ -119,6 +123,7 @@ class KaPetaniInherit(models.Model):
 
 
 class KaMailMessageInherit(models.Model):
+    """Batasi hapus pesan chatter — hanya Administrator KA yang boleh."""
     _inherit = 'mail.message'
 
     def unlink(self):
