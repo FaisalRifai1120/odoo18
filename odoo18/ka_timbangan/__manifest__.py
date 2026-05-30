@@ -7,12 +7,14 @@
     'description': """
         Modul KA Timbangan mencakup:
         - Data Timbang Tebu (sync dari v_spta_timb_odoo)
+        - Hak akses hierarki (PPL → KASUBSI → KASI → KABAG)
         - Sinkronisasi otomatis (cron 1 menit) dan manual (rentang tanggal)
     """,
     'author': 'PDE KBA',
     'depends': ['base', 'mail', 'ka_user_management', 'ka_tanaman', 'ka_sita'],
     'data': [
         'security/ir.model.access.csv',
+        'security/ka_timbangan_record_rules.xml',
         'data/ka_timbangan_cron.xml',
         'views/ka_tebu_views.xml',
         'views/ka_timbangan_sync_views.xml',

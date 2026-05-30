@@ -180,10 +180,25 @@ class KaSyncConfig(models.Model):
         rows = self._fetch_from_postgres(limit=limit)
         total_rows = len(rows)
 
-        # Step 2: Proses dengan Odoo ORM
-        Register = self.env['ka.sita.register'].sudo()
+        # Step 2: Proses dengan Odoo ORM (batch processing)
+        Register = self.env['ka.sita.register'].sudo().with_context(
+            tracking_disable=True,
+            mail_notrack=True,
+            mail_create_nolog=True,
+        )
         count_insert = 0
         count_update = 0
+
+        BATCH_SIZE = 500
+
+        # Ambil semua kode_register yang sudah ada
+        existing_keys = {
+            r['kode_register']: r['id']
+            for r in Register.search_read([], ['kode_register', 'id'])
+        }
+
+        vals_to_create = []
+        vals_to_update = []  # list of (id, vals)
 
         _logger.debug('[KA-SITA] Memproses %d record ke Odoo...', total_rows)
 
@@ -196,29 +211,47 @@ class KaSyncConfig(models.Model):
                 'nama_bank':     row['bank'] or '',
                 'nama_rekening': row['atas_nama'] or '',
             }
-            existing = Register.search([('kode_register', '=', kode)], limit=1)
-            if existing:
-                existing.write(vals)
-                count_update += 1
-                action = 'UPDATE'
-            else:
-                vals['kode_register'] = kode
-                vals['jenis_register'] = 'TR'
-                vals['metode'] = 'SBH'
-                vals['jenis_pembayaran'] = 'Harian'
-                Register.create(vals)
-                count_insert += 1
-                action = 'INSERT'
-            count += 1
 
-            if idx % 50 == 0 or idx == total_rows:
+            if kode in existing_keys:
+                vals_to_update.append((existing_keys[kode], vals))
+            else:
+                vals['kode_register']  = kode
+                vals['jenis_register'] = 'TR'
+                vals['metode']         = 'SBH'
+                vals['jenis_pembayaran'] = 'Harian'
+                vals_to_create.append(vals)
+
+            # Flush batch
+            if len(vals_to_create) >= BATCH_SIZE:
+                Register.create(vals_to_create)
+                count_insert += len(vals_to_create)
+                vals_to_create = []
+
+            if len(vals_to_update) >= BATCH_SIZE:
+                for rec_id, rec_vals in vals_to_update:
+                    Register.browse(rec_id).write(rec_vals)
+                count_update += len(vals_to_update)
+                vals_to_update = []
+
+            if idx % 500 == 0 or idx == total_rows:
                 _logger.debug(
                     '[KA-SITA] Progress [%s]: %d/%d | Insert: %d | Update: %d',
-                    sync_type, idx, total_rows, count_insert, count_update
+                    sync_type, idx, total_rows,
+                    count_insert + len(vals_to_create),
+                    count_update + len(vals_to_update)
                 )
-            else:
-                _logger.debug('[KA-SITA] [%s] kode: %s | nama: %s', action, kode, row['nama'])
 
+        # Flush sisa batch
+        if vals_to_create:
+            Register.create(vals_to_create)
+            count_insert += len(vals_to_create)
+
+        if vals_to_update:
+            for rec_id, rec_vals in vals_to_update:
+                Register.browse(rec_id).write(rec_vals)
+            count_update += len(vals_to_update)
+
+        count = count_insert + count_update
         elapsed = (datetime.now() - start_time).total_seconds()
         _logger.debug(
             '[KA-SITA] ✓ Sync %s selesai | Total: %d | Insert: %d | Update: %d | Waktu: %.2fs',

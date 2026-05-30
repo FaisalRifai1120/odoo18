@@ -18,7 +18,7 @@ class KaSitaRegister(models.Model):
     ], string='Jenis Register', required=True, tracking=True)
     metode = fields.Selection([
         ('SBH', 'SBH (Sistem Bagi Hasil)'),
-        ('SPT', 'SPT (Sewa Per Ton)'),
+        ('SPT', 'SPT (Sistem Pembelian Tebu Tunai)'),
     ], string='Metode', required=True, tracking=True)
     jenis_pembayaran = fields.Selection([
         ('Harian',  'Harian'),
