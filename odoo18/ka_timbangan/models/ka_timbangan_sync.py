@@ -7,8 +7,9 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-# Tahun minimal data yang disync oleh cron
-CRON_SYNC_FROM_YEAR = 2025
+# Cron hanya sync tahun berjalan (otomatis)
+import datetime as _dt
+CRON_SYNC_FROM_YEAR = _dt.date.today().year
 
 
 class KaTimbangSync(models.Model):
@@ -123,7 +124,7 @@ class KaTimbangSync(models.Model):
                 rec.write(vals)
 
             if idx % 200 == 0 or idx == total:
-                _logger.debug(
+                _logger.info(
                     '[KA-TIMBANG] Relink progress: %d/%d | Register: %d | MBS: %d',
                     idx, total, count_linked, count_mbs
                 )
@@ -148,7 +149,7 @@ class KaTimbangSync(models.Model):
         """
         Ambil data dari PostgreSQL dan tutup koneksi SEBELUM kembali.
         - Manual  : filter date_out BETWEEN date_from AND date_to
-        - Cron    : filter date_out >= CRON_SYNC_FROM_YEAR (misal 2025-01-01)
+        - Cron    : filter date_out tahun berjalan (otomatis)
         Return: list of dicts
         """
         conn = None
@@ -190,7 +191,7 @@ class KaTimbangSync(models.Model):
                 )
             elif cron_mode:
                 # Cron → hanya tahun CRON_SYNC_FROM_YEAR ke atas
-                cron_start = date(CRON_SYNC_FROM_YEAR, 1, 1)
+                cron_start = _dt.date(CRON_SYNC_FROM_YEAR, 1, 1)
                 _logger.debug(
                     '[KA-TIMBANG] Mode: CRON | date_out >= %s (tahun %d ke atas)',
                     cron_start, CRON_SYNC_FROM_YEAR
@@ -375,7 +376,7 @@ class KaTimbangSync(models.Model):
                 vals_to_update = []
 
             if idx % 500 == 0 or idx == total_rows:
-                _logger.debug(
+                _logger.info(
                     '[KA-TIMBANG] Progress [%s]: %d/%d | Insert: %d | Update: %d',
                     sync_type, idx, total_rows,
                     count_insert + len(vals_to_create),
@@ -395,7 +396,7 @@ class KaTimbangSync(models.Model):
             _logger.debug('[KA-TIMBANG] Final batch UPDATE: %d records', len(vals_to_update))
 
         elapsed = (datetime.now() - start_time).total_seconds()
-        _logger.debug(
+        _logger.info(
             '[KA-TIMBANG] ✓ Sync %s selesai | Total: %d | Insert: %d | Update: %d | Waktu: %.2fs',
             sync_type, total_rows, count_insert, count_update, elapsed
         )
@@ -413,7 +414,7 @@ class KaTimbangSync(models.Model):
 
         _logger.info('[KA-TIMBANG] ════════════════════════════════════════')
         _logger.info(
-            '[KA-TIMBANG] Sync CRON dimulai | Config: %s | Tahun >= %d',
+            '[KA-TIMBANG] Sync CRON dimulai | Config: %s | Tahun: %d',
             configs.name, CRON_SYNC_FROM_YEAR
         )
 
@@ -424,7 +425,7 @@ class KaTimbangSync(models.Model):
                 'last_sync_status': 'success',
                 'last_sync_message': (
                     f'Cron sync berhasil: {count} record diproses '
-                    f'(data tahun {CRON_SYNC_FROM_YEAR}+).'
+                    f'(tahun {CRON_SYNC_FROM_YEAR}).'
                 ),
                 'total_synced': configs.total_synced + count,
             })

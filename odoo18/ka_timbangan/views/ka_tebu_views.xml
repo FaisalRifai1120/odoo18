@@ -95,6 +95,11 @@
                 <field name="petani_id" string="Petani"/>
                 <field name="truck_id" string="No. Polisi"/>
                 <field name="mbs_id" string="MBS"/>
+                <filter name="filter_tahun_ini" string="Tahun Ini"
+                        domain="[('date_out','&gt;=', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d')), ('date_out','&lt;', datetime.date(context_today().year + 1, 1, 1).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_tahun_lalu" string="Tahun Kemarin"
+                        domain="[('date_out','&gt;=', datetime.date(context_today().year - 1, 1, 1).strftime('%Y-%m-%d')), ('date_out','&lt;', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d'))]"/>
+                <separator/>
                 <group expand="0" string="Kelompokkan">
                     <filter name="group_register" string="Register" context="{'group_by': 'register'}"/>
                     <filter name="group_petani" string="Petani" context="{'group_by': 'petani_id'}"/>

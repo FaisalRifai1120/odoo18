@@ -6,6 +6,17 @@
     <!-- Tebu -->
     <menuitem id="menu_ka_timbang_tebu" name="Tebu" parent="menu_ka_timbangan_root" action="action_ka_timbang_tebu" sequence="10"/>
 
+    <!-- Laporan -->
+    <menuitem id="menu_ka_timbangan_laporan" name="Laporan" parent="menu_ka_timbangan_root" sequence="50"/>
+
+    <menuitem id="menu_ka_laporan_harian" name="Laporan Harian" parent="menu_ka_timbangan_laporan" action="action_ka_laporan_harian" sequence="10"/>
+
+    <menuitem id="menu_ka_laporan_register" name="Rekap per Register" parent="menu_ka_timbangan_laporan" action="action_ka_laporan_register" sequence="20"/>
+
+    <menuitem id="menu_ka_laporan_ppl" name="Rekap per PPL" parent="menu_ka_timbangan_laporan" action="action_ka_laporan_ppl" sequence="30"/>
+
+    <menuitem id="menu_ka_laporan_detail" name="Detail Timbang" parent="menu_ka_timbangan_laporan" action="action_ka_laporan_detail" sequence="40"/>
+
     <!-- Sinkronisasi -->
     <menuitem id="menu_ka_timbangan_sync" name="Sinkronisasi" parent="menu_ka_timbangan_root" sequence="90" groups="ka_user_management.group_ka_admin"/>
 

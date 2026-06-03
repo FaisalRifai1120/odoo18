@@ -96,6 +96,11 @@
                 <field name="ppl_id" string="PPL"/>
                 <field name="kecamatan_id" string="Kecamatan"/>
                 <field name="desa_id" string="Desa"/>
+                <filter name="filter_has_nama" string="Ada Nama Register"
+                    domain="[('nama_register', '!=', False), ('nama_register', '!=', '')]"/>
+                <filter name="filter_semua_register" string="Semua Register"
+                    domain="[]"/>
+                <separator/>
                 <filter name="filter_tr" string="TR" domain="[('jenis_register','=','TR')]"/>
                 <filter name="filter_ts" string="TS" domain="[('jenis_register','=','TS')]"/>
                 <separator/>
@@ -119,6 +124,7 @@
         <field name="name">Register</field>
         <field name="res_model">ka.sita.register</field>
         <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_has_nama': 1}</field>
         <field name="search_view_id" ref="view_ka_register_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Buat Register SITA Pertama!</p>

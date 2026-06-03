@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════
+         LAPORAN HARIAN
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_laporan_harian_list" model="ir.ui.view">
+        <field name="name">ka.laporan.harian.list</field>
+        <field name="model">ka.laporan.harian</field>
+        <field name="arch" type="xml">
+            <list string="Laporan Harian Timbang Tebu" create="false" edit="false" delete="false">
+                <field name="tanggal"/>
+                <field name="register"/>
+                <field name="register_id" string="Nama Register"/>
+                <field name="petani_id"/>
+                <field name="ppl_id"/>
+                <field name="jumlah_ritase" sum="Total Ritase"/>
+                <field name="total_bruto" sum="Total Bruto" optional="hide"/>
+                <field name="total_netto" sum="Total Netto (Kg)"/>
+                <field name="total_netto_kw" sum="Total Netto (Kw)"/>
+                <field name="total_rafaksi" sum="Total Rafaksi" optional="show"/>
+                <field name="total_bobot" sum="Total Bobot"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_laporan_harian_search" model="ir.ui.view">
+        <field name="name">ka.laporan.harian.search</field>
+        <field name="model">ka.laporan.harian</field>
+        <field name="arch" type="xml">
+            <search string="Cari Laporan Harian">
+                <field name="tanggal"/>
+                <field name="register"/>
+                <field name="register_id" string="Nama Register"/>
+                <field name="petani_id"/>
+                <field name="ppl_id"/>
+                <filter name="filter_tahun_ini" string="Tahun Ini"
+                        domain="[('tanggal','&gt;=', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d')), ('tanggal','&lt;', datetime.date(context_today().year + 1, 1, 1).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_tahun_lalu" string="Tahun Kemarin"
+                        domain="[('tanggal','&gt;=', datetime.date(context_today().year - 1, 1, 1).strftime('%Y-%m-%d')), ('tanggal','&lt;', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="filter_today" string="Hari Ini"
+                        domain="[('tanggal','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_week" string="Minggu Ini"
+                        domain="[('tanggal','&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_this_month" string="Bulan Ini"
+                        domain="[('tanggal','&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_tanggal" string="Tanggal" context="{'group_by': 'tanggal'}"/>
+                    <filter name="group_register" string="Register" context="{'group_by': 'register_id'}"/>
+                    <filter name="group_petani" string="Petani" context="{'group_by': 'petani_id'}"/>
+                    <filter name="group_ppl" string="PPL" context="{'group_by': 'ppl_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_laporan_harian" model="ir.actions.act_window">
+        <field name="name">Laporan Harian</field>
+        <field name="res_model">ka.laporan.harian</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_ka_laporan_harian_search"/>
+        <field name="context">{'search_default_filter_tahun_ini': 1}</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         LAPORAN PER REGISTER
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_laporan_register_list" model="ir.ui.view">
+        <field name="name">ka.laporan.register.list</field>
+        <field name="model">ka.laporan.register</field>
+        <field name="arch" type="xml">
+            <list string="Laporan Rekap per Register" create="false" edit="false" delete="false">
+                <field name="register"/>
+                <field name="register_id" string="Nama Register"/>
+                <field name="petani_id"/>
+                <field name="ppl_id"/>
+                <field name="kud_id"/>
+                <field name="jumlah_ritase" sum="Total Ritase"/>
+                <field name="total_netto" sum="Total Netto (Kg)"/>
+                <field name="total_netto_kw" sum="Total Netto (Kw)"/>
+                <field name="total_rafaksi" sum="Total Rafaksi" optional="show"/>
+                <field name="total_bobot" sum="Total Bobot"/>
+                <field name="tgl_pertama" optional="show"/>
+                <field name="tgl_terakhir" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_laporan_register_search" model="ir.ui.view">
+        <field name="name">ka.laporan.register.search</field>
+        <field name="model">ka.laporan.register</field>
+        <field name="arch" type="xml">
+            <search string="Cari Laporan Register">
+                <field name="register"/>
+                <field name="register_id" string="Nama Register"/>
+                <field name="petani_id"/>
+                <field name="ppl_id"/>
+                <field name="kud_id"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_ppl" string="PPL" context="{'group_by': 'ppl_id'}"/>
+                    <filter name="group_kud" string="KUD" context="{'group_by': 'kud_id'}"/>
+                    <filter name="group_petani" string="Petani" context="{'group_by': 'petani_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_laporan_register" model="ir.actions.act_window">
+        <field name="name">Laporan per Register</field>
+        <field name="res_model">ka.laporan.register</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_ka_laporan_register_search"/>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         LAPORAN PER PPL
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_laporan_ppl_list" model="ir.ui.view">
+        <field name="name">ka.laporan.ppl.list</field>
+        <field name="model">ka.laporan.ppl</field>
+        <field name="arch" type="xml">
+            <list string="Laporan Rekap per PPL" create="false" edit="false" delete="false">
+                <field name="ppl_id"/>
+                <field name="jumlah_register" sum="Total Register"/>
+                <field name="jumlah_ritase" sum="Total Ritase"/>
+                <field name="total_netto" sum="Total Netto (Kg)"/>
+                <field name="total_netto_kw" sum="Total Netto (Kw)"/>
+                <field name="total_bobot" sum="Total Bobot"/>
+                <field name="tgl_pertama" optional="show"/>
+                <field name="tgl_terakhir" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_laporan_ppl_search" model="ir.ui.view">
+        <field name="name">ka.laporan.ppl.search</field>
+        <field name="model">ka.laporan.ppl</field>
+        <field name="arch" type="xml">
+            <search string="Cari Laporan PPL">
+                <field name="ppl_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_laporan_ppl" model="ir.actions.act_window">
+        <field name="name">Laporan per PPL</field>
+        <field name="res_model">ka.laporan.ppl</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_ka_laporan_ppl_search"/>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         LAPORAN DETAIL
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_laporan_detail_list" model="ir.ui.view">
+        <field name="name">ka.laporan.detail.list</field>
+        <field name="model">ka.laporan.detail</field>
+        <field name="arch" type="xml">
+            <list string="Laporan Detail Timbang Tebu" create="false" edit="false" delete="false">
+                <field name="date_out" string="Tgl. Keluar"/>
+                <field name="spta_id" string="No. Timbangan"/>
+                <field name="no_spta" string="No. SPTA"/>
+                <field name="kd_antrian" string="No. Antrian"/>
+                <field name="register"/>
+                <field name="register_id" string="Nama Register"/>
+                <field name="petani_id"/>
+                <field name="ppl_id"/>
+                <field name="kud_id" optional="show"/>
+                <field name="truck_id" string="No. Polisi"/>
+                <field name="weight_in" string="Masuk (Kg)" sum="Total Masuk"/>
+                <field name="weight_out" string="Keluar (Kg)" sum="Total Keluar"/>
+                <field name="weight_net" string="Netto (Kg)" sum="Total Netto"/>
+                <field name="weight_kw" string="Netto (Kw)" sum="Total Kw"/>
+                <field name="rafaksi" string="Rafaksi" optional="show"/>
+                <field name="bobot_tebu" string="Bobot Tebu" sum="Total Bobot" optional="show"/>
+                <field name="mbs_id" string="MBS" optional="show"/>
+                <field name="varietas" optional="show"/>
+                <field name="date_in" string="Tgl. Masuk" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_laporan_detail_search" model="ir.ui.view">
+        <field name="name">ka.laporan.detail.search</field>
+        <field name="model">ka.laporan.detail</field>
+        <field name="arch" type="xml">
+            <search string="Cari Laporan Detail">
+                <field name="spta_id" string="No. Timbangan"/>
+                <field name="no_spta" string="No. SPTA"/>
+                <field name="register"/>
+                <field name="register_id" string="Nama Register"/>
+                <field name="petani_id"/>
+                <field name="ppl_id"/>
+                <field name="kud_id"/>
+                <field name="truck_id" string="No. Polisi"/>
+                <filter name="filter_tahun_ini" string="Tahun Ini"
+                        domain="[('date_out','&gt;=', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d')), ('date_out','&lt;', datetime.date(context_today().year + 1, 1, 1).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_tahun_lalu" string="Tahun Kemarin"
+                        domain="[('date_out','&gt;=', datetime.date(context_today().year - 1, 1, 1).strftime('%Y-%m-%d')), ('date_out','&lt;', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="filter_today" string="Hari Ini"
+                        domain="[('date_out','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),
+                                  ('date_out','&lt;=', datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+                <filter name="filter_this_month" string="Bulan Ini"
+                        domain="[('date_out','&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_date" string="Tanggal" context="{'group_by': 'date_out:day'}"/>
+                    <filter name="group_register" string="Register" context="{'group_by': 'register_id'}"/>
+                    <filter name="group_petani" string="Petani" context="{'group_by': 'petani_id'}"/>
+                    <filter name="group_ppl" string="PPL" context="{'group_by': 'ppl_id'}"/>
+                    <filter name="group_mbs" string="MBS" context="{'group_by': 'mbs_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_laporan_detail" model="ir.actions.act_window">
+        <field name="name">Laporan Detail</field>
+        <field name="res_model">ka.laporan.detail</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_ka_laporan_detail_search"/>
+        <field name="context">{'search_default_filter_tahun_ini': 1}</field>
+    </record>
+
+</odoo>
