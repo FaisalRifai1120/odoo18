@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Sequence Quota SPTA -->
+        <record id="seq_ka_quota_spta" model="ir.sequence">
+            <field name="name">Quota SPTA</field>
+            <field name="code">ka.quota.spta</field>
+            <field name="prefix">QT/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence QTS -->
+        <record id="seq_ka_spta_qts" model="ir.sequence">
+            <field name="name">No. QTS SPTA</field>
+            <field name="code">ka.spta.qts</field>
+            <field name="prefix">QTS/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Master Jenis Truk default -->
+        <record id="jenis_truk_ek" model="ka.jenis.truk">
+            <field name="kode">EK</field>
+            <field name="nama">Engkel Kecil</field>
+        </record>
+        <record id="jenis_truk_eb" model="ka.jenis.truk">
+            <field name="kode">EB</field>
+            <field name="nama">Engkel Besar</field>
+        </record>
+        <record id="jenis_truk_gd" model="ka.jenis.truk">
+            <field name="kode">GD</field>
+            <field name="nama">Gandeng</field>
+        </record>
+
+    </data>
+</odoo>

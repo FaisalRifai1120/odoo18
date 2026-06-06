@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════
+         SPTA FORM
+    ══════════════════════════════ -->
+    <record id="view_ka_spta_form" model="ir.ui.view">
+        <field name="name">ka.spta.form</field>
+        <field name="model">ka.spta</field>
+        <field name="arch" type="xml">
+            <form string="SPTA">
+                <header>
+                    <button name="action_fill_register"
+                            string="Konfirmasi Register"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            groups="ka_user_management.group_ka_operator,ka_user_management.group_ka_admin"/>
+                    <button name="action_approve"
+                            string="Setujui SPTA"
+                            type="object" class="btn-success"
+                            invisible="state != 'filled'"
+                            groups="ka_user_management.group_ka_kasubsi,ka_user_management.group_ka_kasi,ka_user_management.group_ka_admin"
+                            confirm="Setujui SPTA ini?"/>
+                    <button name="action_distribute"
+                            string="Cetak SPTA"
+                            type="object" class="btn-warning"
+                            invisible="state != 'approved'"
+                            confirm="SPTA akan Cetak. Lanjutkan?"/>
+                    <button name="action_preview_spta"
+                            string="Preview SPTA"
+                            type="object" class="btn-secondary"
+                            invisible="state not in ['approved','distributed']"/>
+                    <button name="action_lihat_nomor_spta"
+                            string="Lihat Nomor SPTA"
+                            type="object" class="btn-info"
+                            invisible="state not in ['approved','distributed']"/>
+                    <button name="action_cancel"
+                            string="Batalkan"
+                            type="object"
+                            invisible="state in ['distributed','cancel']"
+                            groups="ka_user_management.group_ka_kasi,ka_user_management.group_ka_admin"/>
+                    <button name="action_reset_draft"
+                            string="Reset ke Draft"
+                            type="object"
+                            invisible="state not in ['filled','cancel']"
+                            groups="ka_user_management.group_ka_admin"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,filled,approved,distributed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="no_qts" string="No. QTS"/>
+                        <h1><field name="no_qts" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Informasi SPTA">
+                            <field name="tanggal" readonly="state != 'draft'"/>
+                            <field name="quota_id"
+                                   domain="[('state','=','approved'),('tanggal','=',tanggal)]"
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="quota_line_id"
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="Petani &amp; Register">
+                            <field name="plot_kud_id" invisible="1"/>
+                            <field name="register_id"
+                                   domain="[('active','=',True),('kud_id','=',plot_kud_id)]"
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"
+                                   help="Register yang tampil hanya dari KUD sesuai plot wilayah yang disetujui"/>
+                            <field name="nama_register_display" string="Nama Register" readonly="1"
+                                   invisible="not register_id"/>
+                            <field name="petani_id" readonly="1"/>
+                            <field name="kud_id" readonly="1"/>
+                            <field name="ppl_id" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Tebang &amp; Angkut">
+                            <field name="jenis_tebang" readonly="state != 'draft'"/>
+                            <field name="jenis_truk_id"
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="jumlah_diberikan" readonly="state != 'draft'"/>
+                            <field name="quota_sisa" readonly="1"
+                                   decoration-danger="quota_sisa == 0"
+                                   decoration-warning="quota_sisa &lt; 5"/>
+                        </group>
+                        <group string="Jadwal Tebang">
+                            <field name="tgl_mulai" readonly="state != 'draft'"/>
+                            <field name="tgl_selesai" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                    <group string="Catatan" invisible="not notes">
+                        <field name="notes" nolabel="1" readonly="state not in ['draft']"/>
+                    </group>
+
+                    <group invisible="not is_printed">
+                        <field name="is_printed" readonly="1"/>
+                        <field name="tgl_cetak" readonly="1"/>
+                    </group>
+
+                    <!-- Nomor SPTA yang di-generate -->
+                    <notebook invisible="state not in ['approved','distributed']">
+                        <page string="Nomor SPTA" name="nomor_spta">
+                            <div class="alert alert-info" role="alert"
+                                 invisible="jumlah_generated == 0">
+                                <strong><field name="jumlah_generated" readonly="1"/></strong>
+                                nomor SPTA telah di-generate.
+                            </div>
+                            <field name="nomor_ids" readonly="1">
+                                <list>
+                                     <field name="no_spta" string="No. SPTA"/>
+                                    <field name="state"/>
+                                    <field name="is_distributed" string="Cetak"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════
+         SPTA PRINT FORM (Preview)
+    ══════════════════════════════ -->
+    <record id="view_ka_spta_print_form" model="ir.ui.view">
+        <field name="name">ka.spta.print.form</field>
+        <field name="model">ka.spta</field>
+        <field name="arch" type="xml">
+            <form string="Preview SPTA">
+                <sheet>
+                    <!-- Header Logo & Judul -->
+                    <div style="text-align:center; padding: 10px 0 5px 0;">
+                        <h2 style="color:#1B6CA8; font-weight:bold; letter-spacing:2px;">
+                            KA PG KEBON AGUNG
+                        </h2>
+                    </div>
+
+                    <!-- Barcode simulasi (no_qts) -->
+                    <div style="text-align:center; padding:5px 0;">
+                        <field name="no_qts" readonly="1"
+                               style="font-size:32px; font-weight:bold; letter-spacing:4px;
+                                      font-family:monospace; display:block;"/>
+                    </div>
+
+                    <hr style="border-top: 1px solid #ccc;"/>
+
+                    <!-- Data SPTA -->
+                    <group>
+                        <group>
+                            <field name="petani_id" string="Petani" readonly="1"/>
+                            <field name="no_qts" string="No. QTS" readonly="1"/>
+                            <field name="register_id" string="Register" readonly="1"/>
+                            <field name="tgl_mulai" string="Mulai" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="jenis_tebang" string="Tebang" readonly="1"/>
+                            <field name="jenis_truk_id" string="Jns Truk" readonly="1"/>
+                            <field name="jumlah_diberikan" string="Jml. SPTA" readonly="1"/>
+                            <field name="tgl_selesai" string="Selesai" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <hr style="border-top: 1px solid #ccc;"/>
+                    <div style="padding: 5px 0;">
+                        <strong>Created By: </strong>
+                        <field name="create_uid" readonly="1" nolabel="1"
+                               style="display:inline;"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════
+         SPTA LIST
+    ══════════════════════════════ -->
+    <record id="view_ka_spta_list" model="ir.ui.view">
+        <field name="name">ka.spta.list</field>
+        <field name="model">ka.spta</field>
+        <field name="arch" type="xml">
+            <list string="Daftar SPTA"
+                  decoration-success="state == 'distributed'"
+                  decoration-info="state == 'approved'"
+                  decoration-warning="state == 'filled'"
+                  decoration-muted="state == 'cancel'">
+                <field name="no_qts" string="No. QTS"/>
+                <field name="tanggal"/>
+                <field name="register_id"/>
+                <field name="petani_id"/>
+                <field name="kud_id" optional="show"/>
+                <field name="ppl_id" optional="show"/>
+                <field name="jenis_tebang"/>
+                <field name="jenis_truk_id"/>
+                <field name="jumlah_diberikan" optional="show"/>
+                <field name="tgl_mulai"/>
+                <field name="tgl_selesai"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════
+         SPTA SEARCH
+    ══════════════════════════════ -->
+    <record id="view_ka_spta_search" model="ir.ui.view">
+        <field name="name">ka.spta.search</field>
+        <field name="model">ka.spta</field>
+        <field name="arch" type="xml">
+            <search string="Cari SPTA">
+                <field name="no_qts" string="No. QTS"/>
+                <field name="register_id" string="Register"/>
+                <field name="petani_id" string="Petani"/>
+                <field name="kud_id" string="KUD"/>
+                <field name="ppl_id" string="PPL"/>
+                <separator/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state','=','draft')]"/>
+                <filter name="filter_filled" string="Register Terisi"
+                        domain="[('state','=','filled')]"/>
+                <filter name="filter_approved" string="Disetujui"
+                        domain="[('state','=','approved')]"/>
+                <filter name="filter_distributed" string="Cetak"
+                        domain="[('state','=','distributed')]"/>
+                <separator/>
+                <filter name="filter_today" string="Hari Ini"
+                        domain="[('tanggal','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_tahun_ini" string="Tahun Ini"
+                        domain="[('tanggal','&gt;=', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d')), ('tanggal','&lt;', datetime.date(context_today().year + 1, 1, 1).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_tanggal" string="Tanggal"
+                            context="{'group_by': 'tanggal'}"/>
+                    <filter name="group_kud" string="KUD"
+                            context="{'group_by': 'kud_id'}"/>
+                    <filter name="group_ppl" string="PPL"
+                            context="{'group_by': 'ppl_id'}"/>
+                    <filter name="group_jenis_tebang" string="Jenis Tebang"
+                            context="{'group_by': 'jenis_tebang'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════
+         ACTIONS
+    ══════════════════════════════ -->
+    <record id="action_ka_spta" model="ir.actions.act_window">
+        <field name="name">SPTA</field>
+        <field name="res_model">ka.spta</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_spta_search"/>
+        <field name="context">{'search_default_filter_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Buat SPTA Pertama!</p>
+            <p>Pastikan Quota SPTA sudah disetujui sebelum membuat SPTA.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_spta_nomor_list" model="ir.ui.view">
+        <field name="name">ka.spta.nomor.list</field>
+        <field name="model">ka.spta.nomor</field>
+        <field name="arch" type="xml">
+            <list string="Nomor SPTA" create="false" delete="false">
+                <field name="no_spta" string="No. SPTA"/>
+                <field name="tanggal"/>
+                <field name="register_id" string="Register"/>
+                <field name="petani_id" string="Petani"/>
+                <field name="jenis_tebang" string="Jenis Tebang"/>
+                <field name="jenis_truk_id" string="Jenis Truk"/>
+                <field name="tgl_mulai" string="Tgl. Mulai"/>
+                <field name="tgl_selesai" string="Tgl. Selesai"/>
+                <field name="state"
+                       decoration-success="state == 'used'"
+                       decoration-muted="state == 'cancel'"/>
+                <field name="is_distributed" string="Cetak"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_spta_nomor_search" model="ir.ui.view">
+        <field name="name">ka.spta.nomor.search</field>
+        <field name="model">ka.spta.nomor</field>
+        <field name="arch" type="xml">
+            <search string="Cari Nomor SPTA">
+                <field name="no_spta" string="No. SPTA"/>
+                <field name="register_id" string="Register"/>
+                <field name="petani_id" string="Petani"/>
+                <filter name="filter_today" string="Hari Ini"
+                        domain="[('tanggal','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_available" string="Tersedia"
+                        domain="[('state','=','available')]"/>
+                <filter name="filter_used" string="Terpakai"
+                        domain="[('state','=','used')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_spta_nomor" model="ir.actions.act_window">
+        <field name="name">Daftar Nomor SPTA</field>
+        <field name="res_model">ka.spta.nomor</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_ka_spta_nomor_search"/>
+        <field name="context">{'search_default_filter_today': 1}</field>
+    </record>
+
+</odoo>

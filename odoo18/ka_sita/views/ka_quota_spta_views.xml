@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════
+         QUOTA SPTA
+    ══════════════════════════════ -->
+    <record id="view_ka_quota_spta_form" model="ir.ui.view">
+        <field name="name">ka.quota.spta.form</field>
+        <field name="model">ka.quota.spta</field>
+        <field name="arch" type="xml">
+            <form string="Quota SPTA">
+                <header>
+                    <button name="action_approve" string="Setujui Quota"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            groups="ka_user_management.group_ka_kasi,ka_user_management.group_ka_admin"
+                            confirm="Setujui quota SPTA ini?"/>
+                    <button name="action_cancel" string="Batalkan"
+                            type="object" class="btn-danger"
+                            invisible="state not in ['draft']"
+                            groups="ka_user_management.group_ka_kasi,ka_user_management.group_ka_admin"/>
+                    <button name="action_reset_draft" string="Reset ke Draft"
+                            type="object"
+                            invisible="state != 'cancel'"
+                            groups="ka_user_management.group_ka_admin"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="No. Quota"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Informasi Quota">
+                            <field name="tanggal" readonly="state != 'draft'"/>
+                            <field name="jumlah_quota" readonly="state != 'draft'"/>
+                            <field name="jumlah_terpakai" readonly="1"/>
+                            <field name="jumlah_sisa" readonly="1"/>
+                        </group>
+                        <group string="Keterangan">
+                            <field name="keterangan" readonly="state != 'draft'"/>
+                            <field name="create_uid_name" string="Dibuat Oleh" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Plot per Wilayah">
+                            <field name="line_ids" readonly="state == 'cancel'">
+                                <list editable="bottom">
+                                    <field name="kud_id"/>
+                                    <field name="kota_id" readonly="1"/>
+                                    <field name="jumlah_spta"/>
+                                    <field name="jumlah_terisi" readonly="1"/>
+                                    <field name="jumlah_sisa" readonly="1"/>
+                                    <field name="state" readonly="1"/>
+                                    <button name="action_approve"
+                                            string="Setujui"
+                                            type="object"
+                                            icon="fa-check"
+                                            invisible="state != 'draft'"
+                                            groups="ka_user_management.group_ka_kasubsi,ka_user_management.group_ka_kasi,ka_user_management.group_ka_admin"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Daftar SPTA">
+                            <field name="spta_ids" readonly="1">
+                                <list>
+                                    <field name="no_qts" string="No. QTS"/>
+                                    <field name="register_id"/>
+                                    <field name="petani_id"/>
+                                    <field name="jenis_tebang"/>
+                                    <field name="jenis_truk_id"/>
+                                    <field name="tgl_mulai"/>
+                                    <field name="tgl_selesai"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_quota_spta_list" model="ir.ui.view">
+        <field name="name">ka.quota.spta.list</field>
+        <field name="model">ka.quota.spta</field>
+        <field name="arch" type="xml">
+            <list string="Quota SPTA"
+                  decoration-success="state == 'approved'"
+                  decoration-muted="state == 'cancel'">
+                <field name="name"/>
+                <field name="tanggal"/>
+                <field name="jumlah_quota"/>
+                <field name="jumlah_terpakai"/>
+                <field name="jumlah_sisa"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_quota_spta_search" model="ir.ui.view">
+        <field name="name">ka.quota.spta.search</field>
+        <field name="model">ka.quota.spta</field>
+        <field name="arch" type="xml">
+            <search string="Cari Quota SPTA">
+                <field name="name" string="No. Quota"/>
+                <field name="tanggal"/>
+                <filter name="filter_draft" string="Draft"
+                        domain="[('state','=','draft')]"/>
+                <filter name="filter_approved" string="Disetujui"
+                        domain="[('state','=','approved')]"/>
+                <filter name="filter_today" string="Hari Ini"
+                        domain="[('tanggal','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_tanggal" string="Tanggal"
+                            context="{'group_by': 'tanggal'}"/>
+                    <filter name="group_state" string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_quota_spta" model="ir.actions.act_window">
+        <field name="name">Quota SPTA</field>
+        <field name="res_model">ka.quota.spta</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_quota_spta_search"/>
+        <field name="context">{'search_default_filter_today': 1}</field>
+    </record>
+
+</odoo>

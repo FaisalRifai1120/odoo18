@@ -41,8 +41,6 @@
                 <separator/>
                 <filter name="filter_today" string="Hari Ini"
                         domain="[('tanggal','=', context_today().strftime('%Y-%m-%d'))]"/>
-                <filter name="filter_this_week" string="Minggu Ini"
-                        domain="[('tanggal','&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
                 <filter name="filter_this_month" string="Bulan Ini"
                         domain="[('tanggal','&gt;=', context_today().strftime('%Y-%m-01'))]"/>
                 <group expand="0" string="Kelompokkan">
@@ -200,8 +198,7 @@
                         domain="[('date_out','&gt;=', datetime.date(context_today().year - 1, 1, 1).strftime('%Y-%m-%d')), ('date_out','&lt;', datetime.date(context_today().year, 1, 1).strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <filter name="filter_today" string="Hari Ini"
-                        domain="[('date_out','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),
-                                  ('date_out','&lt;=', datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+                        domain="[('date_out','&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')), ('date_out','&lt;=', datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
                 <filter name="filter_this_month" string="Bulan Ini"
                         domain="[('date_out','&gt;=', context_today().strftime('%Y-%m-01'))]"/>
                 <group expand="0" string="Kelompokkan">

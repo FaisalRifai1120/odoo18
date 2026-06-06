@@ -7,7 +7,7 @@ class KaSitaRegister(models.Model):
     _name = 'ka.sita.register'
     _description = 'Register SITA'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name = 'nama_register'
+    _rec_name = 'kode_register'
     _order = 'kode_register'
 
     kode_register = fields.Char(string='Kode Register', required=True, tracking=True)
@@ -82,7 +82,7 @@ class KaSitaRegister(models.Model):
             self.kecamatan_id = self.desa_id.kecamatan_id
 
     def name_get(self):
-        return [(r.id, f"[{r.kode_register}] {r.nama_register}") for r in self]
+        return [(r.id, r.kode_register or f'Register #{r.id}') for r in self]
 
     @api.model_create_multi
     def create(self, vals_list):
