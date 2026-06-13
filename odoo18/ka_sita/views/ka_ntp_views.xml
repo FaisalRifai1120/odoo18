@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_ntp_form" model="ir.ui.view">
+        <field name="name">ka.ntp.form</field>
+        <field name="model">ka.ntp</field>
+        <field name="arch" type="xml">
+            <form string="NTP">
+                <header>
+                    <button name="action_reproses" string="Reproses"
+                            type="object" class="btn-primary"
+                            invisible="state == 'done'"
+                            confirm="Tarik &amp; hitung ulang data dari timbangan? Data lama akan diganti."/>
+                    <button name="action_import_relaksasi" string="Import Relaksasi"
+                            type="object" class="btn-secondary"
+                            invisible="state == 'done' or not upload_relaksasi_file"/>
+                    <button name="action_import_bagihasil" string="Import Bagi Hasil"
+                            type="object" class="btn-secondary"
+                            invisible="state == 'done' or not upload_bagihasil_file"/>
+                    <button name="action_set_done" string="Selesaikan"
+                            type="object" class="btn-success"
+                            invisible="state == 'done'"
+                            groups="ka_user_management.group_ka_admin"
+                            confirm="Tandai NTP ini Selesai? Tidak bisa di-reproses lagi."/>
+                    <button name="action_set_draft" string="Kembali ke Draft"
+                            type="object"
+                            invisible="state != 'done'"
+                            groups="ka_user_management.group_ka_admin"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,proses,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="No. NTP"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Periode">
+                            <field name="company_id" readonly="state != 'draft'"/>
+                            <field name="tanggal_pembuatan" readonly="state == 'done'"/>
+                            <field name="tgl_awal" readonly="state == 'done'"/>
+                            <field name="tgl_akhir" readonly="state == 'done'"/>
+                            <field name="periode" readonly="state == 'done'"/>
+                        </group>
+                        <group string="Pengelompokan &amp; Filter">
+                            <field name="jenis_kelompok" readonly="state == 'done'"/>
+                            <field name="filter_jenis_register" readonly="state == 'done'"
+                                   invisible="jenis_kelompok != 'jenis_register'"/>
+                            <field name="filter_metode" readonly="state == 'done'"
+                                   invisible="jenis_kelompok != 'metode'"/>
+                            <field name="filter_digit_posisi" readonly="state == 'done'"
+                                   invisible="jenis_kelompok != 'digit'"/>
+                            <field name="filter_digit_nilai" readonly="state == 'done'"
+                                   invisible="jenis_kelompok != 'digit'"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Total">
+                            <field name="line_count" readonly="1"/>
+                            <field name="total_netto" readonly="1"/>
+                            <field name="total_netto_relaksasi" readonly="1"/>
+                            <field name="total_gula" readonly="1"/>
+                            <field name="total_rupiah" readonly="1"/>
+                        </group>
+                        <group string="Status Override">
+                            <field name="has_import_relaksasi" readonly="1"/>
+                            <field name="has_import_bagihasil" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Detail per Truk">
+                            <field name="line_ids" readonly="1">
+                                <list string="Detail per Truk">
+                                    <field name="date_out"/>
+                                    <field name="no_timbang"/>
+                                    <field name="register"/>
+                                    <field name="nama_register" optional="show"/>
+                                    <field name="netto" string="Bruto" sum="Total Bruto"/>
+                                    <field name="bobot_tebu" sum="Total Bobot Tebu" optional="show"/>
+                                    <field name="rafaksi_asli" sum="Total Rafaksi"/>
+                                    <field name="persen_relaksasi"/>
+                                    <field name="rafaksi_relaksasi" sum="Total Raf. Relaksasi"/>
+                                    <field name="netto_relaksasi" sum="Total Netto Relaksasi"/>
+                                    <field name="bagi_hasil"/>
+                                    <field name="gula" sum="Total Gula"/>
+                                    <field name="harga_gula" optional="hide"/>
+                                    <field name="rupiah" sum="Total Rupiah"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Upload Import" invisible="state == 'done'">
+                            <group>
+                                <group string="Import Relaksasi (register, persentase)">
+                                    <field name="upload_relaksasi_file" filename="upload_relaksasi_filename"/>
+                                    <field name="upload_relaksasi_filename" invisible="1"/>
+                                </group>
+                                <group string="Import Bagi Hasil (register, bagihasil)">
+                                    <field name="upload_bagihasil_file" filename="upload_bagihasil_filename"/>
+                                    <field name="upload_bagihasil_filename" invisible="1"/>
+                                </group>
+                            </group>
+                            <div class="text-muted" style="padding:8px;">
+                                Setelah upload file, klik tombol <strong>Import</strong> di header,
+                                lalu klik <strong>Reproses</strong> agar perhitungan mengikuti data import.
+                                Import akan mengalahkan ketentuan/relaksasi dari menu.
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_ntp_list" model="ir.ui.view">
+        <field name="name">ka.ntp.list</field>
+        <field name="model">ka.ntp</field>
+        <field name="arch" type="xml">
+            <list string="NTP"
+                  decoration-success="state == 'done'"
+                  decoration-info="state == 'proses'">
+                <field name="company_id" string="Unit" optional="show"/>
+                <field name="name"/>
+                <field name="tanggal_pembuatan"/>
+                <field name="tgl_awal"/>
+                <field name="tgl_akhir"/>
+                <field name="periode" optional="show"/>
+                <field name="line_count" string="Jml Truk"/>
+                <field name="total_gula" string="Total Gula"/>
+                <field name="total_rupiah" string="Total Rupiah"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_ntp_search" model="ir.ui.view">
+        <field name="name">ka.ntp.search</field>
+        <field name="model">ka.ntp</field>
+        <field name="arch" type="xml">
+            <search string="Cari NTP">
+                <field name="name"/>
+                <field name="periode"/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_proses" string="Proses" domain="[('state','=','proses')]"/>
+                <filter name="filter_done" string="Selesai" domain="[('state','=','done')]"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_company" string="Unit" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_ntp" model="ir.actions.act_window">
+        <field name="name">NTP (Nota Tebu Petani)</field>
+        <field name="res_model">ka.ntp</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_ntp_search"/>
+    </record>
+
+</odoo>

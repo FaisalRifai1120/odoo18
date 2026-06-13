@@ -163,15 +163,18 @@ class KaAnalisaQcSync(models.Model):
             return 0
 
         ctx = dict(tracking_disable=True, mail_notrack=True, mail_create_nolog=True)
-        Qc     = self.env['ka.analisa.qc'].sudo().with_context(**ctx)
-        Timbang = self.env['ka.timbang.tebu'].sudo().with_context(**ctx)
+        company = self.company_id
+        company_id = company.id
+        Qc     = self.env['ka.analisa.qc'].sudo().with_context(**ctx).with_company(company)
+        Timbang = self.env['ka.timbang.tebu'].sudo().with_context(**ctx).with_company(company)
 
-        # Pre-load cache existing QC (no_spta → id)
-        company_id = self.company_id.id
-        existing_qc = {
-            r['no_spta']: r['id']
-            for r in Qc.search_read([('company_id', '=', company_id)], ['no_spta', 'id'])
-        }
+        # Pre-load cache existing QC (no_spta → id) via SQL langsung
+        # supaya tidak terpengaruh record rule / company filter
+        self.env.cr.execute(
+            "SELECT no_spta, id FROM ka_analisa_qc WHERE company_id = %s",
+            (company_id,)
+        )
+        existing_qc = {row[0]: row[1] for row in self.env.cr.fetchall()}
         # Pre-load cache timbang (kd_antrian → id)
         timbang_cache = {
             r['kd_antrian']: r['id']
@@ -218,10 +221,29 @@ class KaAnalisaQcSync(models.Model):
             else:
                 vals_create.append(vals)
 
-        # Batch create
+        # Batch create dengan proteksi savepoint
         if vals_create:
-            Qc.create(vals_create)
-            count_insert = len(vals_create)
+            try:
+                with self.env.cr.savepoint():
+                    Qc.create(vals_create)
+                count_insert = len(vals_create)
+            except Exception as e:
+                _logger.warning('[KA-QC] Batch create gagal (%s), fallback per record...', str(e))
+                # Fallback: create satu per satu, skip yang duplikat
+                for v in vals_create:
+                    try:
+                        with self.env.cr.savepoint():
+                            Qc.create([v])
+                        count_insert += 1
+                    except Exception:
+                        # Sudah ada (race/duplikat) → update saja
+                        existing = Qc.search([
+                            ('no_spta', '=', v['no_spta']),
+                            ('company_id', '=', company_id),
+                        ], limit=1)
+                        if existing:
+                            existing.write(v)
+                            count_update += 1
 
         # Batch update
         BATCH = 500

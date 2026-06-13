@@ -47,11 +47,11 @@ class KaTimbangTebu(models.Model):
 
     # ── MBS (Many2one biasa, diisi saat sync) ──────────────────
     rendemen = fields.Float(
-        string='Rendemen', digits=(10, 4), tracking=True,
+        string='Rendemen', digits=(10, 4),
         help='Rendemen NPP dari Analisa QC'
     )
     rafaksi_relaksasi = fields.Float(
-        string='Rafaksi Setelah Relaksasi', digits=(10, 4), tracking=True,
+        string='Rafaksi Setelah Relaksasi', digits=(10, 4),
         help='Nilai rafaksi setelah dikurangi relaksasi. Dipakai di perhitungan NTP.'
     )
 

@@ -339,9 +339,11 @@ class KaTimbangSync(models.Model):
             mail_notrack=True,
             mail_create_nolog=True,
         )
-        Tebu     = self.env['ka.timbang.tebu'].sudo().with_context(**ctx)
-        Register = self.env['ka.sita.register'].sudo()
-        Mbs      = self.env['ka.mbs'].sudo()
+        # Pakai company dari config agar konteks konsisten (penting untuk cron)
+        company = self.company_id
+        Tebu     = self.env['ka.timbang.tebu'].sudo().with_context(**ctx).with_company(company)
+        Register = self.env['ka.sita.register'].sudo().with_company(company)
+        Mbs      = self.env['ka.mbs'].sudo().with_company(company)
 
         # ── Pre-load semua cache sekaligus (1 query per model) ────
         _logger.debug('[KA-TIMBANG] Pre-loading cache...')
@@ -520,12 +522,15 @@ class KaTimbangSync(models.Model):
                 'total_synced': configs.total_synced + count,
             })
         except Exception as e:
+            # Rollback dulu agar transaksi tidak aborted saat tulis status
+            self.env.cr.rollback()
             _logger.error('[KA-TIMBANG] ✗ Cron sync GAGAL | Error: %s', str(e))
             configs.write({
                 'last_sync': fields.Datetime.now(),
                 'last_sync_status': 'failed',
                 'last_sync_message': str(e),
             })
+            self.env.cr.commit()
         
         # ── Sequential: jalankan QC sync setelah timbang ─────
         try:
@@ -541,4 +546,5 @@ class KaTimbangSync(models.Model):
                     'total_synced':      qc_cfg.total_synced + qc_count,
                 })
         except Exception as e:
+            self.env.cr.rollback()
             _logger.error('[KA-QC] ✗ Sequential QC gagal: %s', str(e))

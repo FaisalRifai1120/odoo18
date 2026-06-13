@@ -52,3 +52,11 @@ access_ka_ketentuan_closing,ka.ketentuan closing,model_ka_ketentuan,ka_user_mana
 access_ka_ketentuan_admin,ka.ketentuan admin,model_ka_ketentuan,ka_user_management.group_ka_admin,1,1,1,1
 access_ka_ketentuan_line_closing,ka.ketentuan.line closing,model_ka_ketentuan_line,ka_user_management.group_ka_closing,1,1,1,1
 access_ka_ketentuan_line_admin,ka.ketentuan.line admin,model_ka_ketentuan_line,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_ntp_closing,ka.ntp closing,model_ka_ntp,ka_user_management.group_ka_closing,1,1,1,0
+access_ka_ntp_admin,ka.ntp admin,model_ka_ntp,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_ntp_line_closing,ka.ntp.line closing,model_ka_ntp_line,ka_user_management.group_ka_closing,1,1,1,1
+access_ka_ntp_line_admin,ka.ntp.line admin,model_ka_ntp_line,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_ntp_imp_rlx_closing,ka.ntp.import.relaksasi closing,model_ka_ntp_import_relaksasi,ka_user_management.group_ka_closing,1,1,1,1
+access_ka_ntp_imp_rlx_admin,ka.ntp.import.relaksasi admin,model_ka_ntp_import_relaksasi,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_ntp_imp_bh_closing,ka.ntp.import.bagihasil closing,model_ka_ntp_import_bagihasil,ka_user_management.group_ka_closing,1,1,1,1
+access_ka_ntp_imp_bh_admin,ka.ntp.import.bagihasil admin,model_ka_ntp_import_bagihasil,ka_user_management.group_ka_admin,1,1,1,1

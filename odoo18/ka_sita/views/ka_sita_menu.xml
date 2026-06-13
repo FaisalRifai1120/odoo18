@@ -69,4 +69,9 @@
               action="action_ka_ketentuan" sequence="20"
               groups="ka_user_management.group_ka_closing,ka_user_management.group_ka_admin"/>
 
+    <menuitem id="menu_ka_closing_ntp" name="NTP (Nota Tebu Petani)"
+              parent="menu_ka_closing_root"
+              action="action_ka_ntp" sequence="30"
+              groups="ka_user_management.group_ka_closing,ka_user_management.group_ka_admin"/>
+
 </odoo>
