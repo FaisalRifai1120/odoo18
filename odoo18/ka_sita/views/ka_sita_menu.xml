@@ -64,4 +64,9 @@
               action="action_ka_relaksasi" sequence="10"
               groups="ka_user_management.group_ka_closing,ka_user_management.group_ka_admin"/>
 
+    <menuitem id="menu_ka_closing_ketentuan" name="Ketentuan"
+              parent="menu_ka_closing_root"
+              action="action_ka_ketentuan" sequence="20"
+              groups="ka_user_management.group_ka_closing,ka_user_management.group_ka_admin"/>
+
 </odoo>

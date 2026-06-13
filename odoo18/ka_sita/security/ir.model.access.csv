@@ -48,3 +48,7 @@ access_ka_relaksasi_closing,ka.relaksasi closing,model_ka_relaksasi,ka_user_mana
 access_ka_relaksasi_admin,ka.relaksasi admin,model_ka_relaksasi,ka_user_management.group_ka_admin,1,1,1,1
 access_ka_relaksasi_line_closing,ka.relaksasi.line closing,model_ka_relaksasi_line,ka_user_management.group_ka_closing,1,1,1,1
 access_ka_relaksasi_line_admin,ka.relaksasi.line admin,model_ka_relaksasi_line,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_ketentuan_closing,ka.ketentuan closing,model_ka_ketentuan,ka_user_management.group_ka_closing,1,1,1,0
+access_ka_ketentuan_admin,ka.ketentuan admin,model_ka_ketentuan,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_ketentuan_line_closing,ka.ketentuan.line closing,model_ka_ketentuan_line,ka_user_management.group_ka_closing,1,1,1,1
+access_ka_ketentuan_line_admin,ka.ketentuan.line admin,model_ka_ketentuan_line,ka_user_management.group_ka_admin,1,1,1,1

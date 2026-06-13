@@ -27,11 +27,12 @@
         'views/ka_spta_views.xml',
         'views/ka_spta_nomor_views.xml',
         'views/ka_relaksasi_views.xml',
+        'views/ka_ketentuan_views.xml',
         'views/ka_sync_config_views.xml',
         'views/ka_sita_menu.xml',
     ],
     'external_dependencies': {
-        'python': ['psycopg2'],
+        'python': ['psycopg2', 'openpyxl'],
     },
     'installable': True,
     'auto_install': False,

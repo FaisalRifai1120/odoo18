@@ -8,3 +8,4 @@ from . import ka_quota_spta
 from . import ka_spta
 from . import ka_spta_nomor
 from . import ka_relaksasi
+from . import ka_ketentuan

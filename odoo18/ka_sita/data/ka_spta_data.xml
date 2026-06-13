@@ -29,6 +29,15 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <!-- Sequence Ketentuan -->
+        <record id="seq_ka_ketentuan" model="ir.sequence">
+            <field name="name">No. Ketentuan</field>
+            <field name="code">ka.ketentuan</field>
+            <field name="prefix">KTN/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
         <!-- Master Jenis Truk default -->
         <record id="jenis_truk_ek" model="ka.jenis.truk">
             <field name="kode">EK</field>
