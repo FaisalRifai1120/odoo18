@@ -50,6 +50,10 @@ class KaTimbangTebu(models.Model):
         string='Rendemen', digits=(10, 4), tracking=True,
         help='Rendemen NPP dari Analisa QC'
     )
+    rafaksi_relaksasi = fields.Float(
+        string='Rafaksi Setelah Relaksasi', digits=(10, 4), tracking=True,
+        help='Nilai rafaksi setelah dikurangi relaksasi. Dipakai di perhitungan NTP.'
+    )
 
     mbs_kode = fields.Integer(string='Kode MBS', tracking=True)
     mbs_id = fields.Many2one(

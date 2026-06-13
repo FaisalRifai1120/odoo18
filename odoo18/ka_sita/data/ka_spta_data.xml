@@ -20,6 +20,15 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <!-- Sequence Relaksasi -->
+        <record id="seq_ka_relaksasi" model="ir.sequence">
+            <field name="name">No. Relaksasi</field>
+            <field name="code">ka.relaksasi</field>
+            <field name="prefix">RLX/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
         <!-- Master Jenis Truk default -->
         <record id="jenis_truk_ek" model="ka.jenis.truk">
             <field name="kode">EK</field>

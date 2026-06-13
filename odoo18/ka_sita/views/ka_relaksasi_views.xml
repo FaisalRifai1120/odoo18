@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ka_relaksasi_form" model="ir.ui.view">
+        <field name="name">ka.relaksasi.form</field>
+        <field name="model">ka.relaksasi</field>
+        <field name="arch" type="xml">
+            <form string="Relaksasi">
+                <header>
+                    <button name="action_cancel" string="Batalkan"
+                            type="object" class="btn-danger"
+                            invisible="state != 'active'"
+                            confirm="Batalkan relaksasi ini? Record tetap tersimpan untuk history."/>
+                    <button name="action_set_active" string="Aktifkan Kembali"
+                            type="object"
+                            invisible="state != 'cancel'"
+                            groups="ka_user_management.group_ka_admin"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="No. Relaksasi"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Periode">
+                            <field name="company_id" readonly="state != 'active'"/>
+                            <field name="tanggal" readonly="state != 'active'"/>
+                            <field name="tgl_berlaku" readonly="state != 'active'"/>
+                        </group>
+                        <group string="Info">
+                            <field name="line_count" readonly="1"/>
+                            <field name="keterangan" readonly="state != 'active'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Aturan Digit Register">
+                            <field name="line_ids" readonly="state != 'active'">
+                                <list editable="bottom">
+                                    <field name="posisi_digit"/>
+                                    <field name="nilai_digit"/>
+                                    <field name="nilai_relaksasi"/>
+                                    <field name="keterangan" optional="show"/>
+                                </list>
+                            </field>
+                            <div class="text-muted" style="padding:8px;">
+                                <strong>Contoh:</strong> Posisi Digit = 6, Nilai Digit = 1, Relaksasi = 50
+                                → register dengan karakter ke-6 bernilai "1" akan rafaksinya menjadi 50% dari rafaksi asli.
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ka_relaksasi_list" model="ir.ui.view">
+        <field name="name">ka.relaksasi.list</field>
+        <field name="model">ka.relaksasi</field>
+        <field name="arch" type="xml">
+            <list string="Relaksasi"
+                  decoration-muted="state == 'cancel'">
+                <field name="company_id" string="Unit" optional="show"/>
+                <field name="name"/>
+                <field name="tanggal"/>
+                <field name="tgl_berlaku"/>
+                <field name="line_count" string="Jml Aturan"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_relaksasi_search" model="ir.ui.view">
+        <field name="name">ka.relaksasi.search</field>
+        <field name="model">ka.relaksasi</field>
+        <field name="arch" type="xml">
+            <search string="Cari Relaksasi">
+                <field name="name"/>
+                <filter name="filter_active" string="Aktif" domain="[('state','=','active')]"/>
+                <filter name="filter_cancel" string="Dibatalkan" domain="[('state','=','cancel')]"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter name="group_company" string="Unit" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_relaksasi" model="ir.actions.act_window">
+        <field name="name">Relaksasi</field>
+        <field name="res_model">ka.relaksasi</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ka_relaksasi_search"/>
+        <field name="context">{'search_default_filter_active': 1}</field>
+    </record>
+
+</odoo>

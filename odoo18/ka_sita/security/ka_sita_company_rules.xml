@@ -58,5 +58,19 @@
             <field name="global" eval="True"/>
         </record>
 
+        <record id="rule_ka_relaksasi_company" model="ir.rule">
+            <field name="name">Relaksasi: Multi-Company</field>
+            <field name="model_id" ref="model_ka_relaksasi"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_ka_relaksasi_line_company" model="ir.rule">
+            <field name="name">Relaksasi Line: Multi-Company</field>
+            <field name="model_id" ref="model_ka_relaksasi_line"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
     </data>
 </odoo>

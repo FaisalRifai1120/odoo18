@@ -125,5 +125,12 @@
             <field name="category_id" ref="module_category_ka"/>
         </record>
 
+        <!-- ── GRUP AKSES KHUSUS: CLOSING ─────────────────────── -->
+        <record id="group_ka_closing" model="res.groups">
+            <field name="name">Akses Menu Closing</field>
+            <field name="category_id" ref="module_category_ka"/>
+            <field name="comment">Centang grup ini agar user dapat mengakses menu Closing (Relaksasi, Ketentuan, NTP). Tidak mengikuti hirarki.</field>
+        </record>
+
     </data>
 </odoo>

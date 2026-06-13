@@ -17,6 +17,7 @@ http://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/k
 security
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/security/ir.model.access.csv
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/security/ka_sita_record_rules.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/security/ka_sita_company_rules.xml
 views
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_register_views.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_sita_menu.xml
@@ -38,6 +39,7 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_tanaman/models/ka_wilayah.py
 security
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_tanaman/security/ir.model.access.csv
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_tanaman/security/ka_tanaman_company_rules.xml
 views
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_tanaman/views/ka_kud_views.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_tanaman/views/ka_petani_views.xml
@@ -56,6 +58,7 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 security
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/security/ir.model.access.csv
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/security/ka_user_groups.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/security/ka_user_company_rules.xml
 views
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/views/ka_user_menu.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/views/ka_user_views.xml
@@ -76,6 +79,7 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 security
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_timbangan/security/ir.model.access.csv
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_timbangan/security/ka_timbangan_record_rules.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_timbangan/security/ka_timbangan_company_rules.xml
 views
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_timbangan/views/ka_tebu_views.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_timbangan/views/ka_timbangan_menu.xml

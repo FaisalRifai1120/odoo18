@@ -7,3 +7,4 @@ from . import ka_jenis_truk
 from . import ka_quota_spta
 from . import ka_spta
 from . import ka_spta_nomor
+from . import ka_relaksasi

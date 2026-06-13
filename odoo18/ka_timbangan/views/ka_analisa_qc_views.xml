@@ -146,6 +146,7 @@
                     </div>
                     <group>
                         <group string="Koneksi">
+                            <field name="company_id"/>
                             <field name="sync_config_id"/>
                             <field name="active"/>
                         </group>
@@ -176,6 +177,7 @@
         <field name="model">ka.analisa.qc.sync</field>
         <field name="arch" type="xml">
             <list string="Sinkronisasi Analisa QC">
+                <field name="company_id" string="Unit"/>
                 <field name="name"/>
                 <field name="sync_config_id"/>
                 <field name="last_sync"/>

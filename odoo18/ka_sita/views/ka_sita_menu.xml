@@ -52,4 +52,16 @@
               action="action_ka_sync_config" sequence="10"
               groups="ka_user_management.group_ka_admin"/>
 
+    <!-- ══════════════════════════════
+         MENU CLOSING (akses via group_ka_closing)
+    ══════════════════════════════ -->
+    <menuitem id="menu_ka_closing_root" name="Closing"
+              parent="menu_ka_sita_root" sequence="50"
+              groups="ka_user_management.group_ka_closing,ka_user_management.group_ka_admin"/>
+
+    <menuitem id="menu_ka_closing_relaksasi" name="Relaksasi"
+              parent="menu_ka_closing_root"
+              action="action_ka_relaksasi" sequence="10"
+              groups="ka_user_management.group_ka_closing,ka_user_management.group_ka_admin"/>
+
 </odoo>

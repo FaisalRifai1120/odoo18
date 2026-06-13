@@ -34,6 +34,7 @@
                             <field name="db_name" placeholder="nama_database"/>
                             <field name="db_user" placeholder="postgres"/>
                             <field name="db_password" password="True"/>
+                            <field name="company_id"/>
                             <field name="active"/>
                         </group>
                         <group string="Status Sinkronisasi">
@@ -58,6 +59,7 @@
         <field name="model">ka.sync.config</field>
         <field name="arch" type="xml">
             <list string="Konfigurasi Sinkronisasi">
+                <field name="company_id" string="Unit"/>
                 <field name="name"/>
                 <field name="db_host"/>
                 <field name="db_port"/>

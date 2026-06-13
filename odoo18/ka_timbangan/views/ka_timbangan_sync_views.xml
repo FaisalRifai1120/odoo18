@@ -33,6 +33,7 @@
 
                     <group>
                         <group string="Koneksi">
+                            <field name="company_id"/>
                             <field name="sync_config_id"/>
                             <field name="active"/>
                         </group>
@@ -66,6 +67,7 @@
         <field name="model">ka.timbang.sync</field>
         <field name="arch" type="xml">
             <list string="Sinkronisasi Timbangan">
+                <field name="company_id" string="Unit"/>
                 <field name="name"/>
                 <field name="sync_config_id"/>
                 <field name="last_sync"/>

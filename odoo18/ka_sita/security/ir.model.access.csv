@@ -44,3 +44,7 @@ access_ka_spta_nomor_kasubsi,ka.spta.nomor kasubsi,model_ka_spta_nomor,ka_user_m
 access_ka_spta_nomor_kabag,ka.spta.nomor kabag,model_ka_spta_nomor,ka_user_management.group_ka_kabag,1,0,0,0
 access_ka_spta_nomor_pimpinan,ka.spta.nomor pimpinan,model_ka_spta_nomor,ka_user_management.group_ka_pimpinan,1,0,0,0
 access_ka_spta_nomor_ppl,ka.spta.nomor ppl,model_ka_spta_nomor,ka_user_management.group_ka_ppl,1,0,0,0
+access_ka_relaksasi_closing,ka.relaksasi closing,model_ka_relaksasi,ka_user_management.group_ka_closing,1,1,1,0
+access_ka_relaksasi_admin,ka.relaksasi admin,model_ka_relaksasi,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_relaksasi_line_closing,ka.relaksasi.line closing,model_ka_relaksasi_line,ka_user_management.group_ka_closing,1,1,1,1
+access_ka_relaksasi_line_admin,ka.relaksasi.line admin,model_ka_relaksasi_line,ka_user_management.group_ka_admin,1,1,1,1
