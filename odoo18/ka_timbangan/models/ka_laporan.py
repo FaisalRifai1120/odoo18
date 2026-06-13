@@ -12,8 +12,9 @@ class KaLaporanHarian(models.Model):
     _order = 'tanggal DESC, register'
 
     tanggal       = fields.Date(string='Tanggal', readonly=True)
-    register      = fields.Char(string='Register', readonly=True)
-    register_id   = fields.Many2one('ka.sita.register', string='Nama Register', readonly=True)
+    register      = fields.Char(string='Kode Register', readonly=True)
+    register_id   = fields.Many2one('ka.sita.register', string='Register', readonly=True)
+    nama_register = fields.Char(string='Nama Register', readonly=True)
     petani_id     = fields.Many2one('ka.petani', string='Petani', readonly=True)
     ppl_id        = fields.Many2one('ka.user.profile', string='PPL', readonly=True)
     jumlah_ritase = fields.Integer(string='Ritase', readonly=True)
@@ -25,12 +26,14 @@ class KaLaporanHarian(models.Model):
 
     def init(self):
         self.env.cr.execute("""
+            DROP VIEW IF EXISTS ka_laporan_harian CASCADE;
             CREATE OR REPLACE VIEW ka_laporan_harian AS
             SELECT
                 ROW_NUMBER() OVER ()            AS id,
                 DATE(t.date_out)                AS tanggal,
                 t.register                      AS register,
                 t.register_id                   AS register_id,
+                COALESCE(r.nama_register, t.register) AS nama_register,
                 t.petani_id                     AS petani_id,
                 r.ppl_id                        AS ppl_id,
                 COUNT(*)                        AS jumlah_ritase,
@@ -46,6 +49,7 @@ class KaLaporanHarian(models.Model):
                 DATE(t.date_out),
                 t.register,
                 t.register_id,
+                r.nama_register,
                 t.petani_id,
                 r.ppl_id
         """)
@@ -60,7 +64,8 @@ class KaLaporanRegister(models.Model):
     _order = 'register'
 
     register      = fields.Char(string='Kode Register', readonly=True)
-    register_id   = fields.Many2one('ka.sita.register', string='Nama Register', readonly=True)
+    register_id   = fields.Many2one('ka.sita.register', string='Register', readonly=True)
+    nama_register = fields.Char(string='Nama Register', readonly=True)
     petani_id     = fields.Many2one('ka.petani', string='Petani', readonly=True)
     ppl_id        = fields.Many2one('ka.user.profile', string='PPL', readonly=True)
     kud_id        = fields.Many2one('ka.kud', string='KUD', readonly=True)
@@ -75,11 +80,13 @@ class KaLaporanRegister(models.Model):
 
     def init(self):
         self.env.cr.execute("""
+            DROP VIEW IF EXISTS ka_laporan_register CASCADE;
             CREATE OR REPLACE VIEW ka_laporan_register AS
             SELECT
                 ROW_NUMBER() OVER ()            AS id,
                 t.register                      AS register,
                 t.register_id                   AS register_id,
+                COALESCE(r.nama_register, t.register) AS nama_register,
                 t.petani_id                     AS petani_id,
                 r.ppl_id                        AS ppl_id,
                 r.kud_id                        AS kud_id,
@@ -97,6 +104,7 @@ class KaLaporanRegister(models.Model):
             GROUP BY
                 t.register,
                 t.register_id,
+                r.nama_register,
                 t.petani_id,
                 r.ppl_id,
                 r.kud_id
@@ -122,6 +130,7 @@ class KaLaporanPpl(models.Model):
 
     def init(self):
         self.env.cr.execute("""
+            DROP VIEW IF EXISTS ka_laporan_ppl CASCADE;
             CREATE OR REPLACE VIEW ka_laporan_ppl AS
             SELECT
                 ROW_NUMBER() OVER ()            AS id,
@@ -154,6 +163,7 @@ class KaLaporanDetail(models.Model):
     kd_antrian    = fields.Char(string='Nomor Antrian', readonly=True)
     register      = fields.Char(string='Kode Register', readonly=True)
     register_id   = fields.Many2one('ka.sita.register', string='Register', readonly=True)
+    nama_register = fields.Char(string='Nama Register', readonly=True)
     petani_id     = fields.Many2one('ka.petani', string='Petani', readonly=True)
     ppl_id        = fields.Many2one('ka.user.profile', string='PPL', readonly=True)
     kud_id        = fields.Many2one('ka.kud', string='KUD', readonly=True)
@@ -164,6 +174,7 @@ class KaLaporanDetail(models.Model):
     weight_kw     = fields.Float(string='Netto (Kw)', digits=(10, 4), readonly=True)
     rafaksi       = fields.Float(string='Rafaksi', digits=(10, 2), readonly=True)
     bobot_tebu    = fields.Float(string='Bobot Tebu', digits=(10, 4), readonly=True)
+    rendemen      = fields.Float(string='Rendemen', digits=(10, 4), readonly=True)
     mbs_id        = fields.Many2one('ka.mbs', string='MBS', readonly=True)
     varietas      = fields.Char(string='Varietas', readonly=True)
     jenis_tebu    = fields.Char(string='Jenis Tebu', readonly=True)
@@ -172,6 +183,7 @@ class KaLaporanDetail(models.Model):
 
     def init(self):
         self.env.cr.execute("""
+            DROP VIEW IF EXISTS ka_laporan_detail CASCADE;
             CREATE OR REPLACE VIEW ka_laporan_detail AS
             SELECT
                 t.id,
@@ -180,6 +192,7 @@ class KaLaporanDetail(models.Model):
                 t.kd_antrian,
                 t.register,
                 t.register_id,
+                COALESCE(r.nama_register, t.register) AS nama_register,
                 t.petani_id,
                 r.ppl_id        AS ppl_id,
                 r.kud_id        AS kud_id,
@@ -190,6 +203,7 @@ class KaLaporanDetail(models.Model):
                 t.weight_kw,
                 t.rafaksi,
                 t.bobot_tebu,
+                t.rendemen,
                 t.mbs_id,
                 t.varietas,
                 t.jenis_tebu,

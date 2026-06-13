@@ -20,6 +20,11 @@ class KaTimbangTebu(models.Model):
         'ka.sita.register', string='Register',
         ondelete='set null', tracking=True
     )
+    nama_register = fields.Char(
+        string='Nama Register',
+        related='register_id.nama_register',
+        store=True, readonly=True
+    )
     petani_id = fields.Many2one(
         'ka.petani', string='Petani',
         ondelete='set null', tracking=True
@@ -37,6 +42,11 @@ class KaTimbangTebu(models.Model):
     bobot_tebu = fields.Float(string='Bobot Tebu', digits=(10, 4), tracking=True)
 
     # ── MBS (Many2one biasa, diisi saat sync) ──────────────────
+    rendemen = fields.Float(
+        string='Rendemen', digits=(10, 4), tracking=True,
+        help='Rendemen NPP dari Analisa QC'
+    )
+
     mbs_kode = fields.Integer(string='Kode MBS', tracking=True)
     mbs_id = fields.Many2one(
         'ka.mbs', string='MBS',

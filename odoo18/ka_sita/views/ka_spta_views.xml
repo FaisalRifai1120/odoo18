@@ -14,12 +14,12 @@
                             string="Konfirmasi Register"
                             type="object" class="btn-primary"
                             invisible="state != 'draft'"
-                            groups="ka_user_management.group_ka_operator,ka_user_management.group_ka_admin"/>
+                            groups="ka_user_management.group_ka_operator_ta,ka_user_management.group_ka_admin"/>
                     <button name="action_approve"
                             string="Setujui SPTA"
                             type="object" class="btn-success"
                             invisible="state != 'filled'"
-                            groups="ka_user_management.group_ka_kasubsi,ka_user_management.group_ka_kasi,ka_user_management.group_ka_admin"
+                            groups="ka_user_management.group_ka_kasubsi,ka_user_management.group_ka_kasi_ta,ka_user_management.group_ka_admin"
                             confirm="Setujui SPTA ini?"/>
                     <button name="action_distribute"
                             string="Cetak SPTA"
@@ -38,7 +38,7 @@
                             string="Batalkan"
                             type="object"
                             invisible="state in ['distributed','cancel']"
-                            groups="ka_user_management.group_ka_kasi,ka_user_management.group_ka_admin"/>
+                            groups="ka_user_management.group_ka_kasi_ta,ka_user_management.group_ka_admin"/>
                     <button name="action_reset_draft"
                             string="Reset ke Draft"
                             type="object"

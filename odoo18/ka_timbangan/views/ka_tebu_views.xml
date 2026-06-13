@@ -41,6 +41,7 @@
                             <field name="weight_kw" readonly="1"/>
                             <field name="rafaksi" readonly="1"/>
                             <field name="bobot_tebu" readonly="1"/>
+                            <field name="rendemen" readonly="1"/>
                         </group>
                         <group string="Tanggal">
                             <field name="date_in" readonly="1"/>
@@ -68,7 +69,7 @@
                 <field name="no_spta" string="No. SPTA"/>
                 <field name="kd_antrian" string="Nomor Antrian"/>
                 <field name="register" string="Register"/>
-                <field name="petani_id" string="Petani"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="truck_id" string="No. Polisi"/>
                 <field name="weight_in" string="Masuk (Kg)" sum="Total Masuk"/>
                 <field name="weight_out" string="Keluar (Kg)" sum="Total Keluar"/>
@@ -76,6 +77,7 @@
                 <field name="weight_kw" string="Netto (Kw)" sum="Total Netto Kw"/>
                 <field name="rafaksi" string="Rafaksi" optional="show"/>
                 <field name="bobot_tebu" string="Bobot Tebu" sum="Total Bobot" optional="show"/>
+                <field name="rendemen" string="Rendemen" digits="[10,4]"/>
                 <field name="mbs_id" string="MBS" optional="show"/>
                 <field name="date_in" string="Tgl. Masuk" optional="hide"/>
                 <field name="date_out" string="Tgl. Keluar"/>
@@ -92,7 +94,7 @@
                 <field name="no_spta" string="No. SPTA"/>
                 <field name="kd_antrian" string="Nomor Antrian"/>
                 <field name="register" string="Register"/>
-                <field name="petani_id" string="Petani"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="truck_id" string="No. Polisi"/>
                 <field name="mbs_id" string="MBS"/>
                 <filter name="filter_tahun_ini" string="Tahun Ini"

@@ -35,3 +35,12 @@ access_ka_laporan_detail_kabag,ka.laporan.detail kabag,model_ka_laporan_detail,k
 access_ka_laporan_detail_kasi,ka.laporan.detail kasi,model_ka_laporan_detail,ka_user_management.group_ka_kasi,1,0,0,0
 access_ka_laporan_detail_kasubsi,ka.laporan.detail kasubsi,model_ka_laporan_detail,ka_user_management.group_ka_kasubsi,1,0,0,0
 access_ka_laporan_detail_ppl,ka.laporan.detail ppl,model_ka_laporan_detail,ka_user_management.group_ka_ppl,1,0,0,0
+access_ka_analisa_qc_admin,ka.analisa.qc admin,model_ka_analisa_qc,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_analisa_qc_operator,ka.analisa.qc operator,model_ka_analisa_qc,ka_user_management.group_ka_operator,1,0,0,0
+access_ka_analisa_qc_pimpinan,ka.analisa.qc pimpinan,model_ka_analisa_qc,ka_user_management.group_ka_pimpinan,1,0,0,0
+access_ka_analisa_qc_kabag,ka.analisa.qc kabag,model_ka_analisa_qc,ka_user_management.group_ka_kabag,1,0,0,0
+access_ka_analisa_qc_kasi,ka.analisa.qc kasi,model_ka_analisa_qc,ka_user_management.group_ka_kasi,1,0,0,0
+access_ka_analisa_qc_kasubsi,ka.analisa.qc kasubsi,model_ka_analisa_qc,ka_user_management.group_ka_kasubsi,1,0,0,0
+access_ka_analisa_qc_ppl,ka.analisa.qc ppl,model_ka_analisa_qc,ka_user_management.group_ka_ppl,1,0,0,0
+access_ka_analisa_qc_sync_admin,ka.analisa.qc.sync admin,model_ka_analisa_qc_sync,ka_user_management.group_ka_admin,1,1,1,1
+access_ka_analisa_qc_sync_operator,ka.analisa.qc.sync operator,model_ka_analisa_qc_sync,ka_user_management.group_ka_operator,1,0,0,0

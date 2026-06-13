@@ -9,20 +9,19 @@ class KaUserProfile(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
 
-    user_id = fields.Many2one('res.users', string='User Odoo', required=True, ondelete='cascade', tracking=True, domain=[('share', '=', False)])
+    user_id = fields.Many2one(
+        'res.users', string='User Odoo', required=True,
+        ondelete='cascade', tracking=True,
+        domain=[('share', '=', False)]
+    )
     name = fields.Char(string='Nama Lengkap', required=True, tracking=True)
     nip = fields.Char(string='NIP', tracking=True)
     employee_code = fields.Char(string='Kode Pegawai', tracking=True)
     phone = fields.Char(string='No. Telepon', tracking=True)
-    email = fields.Char(string='Email', related='user_id.email', store=True, readonly=False)
-
-    bagian = fields.Selection([
-        ('tanaman',   'Tanaman'),
-        ('tuk',       'TUK'),
-        ('teknik',    'Teknik'),
-        ('pabrikasi', 'Pabrikasi'),
-        ('qc',        'QC'),
-    ], string='Bagian', tracking=True)
+    email = fields.Char(
+        string='Email', related='user_id.email',
+        store=True, readonly=False
+    )
 
     role = fields.Selection([
         ('pimpinan', 'Pemimpin Pabrik'),
@@ -34,41 +33,49 @@ class KaUserProfile(models.Model):
         ('admin',    'Administrator'),
     ], string='Jabatan / Peran', required=True, tracking=True)
 
-    atasan_id = fields.Many2one('ka.user.profile', string='Atasan Langsung', domain="[('role', 'in', ['kabag','kasi','kasubsi','pimpinan','admin'])]", tracking=True)
+    atasan_id = fields.Many2one(
+        'ka.user.profile', string='Atasan Langsung',
+        domain="[('role', 'in', ['kabag','kasi','kasubsi','pimpinan','admin'])]",
+        tracking=True
+    )
 
     active = fields.Boolean(default=True, tracking=True)
-    state = fields.Selection([('active', 'Aktif'), ('inactive', 'Tidak Aktif')], string='Status', default='active', tracking=True)
+    state = fields.Selection([
+        ('active',   'Aktif'),
+        ('inactive', 'Tidak Aktif'),
+    ], string='Status', default='active', tracking=True)
 
-    role_label = fields.Char(string='Label Jabatan', compute='_compute_role_label', store=True)
-    bagian_label = fields.Char(string='Label Bagian', compute='_compute_bagian_label', store=True)
+    role_label = fields.Char(
+        string='Label Jabatan',
+        compute='_compute_role_label', store=True
+    )
 
     @api.depends('role')
     def _compute_role_label(self):
-        role_map = {'pimpinan': 'Pemimpin Pabrik', 'kabag': 'KABAG', 'kasi': 'KASI', 'kasubsi': 'KASUBSI', 'ppl': 'PPL', 'operator': 'Operator', 'admin': 'Administrator'}
+        role_map = {
+            'pimpinan': 'Pemimpin Pabrik',
+            'kabag':    'KABAG',
+            'kasi':     'KASI',
+            'kasubsi':  'KASUBSI',
+            'ppl':      'PPL',
+            'operator': 'Operator',
+            'admin':    'Administrator',
+        }
         for rec in self:
             rec.role_label = role_map.get(rec.role, '')
 
-    @api.depends('bagian')
-    def _compute_bagian_label(self):
-        bagian_map = {'tanaman': 'Tanaman', 'tuk': 'TUK', 'teknik': 'Teknik', 'pabrikasi': 'Pabrikasi', 'qc': 'QC'}
-        for rec in self:
-            rec.bagian_label = bagian_map.get(rec.bagian, '')
-
     _sql_constraints = [
-        ('user_id_uniq', 'unique(user_id)', 'Satu akun Odoo hanya boleh memiliki satu profil KA!'),
-        ('employee_code_uniq', 'UNIQUE(employee_code)', 'Kode Pegawai harus unik!'),
+        ('user_id_uniq', 'unique(user_id)',
+         'Satu akun Odoo hanya boleh memiliki satu profil KA!'),
+        ('employee_code_uniq', 'UNIQUE(employee_code)',
+         'Kode Pegawai harus unik!'),
     ]
 
-    @api.constrains('role', 'atasan_id', 'bagian')
+    @api.constrains('role', 'atasan_id')
     def _check_role_constraints(self):
         for rec in self:
-            if rec.role == 'ppl':
-                if rec.bagian != 'tanaman':
-                    raise ValidationError(_('PPL hanya boleh ada di Bagian Tanaman.'))
-                if not rec.atasan_id:
-                    raise ValidationError(_('PPL harus memiliki Atasan Langsung.'))
-            if rec.role == 'operator' and rec.bagian not in ['tanaman', 'tuk', False]:
-                raise ValidationError(_('Operator hanya boleh di Bagian Tanaman atau TUK.'))
+            if rec.role == 'ppl' and not rec.atasan_id:
+                raise ValidationError(_('PPL harus memiliki Atasan Langsung.'))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -79,31 +86,45 @@ class KaUserProfile(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if 'role' in vals or 'bagian' in vals:
+        if 'role' in vals:
             self._sync_odoo_groups()
         return res
 
     def _sync_odoo_groups(self):
-        group_map = {
+        """
+        Sync grup Odoo berdasarkan role user.
+        Grup spesifik bagian (ta, teknik, dll) di-assign manual
+        via Settings → Users oleh Administrator.
+        """
+        # Grup yang dikelola otomatis oleh role
+        role_group_map = {
             'admin':    'ka_user_management.group_ka_admin',
-            'operator': 'ka_user_management.group_ka_operator',
             'pimpinan': 'ka_user_management.group_ka_pimpinan',
             'kabag':    'ka_user_management.group_ka_kabag',
             'kasi':     'ka_user_management.group_ka_kasi',
             'kasubsi':  'ka_user_management.group_ka_kasubsi',
+            'operator': 'ka_user_management.group_ka_operator',
             'ppl':      'ka_user_management.group_ka_ppl',
         }
-        all_groups = list(group_map.values())
+        # Hanya grup umum yang di-reset otomatis
+        auto_groups = list(role_group_map.values())
+
         for rec in self:
             user = rec.user_id
-            for xml_id in all_groups:
+            if not user:
+                continue
+
+            # Hapus dari semua grup umum dulu
+            for xml_id in auto_groups:
                 try:
                     grp = self.env.ref(xml_id)
                     if user in grp.users:
                         grp.write({'users': [(3, user.id)]})
                 except Exception:
                     pass
-            target_xml = group_map.get(rec.role)
+
+            # Tambahkan ke grup sesuai role
+            target_xml = role_group_map.get(rec.role)
             if target_xml:
                 try:
                     grp = self.env.ref(target_xml)
@@ -118,6 +139,7 @@ class KaUserProfile(models.Model):
         self.write({'state': 'active', 'active': True})
 
     def action_recompute_all_groups(self):
+        """Recompute grup Odoo untuk semua profil user KA."""
         all_profiles = self.search([])
         for profile in all_profiles:
             profile._sync_odoo_groups()

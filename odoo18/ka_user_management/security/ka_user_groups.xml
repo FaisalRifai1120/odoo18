@@ -8,7 +8,7 @@
             <field name="sequence">100</field>
         </record>
 
-        <!-- Grup TANPA implied_ids agar record rules tidak saling override -->
+        <!-- ── GRUP UMUM (lintas bagian) ─────────────────────── -->
         <record id="group_ka_ppl" model="res.groups">
             <field name="name">PPL (Penyuluh Pertanian Lapangan)</field>
             <field name="category_id" ref="module_category_ka"/>
@@ -43,6 +43,86 @@
             <field name="name">Administrator KA</field>
             <field name="category_id" ref="module_category_ka"/>
             <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- ── TANAMAN ────────────────────────────────────────── -->
+        <record id="group_ka_operator_tanaman" model="res.groups">
+            <field name="name">Operator Tanaman</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasubsi_tanaman" model="res.groups">
+            <field name="name">Kasubsi Tanaman</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasi_tanaman" model="res.groups">
+            <field name="name">Kasi Tanaman</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <!-- ── TEBANG ANGKUT (TA) ─────────────────────────────── -->
+        <record id="group_ka_operator_ta" model="res.groups">
+            <field name="name">Operator Tebang Angkut</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasubsi_ta" model="res.groups">
+            <field name="name">Kasubsi Tebang Angkut</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasi_ta" model="res.groups">
+            <field name="name">Kasi Tebang Angkut</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <!-- ── TEKNIK ─────────────────────────────────────────── -->
+        <record id="group_ka_operator_teknik" model="res.groups">
+            <field name="name">Operator Teknik</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasubsi_teknik" model="res.groups">
+            <field name="name">Kasubsi Teknik</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasi_teknik" model="res.groups">
+            <field name="name">Kasi Teknik</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <!-- ── PABRIKASI ──────────────────────────────────────── -->
+        <record id="group_ka_operator_pabrikasi" model="res.groups">
+            <field name="name">Operator Pabrikasi</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasubsi_pabrikasi" model="res.groups">
+            <field name="name">Kasubsi Pabrikasi</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasi_pabrikasi" model="res.groups">
+            <field name="name">Kasi Pabrikasi</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <!-- ── TUK ───────────────────────────────────────────── -->
+        <record id="group_ka_operator_tuk" model="res.groups">
+            <field name="name">Operator TUK</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasubsi_tuk" model="res.groups">
+            <field name="name">Kasubsi TUK</field>
+            <field name="category_id" ref="module_category_ka"/>
+        </record>
+
+        <record id="group_ka_kasi_tuk" model="res.groups">
+            <field name="name">Kasi TUK</field>
+            <field name="category_id" ref="module_category_ka"/>
         </record>
 
     </data>

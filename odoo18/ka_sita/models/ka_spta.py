@@ -281,8 +281,8 @@ class KaSpta(models.Model):
         """Kasubsi TA menyetujui SPTA dan generate nomor SPTA."""
         self.ensure_one()
         if not (
-            self.env.user.has_group('ka_user_management.group_ka_kasubsi') or
-            self.env.user.has_group('ka_user_management.group_ka_kasi')
+            self.env.user.has_group('ka_user_management.group_ka_kasubsi_ta') or
+            self.env.user.has_group('ka_user_management.group_ka_kasi_ta')
         ):
             raise UserError(_('Hanya Kasubsi/Kasi TA yang dapat menyetujui SPTA.'))
         if self.state != 'filled':
@@ -329,7 +329,7 @@ class KaSpta(models.Model):
         """Batalkan SPTA — hanya Kasi TA atau Admin."""
         self.ensure_one()
         if not (
-            self.env.user.has_group('ka_user_management.group_ka_kasi') or
+            self.env.user.has_group('ka_user_management.group_ka_kasi_ta') or
             self.env.user.has_group('ka_user_management.group_ka_admin')
         ):
             raise UserError(_('Hanya Kasi TA atau Administrator yang dapat membatalkan SPTA.'))

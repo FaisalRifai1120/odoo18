@@ -1,12 +1,19 @@
 ka_sita
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/__init__.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/__manifest__.py
+data
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/data/ka_sync_cron.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/data/ka_spta_data.xml
 models
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/__init__.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_register.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_access_rule.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_sync_config.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_mbs.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_jenis_truk.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_quota_spta.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_spta.py
+http://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/models/ka_spta_nomor.py
 security
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/security/ir.model.access.csv
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/security/ka_sita_record_rules.xml
@@ -15,10 +22,10 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_sita_menu.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_sync_config_views.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_mbs_views.xml
-data
-https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/data/ka_sync_cron.xml
-https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_mbs_views.xml
-
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_jenis_truk_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_quota_spta_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_spta_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_sita/views/ka_spta_nomor_views.xml
 
 
 ka_tanaman
@@ -38,7 +45,6 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_tanaman/views/ka_wilayah_views.xml
 
 
-
 ka_user_management
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/__init__.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/__manifest__.py
@@ -53,7 +59,6 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 views
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/views/ka_user_menu.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_user_management/views/ka_user_views.xml
-
 
 
 ka_timbangan

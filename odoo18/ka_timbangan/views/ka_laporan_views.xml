@@ -10,8 +10,8 @@
         <field name="arch" type="xml">
             <list string="Laporan Harian Timbang Tebu" create="false" edit="false" delete="false">
                 <field name="tanggal"/>
-                <field name="register"/>
-                <field name="register_id" string="Nama Register"/>
+                <field name="register" string="Kode Register"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="petani_id"/>
                 <field name="ppl_id"/>
                 <field name="jumlah_ritase" sum="Total Ritase"/>
@@ -30,8 +30,8 @@
         <field name="arch" type="xml">
             <search string="Cari Laporan Harian">
                 <field name="tanggal"/>
-                <field name="register"/>
-                <field name="register_id" string="Nama Register"/>
+                <field name="register" string="Kode Register"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="petani_id"/>
                 <field name="ppl_id"/>
                 <filter name="filter_tahun_ini" string="Tahun Ini"
@@ -69,8 +69,8 @@
         <field name="model">ka.laporan.register</field>
         <field name="arch" type="xml">
             <list string="Laporan Rekap per Register" create="false" edit="false" delete="false">
-                <field name="register"/>
-                <field name="register_id" string="Nama Register"/>
+                <field name="register" string="Kode Register"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="petani_id"/>
                 <field name="ppl_id"/>
                 <field name="kud_id"/>
@@ -90,8 +90,8 @@
         <field name="model">ka.laporan.register</field>
         <field name="arch" type="xml">
             <search string="Cari Laporan Register">
-                <field name="register"/>
-                <field name="register_id" string="Nama Register"/>
+                <field name="register" string="Kode Register"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="petani_id"/>
                 <field name="ppl_id"/>
                 <field name="kud_id"/>
@@ -160,8 +160,8 @@
                 <field name="spta_id" string="No. Timbangan"/>
                 <field name="no_spta" string="No. SPTA"/>
                 <field name="kd_antrian" string="No. Antrian"/>
-                <field name="register"/>
-                <field name="register_id" string="Nama Register"/>
+                <field name="register" string="Kode Register"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="petani_id"/>
                 <field name="ppl_id"/>
                 <field name="kud_id" optional="show"/>
@@ -172,6 +172,7 @@
                 <field name="weight_kw" string="Netto (Kw)" sum="Total Kw"/>
                 <field name="rafaksi" string="Rafaksi" optional="show"/>
                 <field name="bobot_tebu" string="Bobot Tebu" sum="Total Bobot" optional="show"/>
+                <field name="rendemen" string="Rendemen" digits="[10,4]" optional="show"/>
                 <field name="mbs_id" string="MBS" optional="show"/>
                 <field name="varietas" optional="show"/>
                 <field name="date_in" string="Tgl. Masuk" optional="hide"/>
@@ -186,8 +187,8 @@
             <search string="Cari Laporan Detail">
                 <field name="spta_id" string="No. Timbangan"/>
                 <field name="no_spta" string="No. SPTA"/>
-                <field name="register"/>
-                <field name="register_id" string="Nama Register"/>
+                <field name="register" string="Kode Register"/>
+                <field name="nama_register" string="Nama Register"/>
                 <field name="petani_id"/>
                 <field name="ppl_id"/>
                 <field name="kud_id"/>

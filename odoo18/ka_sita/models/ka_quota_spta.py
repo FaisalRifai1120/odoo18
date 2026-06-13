@@ -78,7 +78,10 @@ class KaQuotaSpta(models.Model):
     def action_approve(self):
         """Kasi TA menyetujui quota."""
         self.ensure_one()
-        if not self.env.user.has_group('ka_user_management.group_ka_kasi'):
+        if not (
+            self.env.user.has_group('ka_user_management.group_ka_kasi_ta') or
+            self.env.user.has_group('ka_user_management.group_ka_admin')
+        ):
             raise UserError(_('Hanya Kasi TA yang dapat menyetujui Quota SPTA.'))
         if self.jumlah_quota <= 0:
             raise UserError(_('Jumlah quota harus lebih dari 0.'))
@@ -88,7 +91,7 @@ class KaQuotaSpta(models.Model):
         """Batalkan quota — hanya Kasi TA atau Admin."""
         self.ensure_one()
         if not (
-            self.env.user.has_group('ka_user_management.group_ka_kasi') or
+            self.env.user.has_group('ka_user_management.group_ka_kasi_ta') or
             self.env.user.has_group('ka_user_management.group_ka_admin')
         ):
             raise UserError(_('Hanya Kasi TA atau Administrator yang dapat membatalkan Quota.'))
@@ -167,8 +170,9 @@ class KaQuotaSptaLine(models.Model):
         """Kasubsi/Kasi TA menyetujui plot wilayah."""
         self.ensure_one()
         if not (
-            self.env.user.has_group('ka_user_management.group_ka_kasubsi') or
-            self.env.user.has_group('ka_user_management.group_ka_kasi')
+            self.env.user.has_group('ka_user_management.group_ka_kasubsi_ta') or
+            self.env.user.has_group('ka_user_management.group_ka_kasi_ta') or
+            self.env.user.has_group('ka_user_management.group_ka_admin')
         ):
             raise UserError(_('Hanya Kasubsi/Kasi TA yang dapat menyetujui plot wilayah.'))
         if self.quota_id.state != 'approved':
@@ -191,8 +195,8 @@ class KaQuotaSptaLine(models.Model):
     def action_cancel(self):
         self.ensure_one()
         if not (
-            self.env.user.has_group('ka_user_management.group_ka_kasi') or
-            self.env.user.has_group('ka_user_management.group_ka_kasubsi') or
+            self.env.user.has_group('ka_user_management.group_ka_kasubsi_ta') or
+            self.env.user.has_group('ka_user_management.group_ka_kasi_ta') or
             self.env.user.has_group('ka_user_management.group_ka_admin')
         ):
             raise UserError(_('Hanya Kasubsi/Kasi TA atau Administrator yang dapat membatalkan plot wilayah.'))

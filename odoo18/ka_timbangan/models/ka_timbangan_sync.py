@@ -9,6 +9,11 @@ _logger = logging.getLogger(__name__)
 
 # Cron hanya sync tahun berjalan (otomatis)
 import datetime as _dt
+from datetime import timedelta
+from zoneinfo import ZoneInfo
+
+TZ_OFFSET = timedelta(hours=14)  # 7 jam konversi + 7 jam kompensasi display Odoo
+SOURCE_TZ = 'Asia/Jakarta'
 CRON_SYNC_FROM_YEAR = _dt.date.today().year
 
 
@@ -36,6 +41,26 @@ class KaTimbangSync(models.Model):
     ], string='Status Terakhir', readonly=True)
     last_sync_message = fields.Text(string='Pesan Terakhir', readonly=True)
     total_synced = fields.Integer(string='Total Record Ter-sync', readonly=True)
+
+    def action_reset_data_timbang(self):
+        """Hapus semua data timbang tebu untuk sync ulang dari awal."""
+        self.ensure_one()
+        Tebu = self.env['ka.timbang.tebu'].sudo()
+        total = Tebu.search_count([])
+        Tebu.search([]).unlink()
+        self.write({
+            'last_sync_message': f'Reset: {total} record dihapus. Silakan sync ulang.',
+        })
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Reset Selesai',
+                'message': f'{total} record timbang tebu berhasil dihapus. Silakan sync ulang.',
+                'type': 'warning',
+                'sticky': True,
+            }
+        }
 
     def action_sync_manual(self):
         """Sync manual dengan filter rentang tanggal date_out."""
@@ -74,76 +99,116 @@ class KaTimbangSync(models.Model):
 
     def action_relink_register(self):
         """
-        Isi ulang register_id, petani_id, mbs_id untuk semua record
-        yang register_id-nya masih kosong atau perlu diperbarui.
+        Isi ulang register_id, petani_id, mbs_id, dan rendemen (rend_npp)
+        untuk semua record timbang tebu.
         """
         self.ensure_one()
-        Tebu = self.env['ka.timbang.tebu'].sudo()
+        ctx = dict(tracking_disable=True, mail_notrack=True, mail_create_nolog=True)
+        Tebu     = self.env['ka.timbang.tebu'].sudo().with_context(**ctx)
         Register = self.env['ka.sita.register'].sudo()
-        Mbs = self.env['ka.mbs'].sudo()
+        Mbs      = self.env['ka.mbs'].sudo()
+        Qc       = self.env['ka.analisa.qc'].sudo()
 
-        # Cache
+        # Pre-load semua cache sekaligus
         register_cache = {}
-        petani_cache = {}
-        mbs_cache = {}
+        petani_cache   = {}
+        mbs_cache      = {}
 
-        # Ambil semua record timbang tebu
+        for r in Register.search_read([], ['kode_register', 'petani_id']):
+            register_cache[r['kode_register']] = r['id']
+            petani_cache[r['kode_register']]   = r['petani_id'][0] if r['petani_id'] else False
+
+        for r in Mbs.search_read([], ['kode']):
+            mbs_cache[r['kode']] = r['id']
+
+        # Cache rend_npp dari analisa QC: kd_antrian → rend_npp
+        qc_cache = {
+            r['kd_antrian']: r['rend_npp']
+            for r in Qc.search_read(
+                [('kd_antrian', '!=', False)],
+                ['kd_antrian', 'rend_npp']
+            )
+        }
+
         all_tebu = Tebu.search([])
-        total = len(all_tebu)
-        count_linked = 0
-        count_mbs = 0
+        total        = len(all_tebu)
+        count_reg    = 0
+        count_mbs    = 0
+        count_rend   = 0
 
-        _logger.info('[KA-TIMBANG] Relink dimulai | Total record: %d', total)
+        _logger.info('[KA-TIMBANG] Relink dimulai | Total: %d', total)
 
         for idx, rec in enumerate(all_tebu, start=1):
             vals = {}
 
-            # Relink register_id
+            # Relink register_id & petani_id
             kode = rec.register or ''
-            if kode:
-                if kode not in register_cache:
-                    reg = Register.search([('kode_register', '=', kode)], limit=1)
-                    register_cache[kode] = reg.id if reg else False
-                    petani_cache[kode] = reg.petani_id.id if reg and reg.petani_id else False
-                if register_cache[kode] and rec.register_id.id != register_cache[kode]:
+            if kode and register_cache.get(kode):
+                if rec.register_id.id != register_cache[kode]:
                     vals['register_id'] = register_cache[kode]
-                    vals['petani_id']   = petani_cache[kode]
-                    count_linked += 1
+                    vals['petani_id']   = petani_cache.get(kode, False)
+                    count_reg += 1
 
             # Relink mbs_id
             mbs_kode = rec.mbs_kode or 0
-            if mbs_kode:
-                if mbs_kode not in mbs_cache:
-                    mbs = Mbs.search([('kode', '=', mbs_kode)], limit=1)
-                    mbs_cache[mbs_kode] = mbs.id if mbs else False
-                if mbs_cache[mbs_kode] and rec.mbs_id.id != mbs_cache[mbs_kode]:
+            if mbs_kode and mbs_cache.get(mbs_kode):
+                if rec.mbs_id.id != mbs_cache[mbs_kode]:
                     vals['mbs_id'] = mbs_cache[mbs_kode]
                     count_mbs += 1
+
+            # Relink rendemen dari analisa QC
+            kd_antrian = rec.kd_antrian or ''
+            if kd_antrian and kd_antrian in qc_cache:
+                rend = float(qc_cache[kd_antrian] or 0)
+                if rec.rendemen != rend:
+                    vals['rendemen'] = rend
+                    count_rend += 1
 
             if vals:
                 rec.write(vals)
 
             if idx % 200 == 0 or idx == total:
                 _logger.info(
-                    '[KA-TIMBANG] Relink progress: %d/%d | Register: %d | MBS: %d',
-                    idx, total, count_linked, count_mbs
+                    '[KA-TIMBANG] Relink %d/%d | Reg: %d | MBS: %d | Rend: %d',
+                    idx, total, count_reg, count_mbs, count_rend
                 )
 
         _logger.info(
-            '[KA-TIMBANG] ✓ Relink selesai | Register linked: %d | MBS linked: %d',
-            count_linked, count_mbs
+            '[KA-TIMBANG] ✓ Relink selesai | Reg: %d | MBS: %d | Rend: %d',
+            count_reg, count_mbs, count_rend
         )
 
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Relink Selesai',
-                'message': f'{count_linked} register & {count_mbs} MBS berhasil di-relink.',
-                'type': 'success',
-                'sticky': False,
+                'title':   'Relink Selesai',
+                'message': f'{count_reg} register, {count_mbs} MBS, {count_rend} rendemen berhasil di-relink.',
+                'type':    'success',
+                'sticky':  False,
             }
         }
+
+    def _to_utc_naive(self, dt):
+        """
+        Normalisasi datetime agar disimpan di Odoo sebagai naive UTC.
+        Jika `dt` memiliki tzinfo, konversi ke UTC lalu strip tzinfo.
+        Jika `dt` sudah naive, kembalikan apa adanya (diasumsikan UTC).
+        Return: datetime naive atau False jika input falsy.
+        """
+        if not dt:
+            return False
+        try:
+            # Gunakan modul datetime yang diimport sebagai _dt
+            if isinstance(dt, _dt.datetime):
+                # Jika dt sudah tz-aware → konversi ke UTC lalu strip tz
+                if dt.tzinfo is not None:
+                    return dt.astimezone(_dt.timezone.utc).replace(tzinfo=None)
+                # Jika dt naive → anggap berasal dari SOURCE_TZ lalu konversi ke UTC
+                local_tz = ZoneInfo(SOURCE_TZ)
+                return dt.replace(tzinfo=local_tz).astimezone(_dt.timezone.utc).replace(tzinfo=None)
+        except Exception:
+            return dt
 
     def _fetch_from_postgres(self, date_from=None, date_to=None, cron_mode=False):
         """
@@ -294,9 +359,19 @@ class KaTimbangSync(models.Model):
         )
         existing_keys = {r['sync_key']: r['id'] for r in existing_recs}
 
+        # Cache rendemen dari analisa QC: kd_antrian → rend_npp
+        Qc = self.env['ka.analisa.qc'].sudo()
+        qc_rend_cache = {
+            r['kd_antrian']: r['rend_npp']
+            for r in Qc.search_read(
+                [('kd_antrian', '!=', False)],
+                ['kd_antrian', 'rend_npp']
+            )
+        }
+
         _logger.debug(
-            '[KA-TIMBANG] Cache loaded | Register: %d | MBS: %d | Existing: %d',
-            len(register_cache), len(mbs_cache), len(existing_keys)
+            '[KA-TIMBANG] Cache loaded | Register: %d | MBS: %d | Existing: %d | QC: %d',
+            len(register_cache), len(mbs_cache), len(existing_keys), len(qc_rend_cache)
         )
 
         vals_to_create = []
@@ -311,6 +386,7 @@ class KaTimbangSync(models.Model):
             spta_id  = row['spta_id']
             truck_id = row['truck_id']
             sync_key = f"{spta_id}_{truck_id or ''}"
+            kd_antrian = str(row['kd_antrian']) if row['kd_antrian'] else ''
 
             # Resolve dari cache (tanpa query)
             kode_register = row['register'] or ''
@@ -329,14 +405,14 @@ class KaTimbangSync(models.Model):
             vals = {
                 'spta_id':        str(spta_id) if spta_id else '',
                 'no_spta':        row['no_spta'] or '',
-                'kd_antrian':     str(row['kd_antrian']) if row['kd_antrian'] else '',
+                'kd_antrian':     kd_antrian,
                 'register':       kode_register,
                 'register_id':    register_id,
                 'petani_id':      petani_id,
                 'petak':          row['petak'] or '',
                 'truck_id':       truck_id or '',
-                'date_in':        row['date_in'],
-                'date_out':       row['date_out'],
+                'date_in':        self._to_utc_naive(row['date_in']) if row['date_in'] else False,
+                'date_out':       self._to_utc_naive(row['date_out']) if row['date_out'] else False,
                 'weight_in':      float(row['weight_in'] or 0),
                 'weight_out':     float(row['weight_out'] or 0),
                 'weight_net':     weight_net,
@@ -351,6 +427,10 @@ class KaTimbangSync(models.Model):
                 'state':          row['state'] or '',
                 'sync_key':       sync_key,
             }
+
+            # Cek rendemen dari cache QC
+            if kd_antrian in qc_rend_cache:
+                vals['rendemen'] = float(qc_rend_cache[kd_antrian] or 0)
 
             if sync_key in existing_keys:
                 vals_to_update.append((existing_keys[sync_key], vals))
@@ -436,3 +516,19 @@ class KaTimbangSync(models.Model):
                 'last_sync_status': 'failed',
                 'last_sync_message': str(e),
             })
+        
+        # ── Sequential: jalankan QC sync setelah timbang ─────
+        try:
+            QcSync = self.env['ka.analisa.qc.sync'].sudo()
+            qc_cfg = QcSync.search([('active', '=', True)], limit=1)
+            if qc_cfg:
+                _logger.info('[KA-QC] Sync QC sequential setelah timbang...')
+                qc_count = qc_cfg._do_sync(cron_mode=True)
+                qc_cfg.write({
+                    'last_sync':         fields.Datetime.now(),
+                    'last_sync_status':  'success',
+                    'last_sync_message': f'Sequential sync: {qc_count} record (tahun {CRON_SYNC_FROM_YEAR}).',
+                    'total_synced':      qc_cfg.total_synced + qc_count,
+                })
+        except Exception as e:
+            _logger.error('[KA-QC] ✗ Sequential QC gagal: %s', str(e))

@@ -8,10 +8,15 @@
             <form string="Sinkronisasi Timbangan">
                 <header>
                     <button name="action_relink_register"
-                            string="Relink Register &amp; MBS"
+                            string="Relink Register, MBS &amp; Analisa"
                             type="object"
                             class="btn-secondary"
-                            confirm="Proses ini akan menghubungkan ulang semua data timbang ke Register dan MBS. Lanjutkan?"
+                            confirm="Proses ini akan menghubungkan ulang Register, MBS, dan Rendemen dari Analisa QC. Lanjutkan?"
+                            groups="ka_user_management.group_ka_admin"/>
+                    <button name="action_reset_data_timbang"
+                            string="⚠️ Hapus Semua Data &amp; Sync Ulang"
+                            type="object" class="btn-danger"
+                            confirm="PERHATIAN! Semua data timbang tebu akan dihapus dan perlu di-sync ulang dari awal. Lanjutkan?"
                             groups="ka_user_management.group_ka_admin"/>
                     <button name="action_sync_manual"
                             string="Sync Manual (Rentang Tanggal)"

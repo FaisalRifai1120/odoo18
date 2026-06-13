@@ -20,6 +20,7 @@
         'views/ka_tebu_views.xml',
         'views/ka_laporan_views.xml',
         'views/ka_timbangan_sync_views.xml',
+        'views/ka_analisa_qc_views.xml',
         'views/ka_timbangan_menu.xml',
     ],
     'external_dependencies': {

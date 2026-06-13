@@ -17,8 +17,18 @@
 
     <menuitem id="menu_ka_laporan_detail" name="Detail Timbang" parent="menu_ka_timbangan_laporan" action="action_ka_laporan_detail" sequence="40"/>
 
+    <!-- Analisa QC -->
+    <menuitem id="menu_ka_analisa_qc" name="Analisa QC"
+              parent="menu_ka_timbangan_root"
+              action="action_ka_analisa_qc" sequence="20"/>
+
     <!-- Sinkronisasi -->
     <menuitem id="menu_ka_timbangan_sync" name="Sinkronisasi" parent="menu_ka_timbangan_root" sequence="90" groups="ka_user_management.group_ka_admin"/>
+
+    <menuitem id="menu_ka_analisa_qc_sync" name="Sinkronisasi Analisa QC"
+              parent="menu_ka_timbangan_sync"
+              action="action_ka_analisa_qc_sync" sequence="20"
+              groups="ka_user_management.group_ka_admin"/>
 
     <menuitem id="menu_ka_timbang_sync_config" name="Konfigurasi Sinkronisasi" parent="menu_ka_timbangan_sync" action="action_ka_timbang_sync" sequence="10" groups="ka_user_management.group_ka_admin"/>
 
