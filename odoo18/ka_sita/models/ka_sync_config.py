@@ -14,6 +14,10 @@ class KaSyncConfig(models.Model):
     _rec_name = 'name'
 
     name = fields.Char(string='Nama Konfigurasi', required=True, default='Koneksi SITA')
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     active = fields.Boolean(default=True)
     db_host = fields.Char(string='Host', required=True, default='localhost')
     db_port = fields.Integer(string='Port', required=True, default=5432)
@@ -191,10 +195,14 @@ class KaSyncConfig(models.Model):
 
         BATCH_SIZE = 500
 
-        # Ambil semua kode_register yang sudah ada
+        # Ambil kode_register yang sudah ada UNTUK COMPANY INI
+        company_id = self.company_id.id
+        Register = Register.with_company(company_id)
         existing_keys = {
             r['kode_register']: r['id']
-            for r in Register.search_read([], ['kode_register', 'id'])
+            for r in Register.search_read(
+                [('company_id', '=', company_id)], ['kode_register', 'id']
+            )
         }
 
         vals_to_create = []
@@ -219,6 +227,7 @@ class KaSyncConfig(models.Model):
                 vals['jenis_register'] = 'TR'
                 vals['metode']         = 'SBH'
                 vals['jenis_pembayaran'] = 'Harian'
+                vals['company_id']     = company_id
                 vals_to_create.append(vals)
 
             # Flush batch
@@ -262,21 +271,24 @@ class KaSyncConfig(models.Model):
 
     @api.model
     def cron_sync_register(self):
-        configs = self.search([('active', '=', True)], limit=1)
+        configs = self.search([('active', '=', True)])
         if not configs:
             _logger.warning('[KA-SITA] Tidak ada konfigurasi aktif, cron dilewati.')
             return
-        try:
-            count = configs._do_sync(limit=None)
-            configs.write({
-                'last_sync': fields.Datetime.now(),
-                'last_sync_status': 'success',
-                'last_sync_message': f'Cron sync berhasil: {count} record diproses.',
-            })
-        except Exception as e:
-            _logger.error('[KA-SITA] ✗ Cron sync GAGAL | Error: %s', str(e))
-            configs.write({
-                'last_sync': fields.Datetime.now(),
-                'last_sync_status': 'failed',
-                'last_sync_message': str(e),
-            })
+        # Loop semua config — setiap company punya database sendiri
+        for config in configs:
+            try:
+                count = config._do_sync(limit=None)
+                config.write({
+                    'last_sync': fields.Datetime.now(),
+                    'last_sync_status': 'success',
+                    'last_sync_message': f'Cron sync berhasil: {count} record (company: {config.company_id.name}).',
+                })
+            except Exception as e:
+                _logger.error('[KA-SITA] ✗ Cron sync GAGAL | Company: %s | Error: %s',
+                              config.company_id.name, str(e))
+                config.write({
+                    'last_sync': fields.Datetime.now(),
+                    'last_sync_status': 'failed',
+                    'last_sync_message': str(e),
+                })

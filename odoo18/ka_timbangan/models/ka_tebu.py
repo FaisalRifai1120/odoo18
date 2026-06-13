@@ -10,6 +10,10 @@ class KaTimbangTebu(models.Model):
     _order = 'date_out DESC, spta_id'
 
     # ── Identitas ──────────────────────────────────────────────
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     spta_id = fields.Char(string='Nomor Timbangan', required=True, tracking=True)
     no_spta = fields.Char(string='No. SPTA', tracking=True)
     kd_antrian = fields.Char(string='Nomor Antrian', tracking=True)
@@ -73,7 +77,7 @@ class KaTimbangTebu(models.Model):
     active = fields.Boolean(default=True)
 
     _sql_constraints = [
-        ('sync_key_uniq', 'UNIQUE(sync_key)', 'Sync key harus unik!'),
+        ('sync_key_company_uniq', 'UNIQUE(sync_key, company_id)', 'Sync key harus unik per unit!'),
     ]
 
     def name_get(self):

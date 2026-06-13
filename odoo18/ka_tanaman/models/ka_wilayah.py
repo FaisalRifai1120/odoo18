@@ -8,13 +8,17 @@ class KaProvinsi(models.Model):
     _rec_name = 'nama'
     _order = 'kode'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode = fields.Char(string='Kode Provinsi', required=True, size=10)
     nama = fields.Char(string='Nama Provinsi', required=True)
     active = fields.Boolean(default=True)
     kota_ids = fields.One2many('ka.wilayah.kota', 'provinsi_id', string='Daftar Kota/Kabupaten')
     kota_count = fields.Integer(string='Jumlah Kota', compute='_compute_kota_count')
 
-    _sql_constraints = [('kode_uniq', 'UNIQUE(kode)', 'Kode Provinsi harus unik!')]
+    _sql_constraints = [('kode_company_uniq', 'UNIQUE(kode, company_id)', 'Kode Provinsi harus unik per unit!')]
 
     @api.depends('kota_ids')
     def _compute_kota_count(self):
@@ -31,6 +35,10 @@ class KaKota(models.Model):
     _rec_name = 'nama'
     _order = 'kode'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode = fields.Char(string='Kode Kota/Kab', required=True, size=10)
     nama = fields.Char(string='Nama Kota/Kabupaten', required=True)
     provinsi_id = fields.Many2one('ka.wilayah.provinsi', string='Provinsi', required=True, ondelete='restrict')
@@ -38,7 +46,7 @@ class KaKota(models.Model):
     kecamatan_ids = fields.One2many('ka.wilayah.kecamatan', 'kota_id', string='Daftar Kecamatan')
     kecamatan_count = fields.Integer(string='Jumlah Kecamatan', compute='_compute_kecamatan_count')
 
-    _sql_constraints = [('kode_uniq', 'UNIQUE(kode)', 'Kode Kota/Kabupaten harus unik!')]
+    _sql_constraints = [('kode_company_uniq', 'UNIQUE(kode, company_id)', 'Kode Kota/Kabupaten harus unik per unit!')]
 
     @api.depends('kecamatan_ids')
     def _compute_kecamatan_count(self):
@@ -55,6 +63,10 @@ class KaKecamatan(models.Model):
     _rec_name = 'nama'
     _order = 'kode'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode = fields.Char(string='Kode Kecamatan', required=True, size=10)
     nama = fields.Char(string='Nama Kecamatan', required=True)
     kota_id = fields.Many2one('ka.wilayah.kota', string='Kota/Kabupaten', required=True, ondelete='restrict')
@@ -63,7 +75,7 @@ class KaKecamatan(models.Model):
     desa_ids = fields.One2many('ka.wilayah.desa', 'kecamatan_id', string='Daftar Desa')
     desa_count = fields.Integer(string='Jumlah Desa', compute='_compute_desa_count')
 
-    _sql_constraints = [('kode_uniq', 'UNIQUE(kode)', 'Kode Kecamatan harus unik!')]
+    _sql_constraints = [('kode_company_uniq', 'UNIQUE(kode, company_id)', 'Kode Kecamatan harus unik per unit!')]
 
     @api.depends('desa_ids')
     def _compute_desa_count(self):
@@ -80,6 +92,10 @@ class KaDesa(models.Model):
     _rec_name = 'nama'
     _order = 'kode'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode = fields.Char(string='Kode Desa', required=True, size=10)
     nama = fields.Char(string='Nama Desa', required=True)
     kecamatan_id = fields.Many2one('ka.wilayah.kecamatan', string='Kecamatan', required=True, ondelete='restrict')
@@ -87,7 +103,7 @@ class KaDesa(models.Model):
     provinsi_id = fields.Many2one('ka.wilayah.provinsi', related='kecamatan_id.provinsi_id', store=True, readonly=True, string='Provinsi')
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [('kode_uniq', 'UNIQUE(kode)', 'Kode Desa harus unik!')]
+    _sql_constraints = [('kode_company_uniq', 'UNIQUE(kode, company_id)', 'Kode Desa harus unik per unit!')]
 
     def name_get(self):
         return [(r.id, f"[{r.kode}] {r.nama}") for r in self]

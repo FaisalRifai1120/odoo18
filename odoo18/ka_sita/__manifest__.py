@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'KA SITA',
-    'version': '18.0.1.0',
+    'version': '18.0.2.0',
     'category': 'Agriculture',
     'summary': 'Sistem Informasi Tebang dan Angkut',
     'description': """
@@ -17,6 +17,7 @@
     'data': [
         'security/ir.model.access.csv',
         'security/ka_sita_record_rules.xml',
+        'security/ka_sita_company_rules.xml',
         'data/ka_sync_cron.xml',
         'data/ka_spta_data.xml',
         'views/ka_register_views.xml',

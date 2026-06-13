@@ -10,6 +10,10 @@ class KaSitaRegister(models.Model):
     _rec_name = 'kode_register'
     _order = 'kode_register'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode_register = fields.Char(string='Kode Register', required=True, tracking=True)
     nama_register = fields.Char(string='Nama Register', required=True, tracking=True)
     jenis_register = fields.Selection([
@@ -49,7 +53,7 @@ class KaSitaRegister(models.Model):
     active = fields.Boolean(default=True)
 
     _sql_constraints = [
-        ('kode_register_uniq', 'UNIQUE(kode_register)', 'Kode Register harus unik!'),
+        ('kode_register_company_uniq', 'UNIQUE(kode_register, company_id)', 'Kode Register harus unik per unit!'),
     ]
 
     @api.onchange('petani_id')

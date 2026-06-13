@@ -8,6 +8,10 @@ class KaMbs(models.Model):
     _rec_name = 'label'
     _order = 'kode'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode = fields.Integer(
         string='Kode MBS', required=True,
         help='Kode angka MBS dari sistem timbangan'
@@ -20,7 +24,7 @@ class KaMbs(models.Model):
     active = fields.Boolean(default=True)
 
     _sql_constraints = [
-        ('kode_uniq', 'UNIQUE(kode)', 'Kode MBS harus unik!'),
+        ('kode_company_uniq', 'UNIQUE(kode, company_id)', 'Kode MBS harus unik per unit!'),
     ]
 
     def name_get(self):

@@ -16,6 +16,10 @@ class KaSpta(models.Model):
     _order = 'no_qts DESC'
 
     # ── Identitas ──────────────────────────────────────────────
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     no_qts = fields.Char(
         string='No. QTS', readonly=True, copy=False,
         default='/', index=True, tracking=True,

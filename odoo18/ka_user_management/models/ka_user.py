@@ -9,6 +9,10 @@ class KaUserProfile(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     user_id = fields.Many2one(
         'res.users', string='User Odoo', required=True,
         ondelete='cascade', tracking=True,
@@ -67,8 +71,8 @@ class KaUserProfile(models.Model):
     _sql_constraints = [
         ('user_id_uniq', 'unique(user_id)',
          'Satu akun Odoo hanya boleh memiliki satu profil KA!'),
-        ('employee_code_uniq', 'UNIQUE(employee_code)',
-         'Kode Pegawai harus unik!'),
+        ('employee_code_company_uniq', 'UNIQUE(employee_code, company_id)',
+         'Kode Pegawai harus unik per unit!'),
     ]
 
     @api.constrains('role', 'atasan_id')

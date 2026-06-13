@@ -14,6 +14,10 @@ class KaQuotaSpta(models.Model):
     _rec_name = 'name'
     _order = 'tanggal DESC, name'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     name = fields.Char(
         string='No. Quota', readonly=True, copy=False,
         default='/'
@@ -115,6 +119,10 @@ class KaQuotaSptaLine(models.Model):
     quota_id = fields.Many2one(
         'ka.quota.spta', string='Quota', required=True,
         ondelete='cascade'
+    )
+    company_id = fields.Many2one(
+        'res.company', related='quota_id.company_id',
+        store=True, index=True, string='Unit/Company'
     )
     tanggal = fields.Date(
         related='quota_id.tanggal', store=True, readonly=True

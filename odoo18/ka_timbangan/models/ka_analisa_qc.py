@@ -10,6 +10,10 @@ class KaAnalisaQc(models.Model):
     _order = 'created_at DESC'
 
     # ── Identitas ──────────────────────────────────────────────
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     no_spta     = fields.Char(string='No. SPTA', required=True, index=True)
     kd_antrian  = fields.Char(string='Kode Antrian', index=True)
 
@@ -44,5 +48,5 @@ class KaAnalisaQc(models.Model):
     active = fields.Boolean(default=True)
 
     _sql_constraints = [
-        ('no_spta_uniq', 'UNIQUE(no_spta)', 'No. SPTA QC harus unik!'),
+        ('no_spta_company_uniq', 'UNIQUE(no_spta, company_id)', 'No. SPTA QC harus unik per unit!'),
     ]

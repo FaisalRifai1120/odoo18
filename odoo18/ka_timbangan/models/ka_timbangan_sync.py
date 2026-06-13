@@ -23,6 +23,10 @@ class KaTimbangSync(models.Model):
     _rec_name = 'name'
 
     name = fields.Char(string='Nama', required=True, default='Sinkronisasi Timbang Tebu')
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     active = fields.Boolean(default=True)
     sync_config_id = fields.Many2one(
         'ka.sync.config', string='Konfigurasi Koneksi',
@@ -46,8 +50,8 @@ class KaTimbangSync(models.Model):
         """Hapus semua data timbang tebu untuk sync ulang dari awal."""
         self.ensure_one()
         Tebu = self.env['ka.timbang.tebu'].sudo()
-        total = Tebu.search_count([])
-        Tebu.search([]).unlink()
+        total = Tebu.search_count([('company_id', '=', self.company_id.id)])
+        Tebu.search([('company_id', '=', self.company_id.id)]).unlink()
         self.write({
             'last_sync_message': f'Reset: {total} record dihapus. Silakan sync ulang.',
         })
@@ -342,29 +346,34 @@ class KaTimbangSync(models.Model):
         # ── Pre-load semua cache sekaligus (1 query per model) ────
         _logger.debug('[KA-TIMBANG] Pre-loading cache...')
 
-        # Cache register: kode -> (id, petani_id)
-        register_recs = Register.search_read([], ['kode_register', 'petani_id'])
+        # COMPANY untuk sync ini
+        company_id = self.company_id.id
+
+        # Cache register: kode -> (id, petani_id) — per company
+        register_recs = Register.search_read(
+            [('company_id', '=', company_id)], ['kode_register', 'petani_id']
+        )
         register_cache = {
             r['kode_register']: (r['id'], r['petani_id'][0] if r['petani_id'] else False)
             for r in register_recs
         }
 
-        # Cache MBS: kode -> id
-        mbs_recs = Mbs.search_read([], ['kode'])
+        # Cache MBS: kode -> id — per company
+        mbs_recs = Mbs.search_read([('company_id', '=', company_id)], ['kode'])
         mbs_cache = {r['kode']: r['id'] for r in mbs_recs}
 
-        # Cache existing sync_keys: sync_key -> id
+        # Cache existing sync_keys: sync_key -> id — per company
         existing_recs = self.env['ka.timbang.tebu'].sudo().search_read(
-            [], ['sync_key', 'id']
+            [('company_id', '=', company_id)], ['sync_key', 'id']
         )
         existing_keys = {r['sync_key']: r['id'] for r in existing_recs}
 
-        # Cache rendemen dari analisa QC: kd_antrian → rend_npp
+        # Cache rendemen dari analisa QC: kd_antrian → rend_npp — per company
         Qc = self.env['ka.analisa.qc'].sudo()
         qc_rend_cache = {
             r['kd_antrian']: r['rend_npp']
             for r in Qc.search_read(
-                [('kd_antrian', '!=', False)],
+                [('kd_antrian', '!=', False), ('company_id', '=', company_id)],
                 ['kd_antrian', 'rend_npp']
             )
         }
@@ -426,6 +435,7 @@ class KaTimbangSync(models.Model):
                 'jenis_tebu':     row['jenis_tebu'] or '',
                 'state':          row['state'] or '',
                 'sync_key':       sync_key,
+                'company_id':     company_id,
             }
 
             # Cek rendemen dari cache QC

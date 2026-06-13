@@ -8,13 +8,17 @@ class KaJenisTruk(models.Model):
     _rec_name = 'nama'
     _order = 'kode'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode = fields.Char(string='Kode', required=True, size=10)
     nama = fields.Char(string='Nama Jenis Truk', required=True)
     keterangan = fields.Char(string='Keterangan')
     active = fields.Boolean(default=True)
 
     _sql_constraints = [
-        ('kode_uniq', 'UNIQUE(kode)', 'Kode Jenis Truk harus unik!'),
+        ('kode_company_uniq', 'UNIQUE(kode, company_id)', 'Kode Jenis Truk harus unik per unit!'),
     ]
 
     def name_get(self):

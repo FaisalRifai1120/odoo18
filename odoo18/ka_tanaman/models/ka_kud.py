@@ -9,6 +9,10 @@ class KaKud(models.Model):
     _rec_name = 'nama'
     _order = 'kode'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode = fields.Char(string='Kode KUD', required=True, size=20, tracking=True)
     nama = fields.Char(string='Nama KUD', required=True, tracking=True)
     kota_id = fields.Many2one('ka.wilayah.kota', string='Kota/Kabupaten', required=True, tracking=True, ondelete='restrict')
@@ -18,7 +22,7 @@ class KaKud(models.Model):
     no_telepon = fields.Char(string='No. Telepon', tracking=True)
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [('kode_uniq', 'UNIQUE(kode)', 'Kode KUD harus unik!')]
+    _sql_constraints = [('kode_company_uniq', 'UNIQUE(kode, company_id)', 'Kode KUD harus unik per unit!')]
 
     def name_get(self):
         return [(r.id, f"[{r.kode}] {r.nama}") for r in self]

@@ -24,6 +24,10 @@ class KaAnalisaQcSync(models.Model):
         string='Nama', required=True,
         default='Sinkronisasi Analisa QC'
     )
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     active = fields.Boolean(default=True)
     sync_config_id = fields.Many2one(
         'ka.sync.config', string='Konfigurasi Koneksi',
@@ -163,15 +167,16 @@ class KaAnalisaQcSync(models.Model):
         Timbang = self.env['ka.timbang.tebu'].sudo().with_context(**ctx)
 
         # Pre-load cache existing QC (no_spta → id)
+        company_id = self.company_id.id
         existing_qc = {
             r['no_spta']: r['id']
-            for r in Qc.search_read([], ['no_spta', 'id'])
+            for r in Qc.search_read([('company_id', '=', company_id)], ['no_spta', 'id'])
         }
         # Pre-load cache timbang (kd_antrian → id)
         timbang_cache = {
             r['kd_antrian']: r['id']
             for r in Timbang.search_read(
-                [('kd_antrian', '!=', False)],
+                [('kd_antrian', '!=', False), ('company_id', '=', company_id)],
                 ['kd_antrian', 'id']
             )
         }
@@ -245,25 +250,26 @@ class KaAnalisaQcSync(models.Model):
 
     @api.model
     def cron_sync_analisa_qc(self):
-        """Cron: sync otomatis data QC tahun berjalan."""
-        configs = self.search([('active', '=', True)], limit=1)
+        """Cron: sync otomatis data QC tahun berjalan untuk SEMUA company."""
+        configs = self.search([('active', '=', True)])
         if not configs:
             _logger.warning('[KA-QC] Tidak ada konfigurasi aktif.')
             return
-        _logger.info('[KA-QC] Sync CRON dimulai | Config: %s | Tahun: %d',
-                     configs.name, CRON_SYNC_FROM_YEAR)
-        try:
-            count = configs._do_sync(cron_mode=True)
-            configs.write({
-                'last_sync':         fields.Datetime.now(),
-                'last_sync_status':  'success',
-                'last_sync_message': f'Cron sync: {count} record (tahun {CRON_SYNC_FROM_YEAR}).',
-                'total_synced':      configs.total_synced + count,
-            })
-        except Exception as e:
-            _logger.error('[KA-QC] ✗ Cron GAGAL: %s', str(e))
-            configs.write({
-                'last_sync':        fields.Datetime.now(),
-                'last_sync_status': 'failed',
-                'last_sync_message': str(e),
-            })
+        for cfg in configs:
+            _logger.info('[KA-QC] Sync CRON | Config: %s | Company: %s | Tahun: %d',
+                         cfg.name, cfg.company_id.name, CRON_SYNC_FROM_YEAR)
+            try:
+                count = cfg._do_sync(cron_mode=True)
+                cfg.write({
+                    'last_sync':         fields.Datetime.now(),
+                    'last_sync_status':  'success',
+                    'last_sync_message': f'Cron sync: {count} record (company: {cfg.company_id.name}).',
+                    'total_synced':      cfg.total_synced + count,
+                })
+            except Exception as e:
+                _logger.error('[KA-QC] ✗ Cron GAGAL | Company: %s | %s', cfg.company_id.name, str(e))
+                cfg.write({
+                    'last_sync':        fields.Datetime.now(),
+                    'last_sync_status': 'failed',
+                    'last_sync_message': str(e),
+                })

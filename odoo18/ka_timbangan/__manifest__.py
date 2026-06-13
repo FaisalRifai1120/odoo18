@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'KA Timbangan',
-    'version': '18.0.1.0',
+    'version': '18.0.2.0',
     'category': 'Agriculture',
     'summary': 'Modul Timbangan: Data timbang tebu + Laporan',
     'description': """
@@ -16,6 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'security/ka_timbangan_record_rules.xml',
+        'security/ka_timbangan_company_rules.xml',
         'data/ka_timbangan_cron.xml',
         'views/ka_tebu_views.xml',
         'views/ka_laporan_views.xml',

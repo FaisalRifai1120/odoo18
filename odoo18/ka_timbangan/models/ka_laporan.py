@@ -11,6 +11,7 @@ class KaLaporanHarian(models.Model):
     _rec_name = 'tanggal'
     _order = 'tanggal DESC, register'
 
+    company_id    = fields.Many2one('res.company', string='Unit/Company', readonly=True)
     tanggal       = fields.Date(string='Tanggal', readonly=True)
     register      = fields.Char(string='Kode Register', readonly=True)
     register_id   = fields.Many2one('ka.sita.register', string='Register', readonly=True)
@@ -31,6 +32,7 @@ class KaLaporanHarian(models.Model):
             SELECT
                 ROW_NUMBER() OVER ()            AS id,
                 DATE(t.date_out)                AS tanggal,
+                t.company_id                    AS company_id,
                 t.register                      AS register,
                 t.register_id                   AS register_id,
                 COALESCE(r.nama_register, t.register) AS nama_register,
@@ -47,6 +49,7 @@ class KaLaporanHarian(models.Model):
             WHERE t.active = true
             GROUP BY
                 DATE(t.date_out),
+                t.company_id,
                 t.register,
                 t.register_id,
                 r.nama_register,
@@ -63,6 +66,7 @@ class KaLaporanRegister(models.Model):
     _rec_name = 'register'
     _order = 'register'
 
+    company_id    = fields.Many2one('res.company', string='Unit/Company', readonly=True)
     register      = fields.Char(string='Kode Register', readonly=True)
     register_id   = fields.Many2one('ka.sita.register', string='Register', readonly=True)
     nama_register = fields.Char(string='Nama Register', readonly=True)
@@ -84,6 +88,7 @@ class KaLaporanRegister(models.Model):
             CREATE OR REPLACE VIEW ka_laporan_register AS
             SELECT
                 ROW_NUMBER() OVER ()            AS id,
+                t.company_id                    AS company_id,
                 t.register                      AS register,
                 t.register_id                   AS register_id,
                 COALESCE(r.nama_register, t.register) AS nama_register,
@@ -102,6 +107,7 @@ class KaLaporanRegister(models.Model):
             LEFT JOIN ka_sita_register r ON r.id = t.register_id
             WHERE t.active = true
             GROUP BY
+                t.company_id,
                 t.register,
                 t.register_id,
                 r.nama_register,
@@ -119,6 +125,7 @@ class KaLaporanPpl(models.Model):
     _rec_name = 'ppl_id'
     _order = 'ppl_id'
 
+    company_id    = fields.Many2one('res.company', string='Unit/Company', readonly=True)
     ppl_id        = fields.Many2one('ka.user.profile', string='PPL', readonly=True)
     jumlah_register = fields.Integer(string='Jml. Register', readonly=True)
     jumlah_ritase = fields.Integer(string='Total Ritase', readonly=True)
@@ -134,6 +141,7 @@ class KaLaporanPpl(models.Model):
             CREATE OR REPLACE VIEW ka_laporan_ppl AS
             SELECT
                 ROW_NUMBER() OVER ()            AS id,
+                t.company_id                    AS company_id,
                 r.ppl_id                        AS ppl_id,
                 COUNT(DISTINCT t.register_id)   AS jumlah_register,
                 COUNT(*)                        AS jumlah_ritase,
@@ -146,7 +154,7 @@ class KaLaporanPpl(models.Model):
             LEFT JOIN ka_sita_register r ON r.id = t.register_id
             WHERE t.active = true
               AND r.ppl_id IS NOT NULL
-            GROUP BY r.ppl_id
+            GROUP BY t.company_id, r.ppl_id
         """)
 
 
@@ -158,6 +166,7 @@ class KaLaporanDetail(models.Model):
     _rec_name = 'spta_id'
     _order = 'date_out DESC'
 
+    company_id    = fields.Many2one('res.company', string='Unit/Company', readonly=True)
     spta_id       = fields.Char(string='Nomor Timbangan', readonly=True)
     no_spta       = fields.Char(string='No. SPTA', readonly=True)
     kd_antrian    = fields.Char(string='Nomor Antrian', readonly=True)
@@ -187,6 +196,7 @@ class KaLaporanDetail(models.Model):
             CREATE OR REPLACE VIEW ka_laporan_detail AS
             SELECT
                 t.id,
+                t.company_id,
                 t.spta_id,
                 t.no_spta,
                 t.kd_antrian,

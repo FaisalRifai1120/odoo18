@@ -13,6 +13,10 @@ class KaSptaNomor(models.Model):
         'ka.spta', string='SPTA Induk',
         required=True, ondelete='cascade'
     )
+    company_id = fields.Many2one(
+        'res.company', related='spta_id.company_id',
+        store=True, index=True, string='Unit/Company'
+    )
     no_spta = fields.Char(string='No. SPTA', required=True, index=True)
     tanggal = fields.Date(
         related='spta_id.tanggal', store=True, readonly=True

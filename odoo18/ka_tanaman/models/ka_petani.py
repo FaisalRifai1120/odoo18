@@ -9,6 +9,10 @@ class KaPetani(models.Model):
     _rec_name = 'nama'
     _order = 'kode_akun'
 
+    company_id = fields.Many2one(
+        'res.company', string='Unit/Company', required=True,
+        default=lambda self: self.env.company, index=True
+    )
     kode_akun = fields.Char(string='Kode Akun', required=True, tracking=True)
     nama = fields.Char(string='Nama Petani', required=True, tracking=True)
     no_ktp = fields.Char(string='No. KTP', size=16, tracking=True)
@@ -24,8 +28,7 @@ class KaPetani(models.Model):
     active = fields.Boolean(default=True)
 
     _sql_constraints = [
-        ('kode_akun_uniq', 'UNIQUE(kode_akun)', 'Kode Akun Petani harus unik!'),
-        ('no_ktp_uniq', 'UNIQUE(no_ktp)', 'No. KTP Petani harus unik!'),
+        ('kode_akun_company_uniq', 'UNIQUE(kode_akun, company_id)', 'Kode Akun Petani harus unik per unit!'),
     ]
 
     def name_get(self):
