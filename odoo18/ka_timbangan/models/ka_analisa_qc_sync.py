@@ -253,14 +253,16 @@ class KaAnalisaQcSync(models.Model):
                 Qc.browse(rec_id).write(rec_vals)
             count_update += len(batch)
 
-        # ── Update rend_npp ke ka_timbang_tebu via kd_antrian ──
+        # ── Update rend_npp ke field RENDEMEN di ka_timbang_tebu (via kd_antrian) ──
+        # PENTING: update kolom 'rendemen', BUKAN 'rafaksi'.
+        # rafaksi adalah data asli dari timbangan, tidak boleh ditimpa.
         for row in rows:
             kd_antrian = str(row['kd_antrian']) if row['kd_antrian'] else ''
             rend_npp   = float(row['rend_npp'] or 0)
             if kd_antrian and kd_antrian in timbang_cache:
                 timbang_rec = Timbang.browse(timbang_cache[kd_antrian])
-                if timbang_rec.rafaksi != rend_npp:
-                    timbang_rec.write({'rafaksi': rend_npp})
+                if timbang_rec.rendemen != rend_npp:
+                    timbang_rec.write({'rendemen': rend_npp})
                     count_linked += 1
 
         elapsed = (_dt.datetime.now() - start_time).total_seconds()

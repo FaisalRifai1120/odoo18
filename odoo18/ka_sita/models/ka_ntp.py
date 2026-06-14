@@ -10,6 +10,14 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 
+def round2(value):
+    """Pembulatan 2 desimal (ROUND_HALF_UP). Contoh: 0.345 -> 0.35"""
+    from decimal import Decimal, ROUND_HALF_UP
+    if not value:
+        return 0.0
+    return float(Decimal(str(value)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
+
+
 def floor2(value):
     """Pembulatan ke bawah 2 desimal. Contoh: 0.058 -> 0.05"""
     if not value:
@@ -82,10 +90,11 @@ class KaNtp(models.Model):
     ], string='Status', default='draft', tracking=True)
 
     line_ids = fields.One2many('ka.ntp.line', 'ntp_id', string='Detail per Truk')
+    nota_gula_ids = fields.One2many('ka.ntp.nota.gula', 'ntp_id', string='Nota Gula')
     line_count = fields.Integer(string='Jml Truk', compute='_compute_totals')
 
     total_netto       = fields.Float(string='Total Netto', compute='_compute_totals', digits=(16, 2))
-    total_netto_relaksasi = fields.Float(string='Total Netto Relaksasi', compute='_compute_totals', digits=(16, 2))
+    total_netto_relaksasi = fields.Float(string='Total Tebu Final', compute='_compute_totals', digits=(16, 2))
     total_gula        = fields.Integer(string='Total Gula', compute='_compute_totals')
     total_rupiah      = fields.Float(string='Total Rupiah', compute='_compute_totals', digits=(16, 2))
 
@@ -98,6 +107,12 @@ class KaNtp(models.Model):
     upload_relaksasi_filename = fields.Char(string='Nama File Relaksasi')
     upload_bagihasil_file = fields.Binary(string='File Bagi Hasil (.xlsx)')
     upload_bagihasil_filename = fields.Char(string='Nama File Bagi Hasil')
+
+    # File import tersimpan (untuk download ulang)
+    import_relaksasi_saved = fields.Binary(string='File Relaksasi Tersimpan', attachment=True)
+    import_relaksasi_filename = fields.Char(string='Nama File Relaksasi Tersimpan')
+    import_bagihasil_saved = fields.Binary(string='File Bagi Hasil Tersimpan', attachment=True)
+    import_bagihasil_filename = fields.Char(string='Nama File Bagi Hasil Tersimpan')
 
     @api.depends('line_ids', 'line_ids.netto', 'line_ids.netto_relaksasi',
                  'line_ids.gula', 'line_ids.rupiah')
@@ -123,19 +138,34 @@ class KaNtp(models.Model):
     #  TOMBOL: REPROSES
     # ─────────────────────────────────────────────────────────
     def action_reproses(self):
-        """
-        Tarik ulang data dari ka.timbang.tebu (rentang tgl), hitung per truk:
-        rafaksi_relaksasi, netto_relaksasi, gula, rupiah.
-
-        Sumber aturan:
-          - Relaksasi & Bagi Hasil dari import (jika ada), else dari menu.
-        """
+        """Tombol Reproses: validasi + panggil _reproses_lines + notif."""
         self.ensure_one()
         if self.state == 'done':
             raise UserError(_('NTP yang sudah Selesai tidak bisa di-reproses.'))
         if not self.tgl_awal or not self.tgl_akhir:
             raise UserError(_('Harap isi Tanggal Awal dan Tanggal Akhir.'))
+        count = self._reproses_lines()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Reproses Selesai',
+                'message': f'{count} data truk berhasil diproses.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
+    def _reproses_lines(self):
+        """
+        Tarik ulang data dari ka.timbang.tebu (rentang tgl), hitung per truk:
+        rafaksi_relaksasi, netto_relaksasi, gula, rupiah.
+        Sumber aturan: import (jika ada), else dari menu Relaksasi & Ketentuan.
+        Return: jumlah baris diproses.
+        """
+        self.ensure_one()
+        if not self.tgl_awal or not self.tgl_akhir:
+            return 0
         company_id = self.company_id.id
         ctx = dict(tracking_disable=True, mail_notrack=True, mail_create_nolog=True)
 
@@ -164,7 +194,8 @@ class KaNtp(models.Model):
             )
 
         if not timbang_recs:
-            raise UserError(_('Tidak ada data timbang dalam rentang tanggal & filter ini.'))
+            self.line_ids.unlink()
+            return 0
 
         # 2. Ambil ketentuan & relaksasi aktif (untuk fallback non-import)
         Ketentuan = self.env['ka.ketentuan']
@@ -203,13 +234,13 @@ class KaNtp(models.Model):
                 )
 
             if rafaksi_asli > 0 and persen_relaksasi is not None:
-                # rafaksi relaksasi = rafaksi asli x persentase
-                rafaksi_relaksasi = floor2(rafaksi_asli * (persen_relaksasi / 100.0))
-                # netto relaksasi = BRUTO - rafaksi relaksasi
-                netto_relaksasi = floor2(bruto - rafaksi_relaksasi)
+                # rafaksi_relaksasi = round(rafaksi_asli x persentase, 2)
+                rafaksi_relaksasi = round2(rafaksi_asli * (persen_relaksasi / 100.0))
+                # tebu_final = bobot_tebu + rafaksi_relaksasi
+                netto_relaksasi = round2(bobot_tebu + rafaksi_relaksasi)
             else:
-                # tidak ada relaksasi → pakai bobot_tebu (bruto - rafaksi asli)
-                rafaksi_relaksasi = rafaksi_asli
+                # tidak ada relaksasi → tebu final = bobot_tebu (bruto - rafaksi asli)
+                rafaksi_relaksasi = 0.0
                 netto_relaksasi = bobot_tebu if rafaksi_asli > 0 else bruto
 
             # ── Bagi Hasil ──
@@ -252,17 +283,7 @@ class KaNtp(models.Model):
 
         Line.create(vals_list)
         _logger.info('[KA-NTP] Reproses %s: %d truk diproses.', self.name, len(vals_list))
-
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': 'Reproses Selesai',
-                'message': f'{len(vals_list)} data truk berhasil diproses.',
-                'type': 'success',
-                'sticky': False,
-            }
-        }
+        return len(vals_list)
 
     # ─────────────────────────────────────────────────────────
     #  TOMBOL: IMPORT RELAKSASI
@@ -286,6 +307,8 @@ class KaNtp(models.Model):
 
         self.write({
             'has_import_relaksasi': True,
+            'import_relaksasi_saved': self.upload_relaksasi_file,
+            'import_relaksasi_filename': self.upload_relaksasi_filename or 'relaksasi.xlsx',
             'upload_relaksasi_file': False,
             'upload_relaksasi_filename': False,
             'state': 'proses',
@@ -314,6 +337,8 @@ class KaNtp(models.Model):
 
         self.write({
             'has_import_bagihasil': True,
+            'import_bagihasil_saved': self.upload_bagihasil_file,
+            'import_bagihasil_filename': self.upload_bagihasil_filename or 'bagihasil.xlsx',
             'upload_bagihasil_file': False,
             'upload_bagihasil_filename': False,
             'state': 'proses',
@@ -354,15 +379,120 @@ class KaNtp(models.Model):
             'params': {'title': 'Info', 'message': msg, 'type': kind, 'sticky': False},
         }
 
+    @api.model
+    def cron_auto_reproses(self):
+        """
+        Auto-reproses NTP draft yang periodenya masih aktif.
+        Dipanggil sequential setelah cron sync timbang + QC.
+        Hanya state draft + tgl_akhir >= sekarang.
+        """
+        now = fields.Datetime.now()
+        ntps = self.search([
+            ('state', '=', 'draft'),
+            ('tgl_akhir', '>=', now),
+        ])
+        if not ntps:
+            return
+        _logger.info('[KA-NTP] Auto-reproses %d NTP draft aktif...', len(ntps))
+        for ntp in ntps:
+            try:
+                with self.env.cr.savepoint():
+                    ntp._reproses_lines()
+                _logger.info('[KA-NTP] ✓ Auto-reproses %s: %d truk', ntp.name, len(ntp.line_ids))
+            except Exception as e:
+                _logger.error('[KA-NTP] ✗ Auto-reproses %s gagal: %s', ntp.name, str(e))
+
+    def action_download_import_relaksasi(self):
+        """Download file import relaksasi yang tersimpan."""
+        self.ensure_one()
+        if not self.import_relaksasi_saved:
+            raise UserError(_('Tidak ada file import relaksasi tersimpan.'))
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/ka.ntp/{self.id}/import_relaksasi_saved/{self.import_relaksasi_filename or "relaksasi.xlsx"}?download=true',
+            'target': 'self',
+        }
+
+    def action_download_import_bagihasil(self):
+        """Download file import bagi hasil yang tersimpan."""
+        self.ensure_one()
+        if not self.import_bagihasil_saved:
+            raise UserError(_('Tidak ada file import bagi hasil tersimpan.'))
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/ka.ntp/{self.id}/import_bagihasil_saved/{self.import_bagihasil_filename or "bagihasil.xlsx"}?download=true',
+            'target': 'self',
+        }
+
     def action_set_done(self):
         self.ensure_one()
         if not self.env.user.has_group('ka_user_management.group_ka_admin'):
             raise UserError(_('Hanya Administrator yang dapat menyelesaikan NTP.'))
         self.write({'state': 'done'})
+        self._generate_nota_gula()
 
     def action_set_draft(self):
         self.ensure_one()
+        # Hapus nota gula saat kembali ke draft
+        self.nota_gula_ids.unlink()
         self.write({'state': 'draft'})
+
+    def _generate_nota_gula(self):
+        """Agregat lines per register → ka.ntp.nota.gula."""
+        self.ensure_one()
+        self.nota_gula_ids.unlink()
+
+        # Agregat per register
+        rekap = {}  # register -> dict
+        for line in self.line_ids:
+            reg = line.register or '-'
+            if reg not in rekap:
+                rekap[reg] = {
+                    'register': reg,
+                    'nama_register': line.nama_register,
+                    'petani_id': line.petani_id.id if line.petani_id else False,
+                    'tebu_final': 0.0,
+                    'bagi_hasil': line.bagi_hasil,   # BH per register (sama dalam 1 register)
+                    'gula': 0,
+                    'rupiah': 0.0,
+                }
+            rekap[reg]['tebu_final'] += line.netto_relaksasi
+            rekap[reg]['gula'] += line.gula
+            rekap[reg]['rupiah'] += line.rupiah
+
+        NotaGula = self.env['ka.ntp.nota.gula']
+        vals_list = []
+        for reg, data in rekap.items():
+            vals_list.append({
+                'ntp_id': self.id,
+                'register': data['register'],
+                'nama_register': data['nama_register'],
+                'petani_id': data['petani_id'],
+                'tebu_final': round2(data['tebu_final']),
+                'bagi_hasil': data['bagi_hasil'],
+                'gula': data['gula'],
+                'rupiah': round2(data['rupiah']),
+            })
+        if vals_list:
+            NotaGula.create(vals_list)
+
+    def action_view_nota_gula(self):
+        """Tampilkan Nota Gula (agregat per register). Hanya saat Done."""
+        self.ensure_one()
+        if self.state != 'done':
+            raise UserError(_('Nota Gula hanya tersedia saat NTP berstatus Selesai.'))
+        # Generate ulang agregat (pastikan fresh)
+        self._generate_nota_gula()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Nota Gula — {self.name}',
+            'res_model': 'ka.ntp.nota.gula',
+            'view_mode': 'list',
+            'domain': [('ntp_id', '=', self.id)],
+            'context': {'search_default_ntp': self.id},
+            'target': 'current',
+        }
+
 
 
 class KaNtpLine(models.Model):
@@ -388,8 +518,8 @@ class KaNtpLine(models.Model):
     rafaksi_asli      = fields.Float(string='Rafaksi Asli', digits=(16, 2))
     persen_relaksasi  = fields.Float(string='Relaksasi (%)', digits=(5, 2))
     rafaksi_relaksasi = fields.Float(string='Rafaksi Relaksasi', digits=(16, 2))
-    netto_relaksasi   = fields.Float(string='Netto Relaksasi', digits=(16, 2))
-    bagi_hasil        = fields.Float(string='Bagi Hasil', digits=(10, 4))
+    netto_relaksasi   = fields.Float(string='Tebu Final', digits=(16, 2))
+    bagi_hasil        = fields.Float(string='Bagi Hasil', digits=(10, 2))
     harga_gula        = fields.Float(string='Harga Gula', digits=(16, 2))
     gula              = fields.Integer(string='Gula')
     rupiah            = fields.Float(string='Rupiah', digits=(16, 2))
@@ -413,3 +543,20 @@ class KaNtpImportBagihasil(models.Model):
     ntp_id = fields.Many2one('ka.ntp', required=True, ondelete='cascade')
     register = fields.Char(string='Register', required=True, index=True)
     bagi_hasil = fields.Float(string='Bagi Hasil', digits=(10, 4))
+
+
+class KaNtpNotaGula(models.Model):
+    """Nota Gula — agregat NTP per register."""
+    _name = 'ka.ntp.nota.gula'
+    _description = 'Nota Gula (Agregat per Register)'
+    _order = 'register'
+
+    ntp_id = fields.Many2one('ka.ntp', string='NTP', required=True, ondelete='cascade')
+    company_id = fields.Many2one('res.company', related='ntp_id.company_id', store=True, index=True)
+    register = fields.Char(string='Register', index=True)
+    nama_register = fields.Char(string='Nama Register')
+    petani_id = fields.Many2one('ka.petani', string='Petani')
+    tebu_final = fields.Float(string='Tebu Final', digits=(16, 2))
+    bagi_hasil = fields.Float(string='Bagi Hasil', digits=(10, 2))
+    gula = fields.Integer(string='Gula')
+    rupiah = fields.Float(string='Rupiah', digits=(16, 2))

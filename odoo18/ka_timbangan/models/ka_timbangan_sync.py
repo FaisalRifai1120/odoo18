@@ -396,8 +396,14 @@ class KaTimbangSync(models.Model):
         for idx, row in enumerate(rows, start=1):
             spta_id  = row['spta_id']
             truck_id = row['truck_id']
-            sync_key = f"{spta_id}_{truck_id or ''}"
             kd_antrian = str(row['kd_antrian']) if row['kd_antrian'] else ''
+            # sync_key pakai kd_antrian (unik per transaksi & lintas tahun).
+            # spta_id TIDAK unik lintas tahun musim giling, jadi tidak dipakai sendiri.
+            if kd_antrian:
+                sync_key = f"A{kd_antrian}"
+            else:
+                # fallback kalau kd_antrian kosong
+                sync_key = f"{spta_id}_{truck_id or ''}_{row['date_out'] or ''}"
 
             # Resolve dari cache (tanpa query)
             kode_register = row['register'] or ''
@@ -548,3 +554,10 @@ class KaTimbangSync(models.Model):
         except Exception as e:
             self.env.cr.rollback()
             _logger.error('[KA-QC] ✗ Sequential QC gagal: %s', str(e))
+
+        # ── Sequential: auto-reproses NTP draft yang periodenya aktif ─────
+        try:
+            self.env['ka.ntp'].sudo().cron_auto_reproses()
+        except Exception as e:
+            self.env.cr.rollback()
+            _logger.error('[KA-NTP] ✗ Auto-reproses gagal: %s', str(e))

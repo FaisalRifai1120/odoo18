@@ -35,6 +35,13 @@
     'external_dependencies': {
         'python': ['psycopg2', 'openpyxl'],
     },
+    'assets': {
+        'web.assets_backend': [
+            'ka_sita/static/src/css/ntp_chatter.css',
+            'ka_sita/static/src/js/ntp_chatter_toggle.js',
+            'ka_sita/static/src/js/ntp_chatter_toggle.xml',
+        ],
+    },
     'installable': True,
     'auto_install': False,
     'application': True,

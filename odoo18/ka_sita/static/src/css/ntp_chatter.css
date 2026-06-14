@@ -1,0 +1,8 @@
+/* ── Chatter NTP tetap di posisi default Odoo 18 (samping kanan) ── */
+/* Hanya menangani sembunyikan saat tombol di-toggle. */
+
+.o_form_view.o_ka_ntp_form.o_ntp_chatter_hidden .o-mail-ChatterContainer,
+.o_form_view.o_ka_ntp_form.o_ntp_chatter_hidden .o-mail-Form-chatter,
+.o_form_view.o_ka_ntp_form.o_ntp_chatter_hidden .o-mail-Chatter {
+    display: none !important;
+}

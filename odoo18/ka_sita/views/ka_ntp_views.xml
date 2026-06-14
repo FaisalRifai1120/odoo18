@@ -5,7 +5,7 @@
         <field name="name">ka.ntp.form</field>
         <field name="model">ka.ntp</field>
         <field name="arch" type="xml">
-            <form string="NTP">
+            <form string="NTP" class="o_ka_ntp_form">
                 <header>
                     <button name="action_reproses" string="Reproses"
                             type="object" class="btn-primary"
@@ -17,6 +17,9 @@
                     <button name="action_import_bagihasil" string="Import Bagi Hasil"
                             type="object" class="btn-secondary"
                             invisible="state == 'done' or not upload_bagihasil_file"/>
+                    <button name="action_view_nota_gula" string="Nota Gula"
+                            type="object" class="btn-primary"
+                            invisible="state != 'done'"/>
                     <button name="action_set_done" string="Selesaikan"
                             type="object" class="btn-success"
                             invisible="state == 'done'"
@@ -27,6 +30,7 @@
                             invisible="state != 'done'"
                             groups="ka_user_management.group_ka_admin"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,proses,done"/>
+                    <widget name="ntp_chatter_toggle"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -81,8 +85,8 @@
                                     <field name="rafaksi_asli" sum="Total Rafaksi"/>
                                     <field name="persen_relaksasi"/>
                                     <field name="rafaksi_relaksasi" sum="Total Raf. Relaksasi"/>
-                                    <field name="netto_relaksasi" sum="Total Netto Relaksasi"/>
-                                    <field name="bagi_hasil"/>
+                                    <field name="netto_relaksasi" string="Tebu Final" sum="Total Tebu Final"/>
+                                    <field name="bagi_hasil" digits="[10,2]"/>
                                     <field name="gula" sum="Total Gula"/>
                                     <field name="harga_gula" optional="hide"/>
                                     <field name="rupiah" sum="Total Rupiah"/>
@@ -104,7 +108,25 @@
                                 Setelah upload file, klik tombol <strong>Import</strong> di header,
                                 lalu klik <strong>Reproses</strong> agar perhitungan mengikuti data import.
                                 Import akan mengalahkan ketentuan/relaksasi dari menu.
+                                File yang sudah diimpor bisa diunduh ulang via tombol <strong>Unduh File</strong> di header.
                             </div>
+                            <field name="import_relaksasi_saved" invisible="1"/>
+                            <field name="import_bagihasil_saved" invisible="1"/>
+                            <group string="File Import Tersimpan"
+                                   invisible="not import_relaksasi_saved and not import_bagihasil_saved">
+                                <div invisible="not import_relaksasi_saved">
+                                    <field name="import_relaksasi_filename" readonly="1" class="oe_inline"/>
+                                    <button name="action_download_import_relaksasi"
+                                            string="Unduh File Relaksasi" type="object"
+                                            class="btn-link" icon="fa-download"/>
+                                </div>
+                                <div invisible="not import_bagihasil_saved">
+                                    <field name="import_bagihasil_filename" readonly="1" class="oe_inline"/>
+                                    <button name="action_download_import_bagihasil"
+                                            string="Unduh File Bagi Hasil" type="object"
+                                            class="btn-link" icon="fa-download"/>
+                                </div>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>
@@ -157,6 +179,35 @@
         <field name="res_model">ka.ntp</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_ka_ntp_search"/>
+    </record>
+
+    <!-- ══════════════════════════════
+         NOTA GULA (agregat per register)
+    ══════════════════════════════ -->
+    <record id="view_ka_ntp_nota_gula_list" model="ir.ui.view">
+        <field name="name">ka.ntp.nota.gula.list</field>
+        <field name="model">ka.ntp.nota.gula</field>
+        <field name="arch" type="xml">
+            <list string="Nota Gula" create="false" edit="false" delete="false">
+                <field name="register"/>
+                <field name="nama_register" optional="show"/>
+                <field name="tebu_final" sum="Total Tebu Final"/>
+                <field name="bagi_hasil"/>
+                <field name="gula" sum="Total Gula"/>
+                <field name="rupiah" sum="Total Rupiah"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_ntp_nota_gula_search" model="ir.ui.view">
+        <field name="name">ka.ntp.nota.gula.search</field>
+        <field name="model">ka.ntp.nota.gula</field>
+        <field name="arch" type="xml">
+            <search string="Cari Nota Gula">
+                <field name="register"/>
+                <field name="nama_register"/>
+            </search>
+        </field>
     </record>
 
 </odoo>
