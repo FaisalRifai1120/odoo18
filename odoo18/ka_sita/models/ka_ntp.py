@@ -32,6 +32,14 @@ def floor0(value):
     return int(math.floor(float(value)))
 
 
+def round0(value):
+    """Pembulatan ke integer (ROUND_HALF_UP). Contoh: 89.5 -> 90, 89.4 -> 89"""
+    from decimal import Decimal, ROUND_HALF_UP
+    if not value:
+        return 0
+    return int(Decimal(str(value)).quantize(Decimal('1'), rounding=ROUND_HALF_UP))
+
+
 class KaNtp(models.Model):
     """
     NTP — Nota Tebu Petani.
@@ -65,6 +73,24 @@ class KaNtp(models.Model):
     )
     periode = fields.Char(string='Periode', tracking=True)
 
+    ketentuan_id = fields.Many2one(
+        'ka.ketentuan', string='Ketentuan',
+        domain="[('state','=','active'),('company_id','=',company_id)]",
+        tracking=True,
+        help='Ketentuan yang dipakai untuk perhitungan. '
+             'Kosongkan untuk auto-pilih ketentuan aktif per waktu timbang (estimasi). '
+             'Pilih satu ketentuan untuk mengunci perhitungan saat closing.'
+    )
+
+    # ── Header Kwitansi ────────────────────────────────────────
+    kode_periode = fields.Char(
+        string='Kode Periode', size=3,
+        help='Akhiran NOMOR kwitansi, mis. "A" pada "00003 / A".'
+    )
+    kwitansi_kota = fields.Char(string='Kota Kwitansi', default='Malang')
+    pejabat_jabatan = fields.Char(string='Jabatan Penandatangan', default='Kepala Bag. TUK')
+    pejabat_nama = fields.Char(string='Nama Penandatangan')
+
     jenis_kelompok = fields.Selection([
         ('jenis_register', 'Jenis Register (TR/TS)'),
         ('metode',         'Metode (SBH/SPT)'),
@@ -95,34 +121,115 @@ class KaNtp(models.Model):
 
     total_netto       = fields.Float(string='Total Netto', compute='_compute_totals', digits=(16, 2))
     total_netto_relaksasi = fields.Float(string='Total Tebu Final', compute='_compute_totals', digits=(16, 2))
-    total_gula        = fields.Integer(string='Total Gula', compute='_compute_totals')
-    total_rupiah      = fields.Float(string='Total Rupiah', compute='_compute_totals', digits=(16, 2))
+    total_gula        = fields.Integer(string='Total Gula BH', compute='_compute_totals')
+    total_rupiah      = fields.Float(string='Total Rupiah BH', compute='_compute_totals', digits=(16, 2))
+    total_gula_kawalan = fields.Integer(string='Total Gula Kawalan', compute='_compute_totals')
+    total_gula_total  = fields.Integer(string='Total Gula (Keseluruhan)', compute='_compute_totals')
+    total_rupiah_total = fields.Float(string='Total Rupiah (Keseluruhan)', compute='_compute_totals', digits=(16, 2))
 
     # Status import (penanda override)
     has_import_relaksasi = fields.Boolean(string='Ada Import Relaksasi', default=False)
     has_import_bagihasil = fields.Boolean(string='Ada Import Bagi Hasil', default=False)
+    has_import_kawalan = fields.Boolean(string='Ada Import Kawalan', default=False)
 
     # Upload fields
     upload_relaksasi_file = fields.Binary(string='File Relaksasi (.xlsx)')
     upload_relaksasi_filename = fields.Char(string='Nama File Relaksasi')
     upload_bagihasil_file = fields.Binary(string='File Bagi Hasil (.xlsx)')
     upload_bagihasil_filename = fields.Char(string='Nama File Bagi Hasil')
+    upload_kawalan_file = fields.Binary(string='File Kawalan (.xlsx)')
+    upload_kawalan_filename = fields.Char(string='Nama File Kawalan')
 
     # File import tersimpan (untuk download ulang)
     import_relaksasi_saved = fields.Binary(string='File Relaksasi Tersimpan', attachment=True)
     import_relaksasi_filename = fields.Char(string='Nama File Relaksasi Tersimpan')
     import_bagihasil_saved = fields.Binary(string='File Bagi Hasil Tersimpan', attachment=True)
     import_bagihasil_filename = fields.Char(string='Nama File Bagi Hasil Tersimpan')
+    import_kawalan_saved = fields.Binary(string='File Kawalan Tersimpan', attachment=True)
+    import_kawalan_filename = fields.Char(string='Nama File Kawalan Tersimpan')
 
     @api.depends('line_ids', 'line_ids.netto', 'line_ids.netto_relaksasi',
-                 'line_ids.gula', 'line_ids.rupiah')
+                 'line_ids.register', 'line_ids.bagi_hasil', 'line_ids.nilai_kawalan',
+                 'line_ids.harga_gula', 'ketentuan_id')
     def _compute_totals(self):
         for rec in self:
             rec.line_count = len(rec.line_ids)
             rec.total_netto = sum(rec.line_ids.mapped('netto'))
             rec.total_netto_relaksasi = sum(rec.line_ids.mapped('netto_relaksasi'))
-            rec.total_gula = sum(rec.line_ids.mapped('gula'))
-            rec.total_rupiah = sum(rec.line_ids.mapped('rupiah'))
+            # Gula & rupiah dihitung di level REGISTER (floor sekali) — match FoxPro
+            rekap = rec._register_rekap()
+            rec.total_gula = sum(d['gula'] for d in rekap)
+            rec.total_rupiah = sum(d['rupiah'] for d in rekap)
+            rec.total_gula_kawalan = sum(d['gula_kawalan'] for d in rekap)
+            rec.total_gula_total = sum(d['gula_total'] for d in rekap)
+            rec.total_rupiah_total = sum(d['rupiah_total'] for d in rekap)
+
+    def _resolve_ketentuan(self):
+        """Ketentuan yang dipakai: pilihan manual > auto-pilih aktif per tgl_akhir."""
+        self.ensure_one()
+        Ketentuan = self.env['ka.ketentuan']
+        if self.ketentuan_id:
+            return self.ketentuan_id
+        if self.tgl_akhir and self.company_id:
+            return Ketentuan.get_ketentuan_aktif(self.tgl_akhir, self.company_id.id)
+        return Ketentuan.browse()
+
+    def _register_rekap(self):
+        """
+        Hitung agregat PER REGISTER (level register, floor sekali) — sesuai FoxPro.
+        Tebu dijumlah dulu, baru gula/natura dihitung sekali per register.
+        Return: list of dict per register.
+        """
+        self.ensure_one()
+        if not self.line_ids:
+            return []
+        ket = self._resolve_ketentuan()
+        persen_natura = ket.persen_natura if ket else 0.0
+
+        # Agregasi input per register
+        agg = {}
+        for line in self.line_ids:
+            reg = line.register or '-'
+            d = agg.get(reg)
+            if not d:
+                d = agg[reg] = {
+                    'register': reg,
+                    'nama_register': line.nama_register,
+                    'petani_id': line.petani_id.id if line.petani_id else False,
+                    'tebu_final': 0.0,
+                    'bagi_hasil': line.bagi_hasil,       # sama dalam 1 register
+                    'nilai_kawalan': line.nilai_kawalan, # sama dalam 1 register
+                    'harga_gula': ket.harga_gula if ket else line.harga_gula,
+                }
+            d['tebu_final'] += line.netto_relaksasi
+
+        result = []
+        for reg, d in agg.items():
+            tebu = d['tebu_final']
+            harga_gula = d['harga_gula'] or 0.0
+            # Gula BH (floor sekali, BH presisi 4 desimal)
+            gula_bh = floor0(tebu * d['bagi_hasil'])
+            # Pembagian jual : natura — natura = ROUND(gula_bh × %natura)
+            natura_kecil = round0(gula_bh * persen_natura / 100.0)
+            gula_jual = gula_bh - natura_kecil
+            # Natura tambahan (semua level register)
+            gula_kawalan = round0(tebu * d['nilai_kawalan'])         # Natura1 = round(tebu × kg_ku)
+            natura2 = ket.compute_natura2_tetes(tebu) if ket else 0
+            natura3 = ket.compute_natura3_titipan(tebu) if ket else 0
+            gula_total = gula_jual + natura_kecil + gula_kawalan + natura2 + natura3
+            d.update({
+                'gula': gula_bh,
+                'gula_jual': gula_jual,
+                'natura_kecil': natura_kecil,
+                'gula_kawalan': gula_kawalan,
+                'natura2': natura2,
+                'natura3': natura3,
+                'gula_total': gula_total,
+                'rupiah': floor2(gula_bh * harga_gula),
+                'rupiah_total': floor2(gula_total * harga_gula),
+            })
+            result.append(d)
+        return result
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -207,12 +314,16 @@ class KaNtp(models.Model):
         # 3. Cache import override (kalau ada)
         import_relaksasi = {}  # register -> persentase
         import_bagihasil = {}  # register -> bagi_hasil
+        import_kawalan = {}    # register -> nilai_kawalan
         if self.has_import_relaksasi:
             for l in self.env['ka.ntp.import.relaksasi'].search([('ntp_id', '=', self.id)]):
                 import_relaksasi[l.register] = l.persentase
         if self.has_import_bagihasil:
             for l in self.env['ka.ntp.import.bagihasil'].search([('ntp_id', '=', self.id)]):
                 import_bagihasil[l.register] = l.bagi_hasil
+        if self.has_import_kawalan:
+            for l in self.env['ka.ntp.import.kawalan'].search([('ntp_id', '=', self.id)]):
+                import_kawalan[l.register] = l.kawalan
 
         Line = self.env['ka.ntp.line'].with_context(**ctx)
         vals_list = []
@@ -243,21 +354,46 @@ class KaNtp(models.Model):
                 rafaksi_relaksasi = 0.0
                 netto_relaksasi = bobot_tebu if rafaksi_asli > 0 else bruto
 
+            # ── Resolusi Ketentuan ──
+            # Jika ketentuan_id dipilih → pakai itu untuk semua truk (closing).
+            # Jika kosong → auto-pilih ketentuan aktif per waktu timbang (estimasi).
+            ket = self.ketentuan_id or Ketentuan.get_ketentuan_aktif(waktu, company_id)
+
             # ── Bagi Hasil ──
             if register_code in import_bagihasil:
                 bagi_hasil = import_bagihasil[register_code]
             else:
-                ket = Ketentuan.get_ketentuan_aktif(waktu, company_id)
                 bagi_hasil = ket.get_bagi_hasil_for_register(register_code) if ket else 0.0
-                harga_gula = ket.harga_gula if ket else 0.0
 
-            # Harga gula dari ketentuan aktif
-            ket_for_harga = Ketentuan.get_ketentuan_aktif(waktu, company_id)
-            harga_gula = ket_for_harga.harga_gula if ket_for_harga else 0.0
+            # Harga gula dari ketentuan terpilih/aktif
+            harga_gula = ket.harga_gula if ket else 0.0
 
-            # ── Hitung gula & rupiah ──
-            gula = floor0(netto_relaksasi * bagi_hasil)       # integer
-            rupiah = floor2(gula * harga_gula)                # 2 desimal
+            # ── Nilai Kawalan (override import > ketentuan > 0) ──
+            if register_code in import_kawalan:
+                nilai_kawalan = import_kawalan[register_code]
+            else:
+                nilai_kawalan = ket.get_kawalan_for_register(register_code) if ket else 0.0
+
+            # ── Gula BH & pembagian jual : natura ──
+            gula = floor0(netto_relaksasi * bagi_hasil)       # Gula BH (integer)
+            if ket:
+                gula_jual, natura_kecil = ket.compute_split_gula(gula)
+                natura2 = ket.compute_natura2_tetes(netto_relaksasi)
+                natura3 = ket.compute_natura3_titipan(netto_relaksasi)
+                tetes_tani, nilai_tetes = ket.compute_tetes_tani(netto_relaksasi)
+            else:
+                gula_jual, natura_kecil = gula, 0
+                natura2 = 0
+                natura3 = 0
+                tetes_tani, nilai_tetes = 0.0, 0.0
+
+            # ── Natura1 (gula kawalan) ──
+            gula_kawalan = round0(netto_relaksasi * nilai_kawalan)
+
+            # ── Total ──
+            gula_total = gula_jual + natura_kecil + gula_kawalan + natura2 + natura3
+            rupiah = floor2(gula * harga_gula)                # rupiah BH (kompatibilitas)
+            rupiah_total = floor2(gula_total * harga_gula)    # rupiah keseluruhan
 
             vals_list.append({
                 'ntp_id':            self.id,
@@ -279,6 +415,16 @@ class KaNtp(models.Model):
                 'harga_gula':        harga_gula,
                 'gula':              gula,
                 'rupiah':            rupiah,
+                'gula_jual':         gula_jual,
+                'natura_kecil':      natura_kecil,
+                'nilai_kawalan':     nilai_kawalan,
+                'gula_kawalan':      gula_kawalan,
+                'natura2':           natura2,
+                'natura3':           natura3,
+                'tetes_tani':        tetes_tani,
+                'nilai_tetes':       nilai_tetes,
+                'gula_total':        gula_total,
+                'rupiah_total':      rupiah_total,
             })
 
         Line.create(vals_list)
@@ -344,6 +490,36 @@ class KaNtp(models.Model):
             'state': 'proses',
         })
         return self._notif(f'{len(vals_list)} bagi hasil diimpor. Klik Reproses untuk menerapkan.')
+
+    # ─────────────────────────────────────────────────────────
+    #  TOMBOL: IMPORT KAWALAN
+    # ─────────────────────────────────────────────────────────
+    def action_import_kawalan(self):
+        self.ensure_one()
+        if not self.upload_kawalan_file:
+            raise UserError(_('Harap pilih file Excel kawalan terlebih dahulu.'))
+        rows = self._read_xlsx(self.upload_kawalan_file)
+
+        self.env['ka.ntp.import.kawalan'].search([('ntp_id', '=', self.id)]).unlink()
+        vals_list = []
+        for register, nilai in rows:
+            vals_list.append({
+                'ntp_id': self.id,
+                'register': register,
+                'kawalan': nilai,
+            })
+        if vals_list:
+            self.env['ka.ntp.import.kawalan'].create(vals_list)
+
+        self.write({
+            'has_import_kawalan': True,
+            'import_kawalan_saved': self.upload_kawalan_file,
+            'import_kawalan_filename': self.upload_kawalan_filename or 'kawalan.xlsx',
+            'upload_kawalan_file': False,
+            'upload_kawalan_filename': False,
+            'state': 'proses',
+        })
+        return self._notif(f'{len(vals_list)} kawalan diimpor. Klik Reproses untuk menerapkan.')
 
     def _read_xlsx(self, file_b64):
         """Baca xlsx → list of (register, nilai_float). Skip header baris 1."""
@@ -424,6 +600,17 @@ class KaNtp(models.Model):
             'target': 'self',
         }
 
+    def action_download_import_kawalan(self):
+        """Download file import kawalan yang tersimpan."""
+        self.ensure_one()
+        if not self.import_kawalan_saved:
+            raise UserError(_('Tidak ada file import kawalan tersimpan.'))
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/ka.ntp/{self.id}/import_kawalan_saved/{self.import_kawalan_filename or "kawalan.xlsx"}?download=true',
+            'target': 'self',
+        }
+
     def action_set_done(self):
         self.ensure_one()
         if not self.env.user.has_group('ka_user_management.group_ka_admin'):
@@ -438,40 +625,30 @@ class KaNtp(models.Model):
         self.write({'state': 'draft'})
 
     def _generate_nota_gula(self):
-        """Agregat lines per register → ka.ntp.nota.gula."""
+        """Nota Gula per register — dihitung di level register (match FoxPro)."""
         self.ensure_one()
         self.nota_gula_ids.unlink()
 
-        # Agregat per register
-        rekap = {}  # register -> dict
-        for line in self.line_ids:
-            reg = line.register or '-'
-            if reg not in rekap:
-                rekap[reg] = {
-                    'register': reg,
-                    'nama_register': line.nama_register,
-                    'petani_id': line.petani_id.id if line.petani_id else False,
-                    'tebu_final': 0.0,
-                    'bagi_hasil': line.bagi_hasil,   # BH per register (sama dalam 1 register)
-                    'gula': 0,
-                    'rupiah': 0.0,
-                }
-            rekap[reg]['tebu_final'] += line.netto_relaksasi
-            rekap[reg]['gula'] += line.gula
-            rekap[reg]['rupiah'] += line.rupiah
-
+        rekap = self._register_rekap()
         NotaGula = self.env['ka.ntp.nota.gula']
         vals_list = []
-        for reg, data in rekap.items():
+        for d in rekap:
             vals_list.append({
                 'ntp_id': self.id,
-                'register': data['register'],
-                'nama_register': data['nama_register'],
-                'petani_id': data['petani_id'],
-                'tebu_final': round2(data['tebu_final']),
-                'bagi_hasil': data['bagi_hasil'],
-                'gula': data['gula'],
-                'rupiah': round2(data['rupiah']),
+                'register': d['register'],
+                'nama_register': d['nama_register'],
+                'petani_id': d['petani_id'],
+                'tebu_final': round2(d['tebu_final']),
+                'bagi_hasil': d['bagi_hasil'],
+                'gula': d['gula'],
+                'rupiah': round2(d['rupiah']),
+                'gula_jual': d['gula_jual'],
+                'natura_kecil': d['natura_kecil'],
+                'gula_kawalan': d['gula_kawalan'],
+                'natura2': d['natura2'],
+                'natura3': d['natura3'],
+                'gula_total': d['gula_total'],
+                'rupiah_total': round2(d['rupiah_total']),
             })
         if vals_list:
             NotaGula.create(vals_list)
@@ -519,10 +696,28 @@ class KaNtpLine(models.Model):
     persen_relaksasi  = fields.Float(string='Relaksasi (%)', digits=(5, 2))
     rafaksi_relaksasi = fields.Float(string='Rafaksi Relaksasi', digits=(16, 2))
     netto_relaksasi   = fields.Float(string='Tebu Final', digits=(16, 2))
-    bagi_hasil        = fields.Float(string='Bagi Hasil', digits=(10, 2))
+    bagi_hasil        = fields.Float(string='Bagi Hasil', digits=(10, 4))
     harga_gula        = fields.Float(string='Harga Gula', digits=(16, 2))
-    gula              = fields.Integer(string='Gula')
-    rupiah            = fields.Float(string='Rupiah', digits=(16, 2))
+    gula              = fields.Integer(string='Gula BH')
+    rupiah            = fields.Float(string='Rupiah BH', digits=(16, 2))
+
+    # ── Pembagian Gula BH ──
+    gula_jual         = fields.Integer(string='Gula Jual (Lelang)')
+    natura_kecil      = fields.Integer(string='Natura Kecil')
+
+    # ── Natura tambahan ──
+    nilai_kawalan     = fields.Float(string='Nilai Kawalan', digits=(10, 4))
+    gula_kawalan      = fields.Integer(string='Natura1 (Kawalan)')
+    natura2           = fields.Integer(string='Natura2 (Tetes)')
+    natura3           = fields.Integer(string='Natura3 (Sharing)')
+
+    # ── Tetes teori (disimpan, tidak ditampilkan di nota) ──
+    tetes_tani        = fields.Float(string='Tetes Petani', digits=(16, 2))
+    nilai_tetes       = fields.Float(string='Nilai Tetes', digits=(16, 2))
+
+    # ── Total ──
+    gula_total        = fields.Integer(string='Gula Total')
+    rupiah_total      = fields.Float(string='Rupiah Total', digits=(16, 2))
 
 
 class KaNtpImportRelaksasi(models.Model):
@@ -545,6 +740,16 @@ class KaNtpImportBagihasil(models.Model):
     bagi_hasil = fields.Float(string='Bagi Hasil', digits=(10, 4))
 
 
+class KaNtpImportKawalan(models.Model):
+    """Staging import kawalan per NTP (override nilai kawalan per register)."""
+    _name = 'ka.ntp.import.kawalan'
+    _description = 'Import Kawalan NTP'
+
+    ntp_id = fields.Many2one('ka.ntp', required=True, ondelete='cascade')
+    register = fields.Char(string='Register', required=True, index=True)
+    kawalan = fields.Float(string='Nilai Kawalan', digits=(10, 4))
+
+
 class KaNtpNotaGula(models.Model):
     """Nota Gula — agregat NTP per register."""
     _name = 'ka.ntp.nota.gula'
@@ -558,5 +763,26 @@ class KaNtpNotaGula(models.Model):
     petani_id = fields.Many2one('ka.petani', string='Petani')
     tebu_final = fields.Float(string='Tebu Final', digits=(16, 2))
     bagi_hasil = fields.Float(string='Bagi Hasil', digits=(10, 2))
-    gula = fields.Integer(string='Gula')
-    rupiah = fields.Float(string='Rupiah', digits=(16, 2))
+    gula = fields.Integer(string='Gula BH')
+    rupiah = fields.Float(string='Rupiah BH', digits=(16, 2))
+    gula_jual = fields.Integer(string='Gula Jual (Lelang)')
+    natura_kecil = fields.Integer(string='Natura Kecil')
+    gula_kawalan = fields.Integer(string='Natura1 (Kawalan)')
+    natura2 = fields.Integer(string='Natura2 (Tetes)')
+    natura3 = fields.Integer(string='Natura3 (Sharing)')
+    gula_total = fields.Integer(string='Gula Total')
+    rupiah_total = fields.Float(string='Rupiah Total', digits=(16, 2))
+
+    def action_print_kwitansi(self):
+        """Cetak kwitansi untuk register ini (atau record terpilih)."""
+        if not self:
+            raise UserError(_('Tidak ada Nota Gula untuk dicetak.'))
+        return self.env.ref('ka_sita.action_report_ka_kwitansi_ng').report_action(self)
+
+    def action_print_kwitansi_all(self):
+        """Cetak SEMUA kwitansi pada NTP yang sama dengan record ini."""
+        ntps = self.mapped('ntp_id')
+        all_ng = ntps.mapped('nota_gula_ids')
+        if not all_ng:
+            raise UserError(_('Tidak ada Nota Gula untuk dicetak.'))
+        return self.env.ref('ka_sita.action_report_ka_kwitansi_ng').report_action(all_ng)

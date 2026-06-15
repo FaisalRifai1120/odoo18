@@ -28,6 +28,7 @@
         'views/ka_spta_nomor_views.xml',
         'views/ka_relaksasi_views.xml',
         'views/ka_ketentuan_views.xml',
+        'report/ka_kwitansi_report.xml',
         'views/ka_ntp_views.xml',
         'views/ka_sync_config_views.xml',
         'views/ka_sita_menu.xml',

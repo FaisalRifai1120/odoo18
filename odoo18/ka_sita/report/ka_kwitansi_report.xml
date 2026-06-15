@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════
+         PAPERFORMAT
+    ══════════════════════════════════════════ -->
+    <record id="paperformat_ka_kwitansi" model="report.paperformat">
+        <field name="name">KA Kwitansi A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">8</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         REPORT ACTIONS
+    ══════════════════════════════════════════ -->
+    <!-- Cetak semua (per NTP, loop semua register) -->
+    <record id="action_report_ka_kwitansi" model="ir.actions.report">
+        <field name="name">Kwitansi Pembelian Tebu &amp; Penjualan Gula</field>
+        <field name="model">ka.ntp</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ka_sita.report_ka_kwitansi</field>
+        <field name="report_file">ka_sita.report_ka_kwitansi</field>
+        <field name="paperformat_id" ref="paperformat_ka_kwitansi"/>
+        <field name="print_report_name">'Kwitansi - %s' % (object.name)</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <!-- Cetak per register / terpilih (model nota gula) -->
+    <record id="action_report_ka_kwitansi_ng" model="ir.actions.report">
+        <field name="name">Kwitansi (per Register)</field>
+        <field name="model">ka.ntp.nota.gula</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ka_sita.report_ka_kwitansi_ng</field>
+        <field name="report_file">ka_sita.report_ka_kwitansi_ng</field>
+        <field name="paperformat_id" ref="paperformat_ka_kwitansi"/>
+        <field name="print_report_name">'Kwitansi - %s' % (object.register or '')</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         STYLE (dipakai bersama)
+    ══════════════════════════════════════════ -->
+    <template id="report_ka_kwitansi_style">
+        <style>
+            .ka-kw { font-family: Arial, sans-serif; font-size: 10px; color:#000; }
+            .ka-kw .title { text-align:center; font-weight:bold; font-size:13px; text-transform:uppercase; }
+            .ka-kw .subtitle { text-align:center; font-size:10px; }
+            .ka-kw table { width:100%; border-collapse:collapse; }
+            .ka-kw .sec { font-weight:bold; font-size:11px; margin-top:6px; border-bottom:1px solid #000; }
+            .ka-kw .lbl { padding:1px 0; }
+            .ka-kw .num { text-align:right; font-variant-numeric:tabular-nums; }
+            .ka-kw .box { border:1px solid #000; padding:1px 4px; text-align:right; font-weight:bold; }
+            .ka-kw .hdr td { vertical-align:top; }
+            .ka-kw .ttl-row td { border-top:1px solid #000; }
+            .ka-kw .small { font-size:9px; }
+            .ka-kw .muted { color:#888; }
+        </style>
+    </template>
+
+    <!-- ══════════════════════════════════════════
+         HALAMAN KWITANSI (sub-template)
+         Butuh: o (ka.ntp), ng (ka.ntp.nota.gula), nomor_urut (int)
+    ══════════════════════════════════════════ -->
+    <template id="report_ka_kwitansi_page">
+        <t t-set="company" t-value="o.company_id"/>
+        <div class="page ka-kw">
+
+            <!-- ===== HEADER ===== -->
+            <table class="hdr">
+                <tr>
+                    <td style="width:18%;">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height:46px;"/>
+                        <div t-else="" class="small"><strong>PT KEBON AGUNG</strong><br/>PG KEBON AGUNG</div>
+                    </td>
+                    <td style="width:52%;">
+                        <div class="title">Kwitansi Pembelian Tebu dan Penjualan Gula</div>
+                        <div class="subtitle">Periode : <span t-out="o.periode"/></div>
+                    </td>
+                    <td style="width:30%; text-align:right;">
+                        <img t-att-src="'/report/barcode/Code128/%s' % (ng.register or '')" style="height:34px; width:170px;"/>
+                        <div><strong>NOMOR : </strong>
+                            <span t-out="str(nomor_urut).zfill(5)"/>
+                            <t t-if="o.kode_periode"> / <span t-out="o.kode_periode"/></t>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="margin-top:4px;">
+                <tr><td style="width:70%;">Nomor Register : <strong t-out="ng.register"/></td></tr>
+                <tr><td>Nama&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; : <strong t-out="ng.nama_register"/></td></tr>
+            </table>
+
+            <!-- ===== I. PENJUALAN GULA ===== -->
+            <div class="sec">I. PENJUALAN GULA</div>
+            <table>
+                <tr>
+                    <td class="lbl" style="width:50%;">Uraian</td>
+                    <td style="width:6%;"></td>
+                    <td class="num" style="width:11%;"></td>
+                    <td class="num" style="width:11%;"></td>
+                    <td class="num" style="width:11%;"></td>
+                    <td class="num" style="width:11%;">Jumlah</td>
+                </tr>
+                <tr>
+                    <td class="lbl">1. Jumlah Tebu Tergiling</td>
+                    <td class="small">(ku)</td>
+                    <td></td><td></td><td></td>
+                    <td class="num"><span t-out="'{:,.2f}'.format(ng.tebu_final).replace(',','#').replace('.',',').replace('#','.')"/></td>
+                </tr>
+                <tr><td class="lbl">2. Gula</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <!-- a. Gula Per Ku Tebu = 4 kolom KW tebu (kualitas). Kebon Agung: bagi hasil di KW-2.
+                     Pengembangan PG Trangkil: mutu 1->KW1, mutu 2-4->KW2, dst. -->
+                <tr>
+                    <td class="lbl">&#160;&#160;&#160;a. Gula Per Ku Tebu</td>
+                    <td class="small">(kg)</td>
+                    <td class="num">0,00</td>
+                    <td class="num"><span t-out="('%.2f' % ng.bagi_hasil).replace('.',',')"/></td>
+                    <td class="num">0,00</td>
+                    <td class="num">0,00</td>
+                </tr>
+                <tr>
+                    <td class="lbl">&#160;&#160;&#160;b. Jumlah Gula</td>
+                    <td class="small">(kg)</td>
+                    <td></td><td></td><td></td>
+                    <td class="num"><span t-out="'{:,.0f}'.format(ng.gula).replace(',','.')"/></td>
+                </tr>
+                <tr>
+                    <td class="lbl">&#160;&#160;&#160;c. Diberikan dalam bentuk SP gula besar</td>
+                    <td class="small">(kg)</td>
+                    <td></td><td></td><td></td>
+                    <td class="num"><span t-out="'{:,.0f}'.format(ng.gula_jual).replace(',','.')"/></td>
+                </tr>
+                <tr>
+                    <td class="lbl">&#160;&#160;&#160;d. Diberikan dalam bentuk SP gula kecil</td>
+                    <td class="small">(kg)</td>
+                    <td></td><td></td><td></td>
+                    <td class="num"><span t-out="'{:,.0f}'.format(ng.natura_kecil).replace(',','.')"/></td>
+                </tr>
+                <tr>
+                    <td class="lbl">&#160;&#160;&#160;e. SP gula kecil 2</td>
+                    <td class="small">(kg)</td>
+                    <td></td><td></td><td></td>
+                    <td class="num"><span t-out="'{:,.0f}'.format(ng.natura2).replace(',','.')"/></td>
+                </tr>
+            </table>
+
+            <!-- ===== II. HUTANG / PIUTANG (placeholder — menyusul) ===== -->
+            <div class="sec">II. HUTANG / PIUTANG <span class="small muted">(akan diisi via import — menyusul)</span></div>
+            <table>
+                <tr><td class="lbl" style="width:70%;"><strong>a. PREMI</strong></td><td class="num" style="width:30%;"></td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;1. Tebu MBS Plus</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;2. Tebu MBS</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;3. Angkutan Tebu</td><td class="num muted">0</td></tr>
+                <tr class="ttl-row"><td class="lbl"><strong>&#160;&#160;&#160;Jumlah Piutang (II.a)</strong></td><td class="num"><span class="box">0</span></td></tr>
+                <tr><td class="lbl"><strong>b. HUTANG</strong></td><td class="num"></td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;1. Karung</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;2. Operasional KUD</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;3. Operasional APTRI</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;4. Tebang Pabrik</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;5. Angkutan Tebang Pabrik</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;6. Biaya Koordinasi</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;7. Bibit</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;8. Traktor</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;9. Pinjaman Tebangan</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;10. Ekstensifikasi (Rawat Ratoon)</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;11. KUR Kemitraan Bank Jatim</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;12. Pinjaman Kemitraan</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;13. BWU BNI</td><td class="num muted">0</td></tr>
+                <tr><td class="lbl">&#160;&#160;&#160;14. PPH 22</td><td class="num muted">0</td></tr>
+                <tr class="ttl-row"><td class="lbl"><strong>&#160;&#160;&#160;Jumlah Hutang (II.b)</strong></td><td class="num"><span class="box">0</span></td></tr>
+                <tr><td class="lbl"><strong>c. Jumlah HUTANG (II.a - II.b)</strong></td><td class="num"><span class="box">0</span></td></tr>
+            </table>
+
+            <div class="sec">III. JUMLAH YANG DISETOR <span class="box" style="float:right;">0</span></div>
+            <div class="small" style="margin-top:14px;">Terbilang : ( ............................................................ )</div>
+
+            <!-- ===== IV. NOMOR SPTA ===== -->
+            <div class="sec" style="margin-top:6px;">IV. NOMOR SPTA YANG CAIR PERIODE INI</div>
+            <t t-set="sptas" t-value="[s for s in o.line_ids.filtered(lambda l: l.register == ng.register).mapped('no_timbang') if s]"/>
+            <div class="small">No_Timbang : <span t-out="' '.join(sptas)"/></div>
+
+            <!-- ===== FOOTER / TTD ===== -->
+            <table style="margin-top:18px;">
+                <tr>
+                    <td style="width:60%; vertical-align:bottom;" class="small">
+                        Catatan: pencairan kwitansi sesuai ketentuan yang berlaku.
+                    </td>
+                    <td style="width:40%; text-align:center;">
+                        <div t-out="(o.kwitansi_kota or 'Malang') + ', ' + (o.tanggal_pembuatan and o.tanggal_pembuatan.strftime('%d-%m-%Y') or '')"/>
+                        <div t-out="o.pejabat_jabatan or 'Kepala Bag. TUK'"/>
+                        <div style="height:46px;"></div>
+                        <div><strong t-out="o.pejabat_nama or '________________'"/></div>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </template>
+
+    <!-- ══════════════════════════════════════════
+         REPORT 1: CETAK SEMUA (model ka.ntp)
+    ══════════════════════════════════════════ -->
+    <template id="report_ka_kwitansi">
+        <t t-call="web.html_container">
+            <t t-call="ka_sita.report_ka_kwitansi_style"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-foreach="o.nota_gula_ids.sorted(key=lambda r: r.register or '')" t-as="ng">
+                    <t t-set="nomor_urut" t-value="ng_index + 1"/>
+                    <t t-call="ka_sita.report_ka_kwitansi_page"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- ══════════════════════════════════════════
+         REPORT 2: PER REGISTER / TERPILIH (model ka.ntp.nota.gula)
+    ══════════════════════════════════════════ -->
+    <template id="report_ka_kwitansi_ng">
+        <t t-call="web.html_container">
+            <t t-call="ka_sita.report_ka_kwitansi_style"/>
+            <t t-foreach="docs" t-as="ng">
+                <t t-set="o" t-value="ng.ntp_id"/>
+                <t t-set="nomor_urut" t-value="o.nota_gula_ids.sorted(key=lambda r: r.register or '').ids.index(ng.id) + 1"/>
+                <t t-call="ka_sita.report_ka_kwitansi_page"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

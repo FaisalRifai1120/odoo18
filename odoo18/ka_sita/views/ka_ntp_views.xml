@@ -17,8 +17,14 @@
                     <button name="action_import_bagihasil" string="Import Bagi Hasil"
                             type="object" class="btn-secondary"
                             invisible="state == 'done' or not upload_bagihasil_file"/>
+                    <button name="action_import_kawalan" string="Import Kawalan"
+                            type="object" class="btn-secondary"
+                            invisible="state == 'done' or not upload_kawalan_file"/>
                     <button name="action_view_nota_gula" string="Nota Gula"
                             type="object" class="btn-primary"
+                            invisible="state != 'done'"/>
+                    <button name="%(ka_sita.action_report_ka_kwitansi)d" string="Cetak Semua Kwitansi"
+                            type="action" class="btn-primary"
                             invisible="state != 'done'"/>
                     <button name="action_set_done" string="Selesaikan"
                             type="object" class="btn-success"
@@ -44,6 +50,8 @@
                             <field name="tgl_awal" readonly="state == 'done'"/>
                             <field name="tgl_akhir" readonly="state == 'done'"/>
                             <field name="periode" readonly="state == 'done'"/>
+                            <field name="ketentuan_id" readonly="state == 'done'"
+                                   options="{'no_create': True}"/>
                         </group>
                         <group string="Pengelompokan &amp; Filter">
                             <field name="jenis_kelompok" readonly="state == 'done'"/>
@@ -64,16 +72,32 @@
                             <field name="total_netto" readonly="1"/>
                             <field name="total_netto_relaksasi" readonly="1"/>
                             <field name="total_gula" readonly="1"/>
+                            <field name="total_gula_kawalan" readonly="1"/>
+                            <field name="total_gula_total" readonly="1"/>
                             <field name="total_rupiah" readonly="1"/>
+                            <field name="total_rupiah_total" readonly="1"/>
                         </group>
                         <group string="Status Override">
                             <field name="has_import_relaksasi" readonly="1"/>
                             <field name="has_import_bagihasil" readonly="1"/>
+                            <field name="has_import_kawalan" readonly="1"/>
                         </group>
+                    </group>
+
+                    <group string="Header Kwitansi" col="4">
+                        <field name="kode_periode"/>
+                        <field name="kwitansi_kota"/>
+                        <field name="pejabat_jabatan"/>
+                        <field name="pejabat_nama"/>
                     </group>
 
                     <notebook>
                         <page string="Detail per Truk">
+                            <div class="text-muted" style="padding:4px 0;">
+                                Catatan: gula di sini <strong>indikatif per truk</strong>.
+                                Angka final dihitung di level register (jumlahkan tebu dulu,
+                                baru gula) dan ada di <strong>Nota Gula</strong>.
+                            </div>
                             <field name="line_ids" readonly="1">
                                 <list string="Detail per Truk">
                                     <field name="date_out"/>
@@ -86,10 +110,20 @@
                                     <field name="persen_relaksasi"/>
                                     <field name="rafaksi_relaksasi" sum="Total Raf. Relaksasi"/>
                                     <field name="netto_relaksasi" string="Tebu Final" sum="Total Tebu Final"/>
-                                    <field name="bagi_hasil" digits="[10,2]"/>
-                                    <field name="gula" sum="Total Gula"/>
+                                    <field name="bagi_hasil" digits="[10,4]"/>
+                                    <field name="gula" string="Gula BH (indikatif)"/>
+                                    <field name="gula_jual" string="Gula Jual" optional="hide"/>
+                                    <field name="natura_kecil" string="Natura Kecil" optional="hide"/>
+                                    <field name="nilai_kawalan" optional="hide"/>
+                                    <field name="gula_kawalan" string="Natura1 (Kawalan)" optional="hide"/>
+                                    <field name="natura2" string="Natura2 (Tetes)" optional="hide"/>
+                                    <field name="natura3" string="Natura3 (Sharing)" optional="hide"/>
+                                    <field name="gula_total" string="Gula Total" optional="hide"/>
                                     <field name="harga_gula" optional="hide"/>
-                                    <field name="rupiah" sum="Total Rupiah"/>
+                                    <field name="rupiah" string="Rupiah BH" optional="hide"/>
+                                    <field name="rupiah_total" string="Rupiah Total" optional="hide"/>
+                                    <field name="tetes_tani" optional="hide"/>
+                                    <field name="nilai_tetes" optional="hide"/>
                                 </list>
                             </field>
                         </page>
@@ -103,6 +137,10 @@
                                     <field name="upload_bagihasil_file" filename="upload_bagihasil_filename"/>
                                     <field name="upload_bagihasil_filename" invisible="1"/>
                                 </group>
+                                <group string="Import Kawalan (register, kawalan)">
+                                    <field name="upload_kawalan_file" filename="upload_kawalan_filename"/>
+                                    <field name="upload_kawalan_filename" invisible="1"/>
+                                </group>
                             </group>
                             <div class="text-muted" style="padding:8px;">
                                 Setelah upload file, klik tombol <strong>Import</strong> di header,
@@ -112,8 +150,9 @@
                             </div>
                             <field name="import_relaksasi_saved" invisible="1"/>
                             <field name="import_bagihasil_saved" invisible="1"/>
+                            <field name="import_kawalan_saved" invisible="1"/>
                             <group string="File Import Tersimpan"
-                                   invisible="not import_relaksasi_saved and not import_bagihasil_saved">
+                                   invisible="not import_relaksasi_saved and not import_bagihasil_saved and not import_kawalan_saved">
                                 <div invisible="not import_relaksasi_saved">
                                     <field name="import_relaksasi_filename" readonly="1" class="oe_inline"/>
                                     <button name="action_download_import_relaksasi"
@@ -124,6 +163,12 @@
                                     <field name="import_bagihasil_filename" readonly="1" class="oe_inline"/>
                                     <button name="action_download_import_bagihasil"
                                             string="Unduh File Bagi Hasil" type="object"
+                                            class="btn-link" icon="fa-download"/>
+                                </div>
+                                <div invisible="not import_kawalan_saved">
+                                    <field name="import_kawalan_filename" readonly="1" class="oe_inline"/>
+                                    <button name="action_download_import_kawalan"
+                                            string="Unduh File Kawalan" type="object"
                                             class="btn-link" icon="fa-download"/>
                                 </div>
                             </group>
@@ -149,8 +194,8 @@
                 <field name="tgl_akhir"/>
                 <field name="periode" optional="show"/>
                 <field name="line_count" string="Jml Truk"/>
-                <field name="total_gula" string="Total Gula"/>
-                <field name="total_rupiah" string="Total Rupiah"/>
+                <field name="total_gula_total" string="Total Gula"/>
+                <field name="total_rupiah_total" string="Total Rupiah"/>
                 <field name="state"/>
             </list>
         </field>
@@ -189,12 +234,27 @@
         <field name="model">ka.ntp.nota.gula</field>
         <field name="arch" type="xml">
             <list string="Nota Gula" create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_print_kwitansi_all" type="object"
+                            string="Cetak Semua Kwitansi" class="btn-primary"/>
+                    <button name="action_print_kwitansi" type="object"
+                            string="Cetak Terpilih" class="btn-secondary"/>
+                </header>
                 <field name="register"/>
                 <field name="nama_register" optional="show"/>
                 <field name="tebu_final" sum="Total Tebu Final"/>
                 <field name="bagi_hasil"/>
-                <field name="gula" sum="Total Gula"/>
-                <field name="rupiah" sum="Total Rupiah"/>
+                <field name="gula" string="Gula BH" sum="Total Gula BH"/>
+                <field name="gula_jual" string="Gula Jual" sum="Total Gula Jual" optional="show"/>
+                <field name="natura_kecil" string="Natura Kecil" sum="Total Natura Kecil" optional="show"/>
+                <field name="gula_kawalan" string="Natura1" sum="Total Kawalan" optional="show"/>
+                <field name="natura2" string="Natura2" sum="Total Natura2" optional="show"/>
+                <field name="natura3" string="Natura3" sum="Total Natura3" optional="show"/>
+                <field name="gula_total" string="Gula Total" sum="Total Gula"/>
+                <field name="rupiah" string="Rupiah BH" sum="Total Rupiah BH" optional="hide"/>
+                <field name="rupiah_total" string="Rupiah Total" sum="Total Rupiah"/>
+                <button name="action_print_kwitansi" type="object"
+                        string="Cetak" icon="fa-print" title="Cetak Kwitansi register ini"/>
             </list>
         </field>
     </record>
