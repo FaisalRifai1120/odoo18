@@ -212,6 +212,27 @@
                                 </group>
                             </page>
 
+                            <!-- ============ ANALISA LAB ============ -->
+                            <page string="Analisa Lab" name="analisa">
+                                <field name="analisa_ids" context="{'default_giling_id': id}">
+                                    <list editable="bottom">
+                                        <field name="npp_brix"/>
+                                        <field name="npp_pol"/>
+                                        <field name="rend_npp"/>
+                                        <field name="bbt_pol"/>
+                                        <field name="bbt_knt"/>
+                                        <field name="hpb_total"/>
+                                        <field name="icumsa_gkp"/>
+                                        <field name="fr_calc"/>
+                                        <field name="or_recovery"/>
+                                    </list>
+                                </field>
+                                <p class="text-muted">
+                                    Entri ringkas. Untuk seluruh parameter lab (ICUMSA, SO2, kinerja
+                                    gilingan/proses, kristal), buka menu <b>Input Harian → Analisa Lab</b>.
+                                </p>
+                            </page>
+
                             <!-- ============ CATATAN ============ -->
                             <page string="Catatan" name="catatan">
                                 <field name="notes" placeholder="Catatan tambahan untuk hari giling ini..."/>

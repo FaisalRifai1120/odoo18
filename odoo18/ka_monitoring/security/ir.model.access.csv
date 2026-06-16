@@ -9,3 +9,11 @@ access_ka_giling_parameter_user,ka.giling.parameter.user,model_ka_giling_paramet
 access_ka_giling_parameter_manager,ka.giling.parameter.manager,model_ka_giling_parameter,group_ka_monitoring_manager,1,1,1,1
 access_ka_giling_harian_user,ka.giling.harian.user,model_ka_giling_harian,group_ka_monitoring_user,1,1,1,0
 access_ka_giling_harian_manager,ka.giling.harian.manager,model_ka_giling_harian,group_ka_monitoring_manager,1,1,1,1
+access_ka_giling_analisa_user,ka.giling.analisa.user,model_ka_giling_analisa,group_ka_monitoring_user,1,1,1,0
+access_ka_giling_analisa_manager,ka.giling.analisa.manager,model_ka_giling_analisa,group_ka_monitoring_manager,1,1,1,1
+access_ka_giling_monitoring_sbh_user,ka.giling.monitoring.sbh.user,model_ka_giling_monitoring_sbh,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_monitoring_sbh_manager,ka.giling.monitoring.sbh.manager,model_ka_giling_monitoring_sbh,group_ka_monitoring_manager,1,0,0,0
+access_ka_giling_monitoring_spt_user,ka.giling.monitoring.spt.user,model_ka_giling_monitoring_spt,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_monitoring_spt_manager,ka.giling.monitoring.spt.manager,model_ka_giling_monitoring_spt,group_ka_monitoring_manager,1,0,0,0
+access_ka_giling_rekap_user,ka.giling.rekap.user,model_ka_giling_rekap,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_rekap_manager,ka.giling.rekap.manager,model_ka_giling_rekap,group_ka_monitoring_manager,1,0,0,0

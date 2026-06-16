@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_analisa_list" model="ir.ui.view">
+            <field name="name">ka.giling.analisa.list</field>
+            <field name="model">ka.giling.analisa</field>
+            <field name="arch" type="xml">
+                <list string="Analisa Lab Harian">
+                    <field name="date"/>
+                    <field name="gil_ke"/>
+                    <field name="npp_brix" optional="show"/>
+                    <field name="npp_pol" optional="show"/>
+                    <field name="rend_npp" optional="show"/>
+                    <field name="icumsa_gkp" optional="show"/>
+                    <field name="bbt_pol" optional="hide"/>
+                    <field name="bbt_knt" optional="hide"/>
+                    <field name="hpb_total" optional="hide"/>
+                    <field name="fr_calc" optional="show"/>
+                    <field name="or_recovery" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_giling_analisa_form" model="ir.ui.view">
+            <field name="name">ka.giling.analisa.form</field>
+            <field name="model">ka.giling.analisa</field>
+            <field name="arch" type="xml">
+                <form string="Analisa Lab Harian">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="giling_id"/>
+                            <h1>
+                                <field name="giling_id" options="{'no_create': True}"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date" readonly="1"/>
+                                <field name="gil_ke" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Nira &amp; Rendemen" name="nira">
+                                <group>
+                                    <group string="Nira">
+                                        <field name="nm_pct"/>
+                                        <field name="imb_pct"/>
+                                        <field name="npp_brix"/>
+                                        <field name="npp_pol"/>
+                                        <field name="nm_brix"/>
+                                        <field name="nm_pol"/>
+                                    </group>
+                                    <group string="Rendemen">
+                                        <field name="rend_npp"/>
+                                        <field name="rend_nm"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="ICUMSA &amp; SO2" name="mutu">
+                                <group>
+                                    <group string="ICUMSA (IU)">
+                                        <field name="icumsa_p1"/>
+                                        <field name="icumsa_p2"/>
+                                        <field name="icumsa_gkp"/>
+                                        <field name="icumsa_rs"/>
+                                    </group>
+                                    <group string="Kadar SO2 (ppm)">
+                                        <field name="so2_p1"/>
+                                        <field name="so2_p2"/>
+                                        <field name="so2_gkp"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Bahan Baku Tebu" name="bbt">
+                                <group>
+                                    <group string="Komposisi BBT">
+                                        <field name="bbt_pol"/>
+                                        <field name="bbt_brix"/>
+                                        <field name="bbt_sabut"/>
+                                        <field name="bbt_knt"/>
+                                        <field name="bbt_brix_pucuk"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Kinerja Gilingan &amp; Proses" name="kinerja">
+                                <group>
+                                    <group string="Kinerja Gilingan">
+                                        <field name="hpb1"/>
+                                        <field name="hpb_total"/>
+                                        <field name="pshk"/>
+                                        <field name="hpg"/>
+                                        <field name="pol_ampas"/>
+                                        <field name="zk_ampas"/>
+                                    </group>
+                                    <group string="Kinerja Proses">
+                                        <field name="delta_hk"/>
+                                        <field name="angka_pemurnian"/>
+                                        <field name="pol_blotong"/>
+                                        <field name="bhr"/>
+                                        <field name="wr"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Kristal &amp; Hasil Hitung" name="kristal">
+                                <group>
+                                    <group string="Kristal Dalam Proses">
+                                        <field name="kristal_total"/>
+                                        <field name="kristal_tebu"/>
+                                        <field name="kristal_rs"/>
+                                        <field name="hk_tetes"/>
+                                    </group>
+                                    <group string="Hasil Hitung (otomatis)">
+                                        <field name="listrik_per_tebu" readonly="1"/>
+                                        <field name="uap_pct_tebu" readonly="1"/>
+                                        <field name="fr_calc" readonly="1"/>
+                                        <field name="or_recovery" readonly="1"/>
+                                        <field name="potensi_kehilangan_ton" readonly="1"/>
+                                        <field name="potensi_kehilangan_rp" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Catatan" name="catatan">
+                                <field name="notes" placeholder="Catatan analisa lab..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_analisa_search" model="ir.ui.view">
+            <field name="name">ka.giling.analisa.search</field>
+            <field name="model">ka.giling.analisa</field>
+            <field name="arch" type="xml">
+                <search string="Cari Analisa Lab">
+                    <field name="giling_id"/>
+                    <field name="date"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_bulan" string="Bulan" context="{'group_by': 'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_analisa" model="ir.actions.act_window">
+            <field name="name">Analisa Lab Harian</field>
+            <field name="res_model">ka.giling.analisa</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_ka_giling_analisa_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Catat Analisa Lab Harian</p>
+                <p>Hasil lab per hari giling: nira, ICUMSA, SO2, BBT, kinerja gilingan &amp; proses.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

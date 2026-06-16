@@ -31,5 +31,29 @@
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
             <field name="global" eval="True"/>
         </record>
+        <record id="rule_ka_giling_analisa_company" model="ir.rule">
+            <field name="name">Analisa Lab: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_analisa"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+        <record id="rule_ka_giling_monitoring_sbh_company" model="ir.rule">
+            <field name="name">Monitoring SBH: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_monitoring_sbh"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+        <record id="rule_ka_giling_monitoring_spt_company" model="ir.rule">
+            <field name="name">Monitoring SPT: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_monitoring_spt"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+        <record id="rule_ka_giling_rekap_company" model="ir.rule">
+            <field name="name">Rekap: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_rekap"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
     </data>
 </odoo>

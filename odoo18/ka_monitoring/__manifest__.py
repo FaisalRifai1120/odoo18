@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'KA Monitoring Giling',
-    'version': '18.0.3.1',
+    'version': '18.0.4.0',
     'category': 'Manufacturing',
     'summary': 'Monitoring Giling & SBH PG Kebon Agung — Laporan Harian, SBH/SPT, Dashboard',
     'description': """
-        Modul KA Monitoring Giling.
+        Modul KA Monitoring Giling — LENGKAP (9 model).
 
-        FASE 1: Musim Giling.
-        FASE 2: Konfigurasi (Periode, Harga & Biaya, Parameter).
-        FASE 3 (aktif): Laporan Harian Giling — tebu otomatis dari ka_timbangan
-                        + perhitungan Monitoring SBH/SPT.
-        Fase berikutnya: Analisa Lab, view Monitoring SBH/SPT, Rekap & Dashboard.
+        Konfigurasi : Musim Giling, Periode Tutupan, Harga & Biaya, Parameter.
+        Input Harian: Laporan Harian Giling (tebu otomatis dari ka_timbangan,
+                      jendela hari giling 06:00-06:00 WIB) + Analisa Lab.
+        Monitoring  : Monitoring SBH, Monitoring SPT (read-only),
+                      Rekap & Dashboard (grafik tebu/rendemen/kapasitas & laba/rugi).
     """,
     'author': 'PDE KBA',
     'depends': [
@@ -29,6 +29,11 @@
         'security/ka_monitoring_company_rules.xml',
         # Views — Input Harian
         'views/ka_giling_harian_views.xml',
+        'views/ka_giling_analisa_views.xml',
+        # Views — Monitoring (read-only)
+        'views/ka_giling_monitoring_sbh_views.xml',
+        'views/ka_giling_monitoring_spt_views.xml',
+        'views/ka_giling_rekap_views.xml',
         # Views — Konfigurasi
         'views/ka_giling_season_views.xml',
         'views/ka_giling_periode_views.xml',

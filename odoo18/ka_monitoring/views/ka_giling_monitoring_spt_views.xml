@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_monitoring_spt_list" model="ir.ui.view">
+            <field name="name">ka.giling.monitoring.spt.list</field>
+            <field name="model">ka.giling.monitoring.spt</field>
+            <field name="arch" type="xml">
+                <list string="Monitoring SPT" create="false" edit="false" delete="false"
+                      decoration-success="labarugi_rp &gt; 0"
+                      decoration-danger="labarugi_rp &lt; 0">
+                    <field name="date"/>
+                    <field name="periode_code" optional="show"/>
+                    <field name="tebu_spt" sum="Tebu SPT"/>
+                    <field name="rend_spt" optional="show"/>
+                    <field name="prod_gula" sum="Produksi Gula" optional="show"/>
+                    <field name="pembelian_spt" optional="hide"/>
+                    <field name="pendapatan" optional="show"/>
+                    <field name="laba_pembelian" optional="show"/>
+                    <field name="biaya_produksi" optional="hide"/>
+                    <field name="laba_biaya_rp" sum="Laba thd Biaya Produksi" optional="show"/>
+                    <field name="labarugi_rp" sum="Laba/Rugi Total"/>
+                    <field name="status" widget="badge"
+                           decoration-success="status == 'laba'"
+                           decoration-danger="status == 'rugi'"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ GRAPH ============ -->
+        <record id="view_ka_giling_monitoring_spt_graph" model="ir.ui.view">
+            <field name="name">ka.giling.monitoring.spt.graph</field>
+            <field name="model">ka.giling.monitoring.spt</field>
+            <field name="arch" type="xml">
+                <graph string="Monitoring SPT" type="line" sample="1">
+                    <field name="date" interval="day"/>
+                    <field name="labarugi_rp" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ PIVOT ============ -->
+        <record id="view_ka_giling_monitoring_spt_pivot" model="ir.ui.view">
+            <field name="name">ka.giling.monitoring.spt.pivot</field>
+            <field name="model">ka.giling.monitoring.spt</field>
+            <field name="arch" type="xml">
+                <pivot string="Monitoring SPT" sample="1">
+                    <field name="periode_code" type="row"/>
+                    <field name="tebu_spt" type="measure"/>
+                    <field name="prod_gula" type="measure"/>
+                    <field name="labarugi_rp" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_monitoring_spt_search" model="ir.ui.view">
+            <field name="name">ka.giling.monitoring.spt.search</field>
+            <field name="model">ka.giling.monitoring.spt</field>
+            <field name="arch" type="xml">
+                <search string="Cari Monitoring SPT">
+                    <field name="date"/>
+                    <field name="periode_id"/>
+                    <filter name="filter_laba" string="Laba" domain="[('status', '=', 'laba')]"/>
+                    <filter name="filter_rugi" string="Rugi" domain="[('status', '=', 'rugi')]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_periode" string="Periode" context="{'group_by': 'periode_id'}"/>
+                        <filter name="group_bulan" string="Bulan" context="{'group_by': 'date:month'}"/>
+                        <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_monitoring_spt" model="ir.actions.act_window">
+            <field name="name">Monitoring SPT</field>
+            <field name="res_model">ka.giling.monitoring.spt</field>
+            <field name="view_mode">list,graph,pivot</field>
+            <field name="search_view_id" ref="view_ka_giling_monitoring_spt_search"/>
+            <field name="context">{'search_default_group_periode': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Belum ada data Monitoring SPT</p>
+                <p>Data muncul otomatis dari Laporan Harian Giling yang memiliki tebu SPT.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -113,9 +113,8 @@ class KaGilingHarian(models.Model):
 
     notes = fields.Text(string='Catatan')
 
-    # ── Analisa Lab (1 record/hari) — AKTIFKAN di Fase 4 ───────
-    # (memerlukan model ka.giling.analisa)
-    # analisa_ids = fields.One2many('ka.giling.analisa', 'giling_id', string='Analisa Lab')
+    # ── Analisa Lab (1 record/hari) ────────────────────────────
+    analisa_ids = fields.One2many('ka.giling.analisa', 'giling_id', string='Analisa Lab')
 
     # ── Snapshot Konfigurasi (computed dari periode/harga/parameter) ──
     bagi_hasil_rate = fields.Float(string='Bagi Hasil (Kg/Ku)', digits=(12, 4),

@@ -21,6 +21,34 @@
                   parent="menu_ka_monitoring_input"
                   action="action_ka_giling_harian"
                   sequence="10"/>
+        <menuitem id="menu_ka_giling_analisa"
+                  name="Analisa Lab"
+                  parent="menu_ka_monitoring_input"
+                  action="action_ka_giling_analisa"
+                  sequence="20"/>
+
+        <!-- ============ MONITORING (Pengguna + Manajer) ============ -->
+        <menuitem id="menu_ka_monitoring_view"
+                  name="Monitoring"
+                  parent="menu_ka_monitoring_root"
+                  sequence="50"
+                  groups="group_ka_monitoring_user,group_ka_monitoring_manager"/>
+
+        <menuitem id="menu_ka_giling_rekap"
+                  name="Rekap &amp; Dashboard"
+                  parent="menu_ka_monitoring_view"
+                  action="action_ka_giling_rekap"
+                  sequence="10"/>
+        <menuitem id="menu_ka_giling_monitoring_sbh"
+                  name="Monitoring SBH"
+                  parent="menu_ka_monitoring_view"
+                  action="action_ka_giling_monitoring_sbh"
+                  sequence="20"/>
+        <menuitem id="menu_ka_giling_monitoring_spt"
+                  name="Monitoring SPT"
+                  parent="menu_ka_monitoring_view"
+                  action="action_ka_giling_monitoring_spt"
+                  sequence="30"/>
 
         <!-- ============ KONFIGURASI (Manajer) ============ -->
         <menuitem id="menu_ka_monitoring_config"

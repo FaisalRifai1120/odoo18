@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ GRAPH (Dashboard utama) ============ -->
+        <record id="view_ka_giling_rekap_graph" model="ir.ui.view">
+            <field name="name">ka.giling.rekap.graph</field>
+            <field name="model">ka.giling.rekap</field>
+            <field name="arch" type="xml">
+                <graph string="Dashboard Giling" type="line" sample="1">
+                    <field name="date" interval="day"/>
+                    <field name="tebu_total" type="measure"/>
+                    <field name="rend_rata" type="measure"/>
+                    <field name="kapasitas_brutto" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ GRAPH Laba/Rugi ============ -->
+        <record id="view_ka_giling_rekap_graph_lr" model="ir.ui.view">
+            <field name="name">ka.giling.rekap.graph.lr</field>
+            <field name="model">ka.giling.rekap</field>
+            <field name="arch" type="xml">
+                <graph string="Laba/Rugi Harian" type="bar" sample="1">
+                    <field name="date" interval="day"/>
+                    <field name="labarugi_total" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_rekap_list" model="ir.ui.view">
+            <field name="name">ka.giling.rekap.list</field>
+            <field name="model">ka.giling.rekap</field>
+            <field name="arch" type="xml">
+                <list string="Rekapitulasi Giling" create="false" edit="false" delete="false"
+                      decoration-success="labarugi_total &gt; 0"
+                      decoration-danger="labarugi_total &lt; 0">
+                    <field name="date"/>
+                    <field name="gil_ke" optional="show"/>
+                    <field name="periode_id" optional="hide"/>
+                    <field name="tebu_tr_sbh" sum="TR-SBH" optional="hide"/>
+                    <field name="tebu_ts" sum="TS" optional="hide"/>
+                    <field name="tebu_spt" sum="SPT" optional="hide"/>
+                    <field name="tebu_total" sum="Total Tebu"/>
+                    <field name="rend_rata" optional="show"/>
+                    <field name="kapasitas_brutto" optional="show"/>
+                    <field name="total_produksi" sum="Total Produksi" optional="show"/>
+                    <field name="labarugi_sbh" sum="L/R SBH" optional="show"/>
+                    <field name="labarugi_spt" sum="L/R SPT" optional="show"/>
+                    <field name="labarugi_total" sum="L/R Total"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ PIVOT ============ -->
+        <record id="view_ka_giling_rekap_pivot" model="ir.ui.view">
+            <field name="name">ka.giling.rekap.pivot</field>
+            <field name="model">ka.giling.rekap</field>
+            <field name="arch" type="xml">
+                <pivot string="Rekapitulasi Giling" sample="1">
+                    <field name="periode_id" type="row"/>
+                    <field name="tebu_total" type="measure"/>
+                    <field name="total_produksi" type="measure"/>
+                    <field name="labarugi_total" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_rekap_search" model="ir.ui.view">
+            <field name="name">ka.giling.rekap.search</field>
+            <field name="model">ka.giling.rekap</field>
+            <field name="arch" type="xml">
+                <search string="Cari Rekap">
+                    <field name="date"/>
+                    <field name="season_id"/>
+                    <field name="periode_id"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_season" string="Musim" context="{'group_by': 'season_id'}"/>
+                        <filter name="group_periode" string="Periode" context="{'group_by': 'periode_id'}"/>
+                        <filter name="group_bulan" string="Bulan" context="{'group_by': 'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_rekap" model="ir.actions.act_window">
+            <field name="name">Rekap &amp; Dashboard</field>
+            <field name="res_model">ka.giling.rekap</field>
+            <field name="view_mode">graph,list,pivot</field>
+            <field name="search_view_id" ref="view_ka_giling_rekap_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Belum ada data rekap</p>
+                <p>Dashboard menampilkan tren tebu, rendemen, kapasitas, dan laba/rugi dari Laporan Harian Giling.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
