@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ka_giling_season_user,ka.giling.season.user,model_ka_giling_season,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_season_manager,ka.giling.season.manager,model_ka_giling_season,group_ka_monitoring_manager,1,1,1,1
+access_ka_giling_periode_user,ka.giling.periode.user,model_ka_giling_periode,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_periode_manager,ka.giling.periode.manager,model_ka_giling_periode,group_ka_monitoring_manager,1,1,1,1
+access_ka_giling_harga_biaya_user,ka.giling.harga.biaya.user,model_ka_giling_harga_biaya,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_harga_biaya_manager,ka.giling.harga.biaya.manager,model_ka_giling_harga_biaya,group_ka_monitoring_manager,1,1,1,1
+access_ka_giling_parameter_user,ka.giling.parameter.user,model_ka_giling_parameter,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_parameter_manager,ka.giling.parameter.manager,model_ka_giling_parameter,group_ka_monitoring_manager,1,1,1,1
+access_ka_giling_harian_user,ka.giling.harian.user,model_ka_giling_harian,group_ka_monitoring_user,1,1,1,0
+access_ka_giling_harian_manager,ka.giling.harian.manager,model_ka_giling_harian,group_ka_monitoring_manager,1,1,1,1

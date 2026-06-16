@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_season_list" model="ir.ui.view">
+            <field name="name">ka.giling.season.list</field>
+            <field name="model">ka.giling.season</field>
+            <field name="arch" type="xml">
+                <list string="Musim Giling">
+                    <field name="name"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <field name="jumlah_periode"/>
+                    <field name="jumlah_hari"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_giling_season_form" model="ir.ui.view">
+            <field name="name">ka.giling.season.form</field>
+            <field name="model">ka.giling.season</field>
+            <field name="arch" type="xml">
+                <form string="Musim Giling">
+                    <header>
+                        <button name="action_generate_days" type="object"
+                                string="Generate Hari Giling" class="btn-primary"
+                                confirm="Buat record Laporan Harian untuk setiap tanggal dalam musim ini?"
+                                invisible="not id"/>
+                        <button name="action_tarik_semua_timbangan" type="object"
+                                string="Tarik Semua Timbangan"
+                                confirm="Tarik ulang data tebu dari Timbangan untuk semua hari giling musim ini?"
+                                invisible="not id"/>
+                        <button name="action_renumber_giling" type="object"
+                                string="Renumber Hari" invisible="not id"/>
+                    </header>
+                    <sheet>
+                        <widget name="web_ribbon" title="Arsip" bg_color="text-bg-danger"
+                                invisible="active"/>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" icon="fa-calendar"
+                                    type="object" name="action_open_giling"
+                                    invisible="not id">
+                                <field name="jumlah_hari" widget="statinfo" string="Hari Giling"/>
+                            </button>
+                            <button class="oe_stat_button" icon="fa-clock-o" disabled="1">
+                                <field name="jumlah_periode" widget="statinfo" string="Periode"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1>
+                                <field name="name" placeholder="2026"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_start"/>
+                                <field name="date_end"/>
+                            </group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="active" widget="boolean_toggle"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Periode Tutupan" name="periode">
+                                <field name="periode_ids" context="{'default_company_id': company_id}">
+                                    <list editable="bottom">
+                                        <field name="code"/>
+                                        <field name="date_start"/>
+                                        <field name="bagi_hasil_rate"/>
+                                        <field name="company_id" column_invisible="True"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_season_search" model="ir.ui.view">
+            <field name="name">ka.giling.season.search</field>
+            <field name="model">ka.giling.season</field>
+            <field name="arch" type="xml">
+                <search string="Cari Musim Giling">
+                    <field name="name" string="Tahun Musim"/>
+                    <filter name="filter_active" string="Aktif" domain="[('active', '=', True)]"/>
+                    <filter name="filter_archived" string="Diarsip" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_company" string="Unit/Company"
+                                context="{'group_by': 'company_id'}"
+                                groups="base.group_multi_company"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_season" model="ir.actions.act_window">
+            <field name="name">Musim Giling</field>
+            <field name="res_model">ka.giling.season</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_ka_giling_season_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Buat Musim Giling pertama Anda
+                </p>
+                <p>
+                    Tentukan tahun musim serta tanggal buka &amp; tutup giling.
+                    Lalu gunakan tombol <b>Generate Hari Giling</b> untuk membuat
+                    laporan harian sepanjang musim sekaligus.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

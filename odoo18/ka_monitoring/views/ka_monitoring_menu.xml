@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ MENU ROOT ============ -->
+        <menuitem id="menu_ka_monitoring_root"
+                  name="Monitoring Giling"
+                  web_icon="ka_monitoring,static/description/icon.png"
+                  sequence="50"
+                  groups="group_ka_monitoring_user,group_ka_monitoring_manager"/>
+
+        <!-- ============ INPUT HARIAN (Pengguna + Manajer) ============ -->
+        <menuitem id="menu_ka_monitoring_input"
+                  name="Input Harian"
+                  parent="menu_ka_monitoring_root"
+                  sequence="10"
+                  groups="group_ka_monitoring_user,group_ka_monitoring_manager"/>
+
+        <menuitem id="menu_ka_giling_harian"
+                  name="Laporan Harian Giling"
+                  parent="menu_ka_monitoring_input"
+                  action="action_ka_giling_harian"
+                  sequence="10"/>
+
+        <!-- ============ KONFIGURASI (Manajer) ============ -->
+        <menuitem id="menu_ka_monitoring_config"
+                  name="Konfigurasi"
+                  parent="menu_ka_monitoring_root"
+                  sequence="90"
+                  groups="group_ka_monitoring_manager"/>
+
+        <menuitem id="menu_ka_giling_season"
+                  name="Musim Giling"
+                  parent="menu_ka_monitoring_config"
+                  action="action_ka_giling_season"
+                  sequence="10"/>
+        <menuitem id="menu_ka_giling_periode"
+                  name="Periode Tutupan"
+                  parent="menu_ka_monitoring_config"
+                  action="action_ka_giling_periode"
+                  sequence="20"/>
+        <menuitem id="menu_ka_giling_harga_biaya"
+                  name="Harga &amp; Biaya"
+                  parent="menu_ka_monitoring_config"
+                  action="action_ka_giling_harga_biaya"
+                  sequence="30"/>
+        <menuitem id="menu_ka_giling_parameter"
+                  name="Parameter"
+                  parent="menu_ka_monitoring_config"
+                  action="action_ka_giling_parameter"
+                  sequence="40"/>
+
+    </data>
+</odoo>

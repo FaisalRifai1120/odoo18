@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--
+            Grup khusus modul Monitoring Giling.
+            TANPA implied_ids → tampil sebagai CHECKBOX terpisah di form user
+            (kategori "KA Modules"). Hanya user yang DICENTANG yang bisa akses.
+            Hak tiap grup didefinisikan langsung di ir.model.access.csv.
+        -->
+        <record id="group_ka_monitoring_user" model="res.groups">
+            <field name="name">Monitoring Giling — Pengguna</field>
+            <field name="category_id" ref="ka_user_management.module_category_ka"/>
+            <field name="comment">Dapat melihat &amp; input data monitoring giling.</field>
+        </record>
+
+        <record id="group_ka_monitoring_manager" model="res.groups">
+            <field name="name">Monitoring Giling — Manajer</field>
+            <field name="category_id" ref="ka_user_management.module_category_ka"/>
+            <field name="comment">Akses penuh: konfigurasi, ubah, &amp; hapus data monitoring giling.</field>
+        </record>
+
+    </data>
+</odoo>

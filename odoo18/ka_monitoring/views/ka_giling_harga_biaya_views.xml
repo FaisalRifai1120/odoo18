@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_harga_biaya_list" model="ir.ui.view">
+            <field name="name">ka.giling.harga.biaya.list</field>
+            <field name="model">ka.giling.harga.biaya</field>
+            <field name="arch" type="xml">
+                <list string="Harga &amp; Biaya">
+                    <field name="periode_id"/>
+                    <field name="season_id" optional="show"/>
+                    <field name="harga_gula"/>
+                    <field name="harga_tetes"/>
+                    <field name="pembelian_spt"/>
+                    <field name="biaya_produksi"/>
+                    <field name="biaya_laba"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_giling_harga_biaya_form" model="ir.ui.view">
+            <field name="name">ka.giling.harga.biaya.form</field>
+            <field name="model">ka.giling.harga.biaya</field>
+            <field name="arch" type="xml">
+                <form string="Harga &amp; Biaya">
+                    <sheet>
+                        <group>
+                            <group string="Periode">
+                                <field name="periode_id"/>
+                                <field name="season_id" readonly="1"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Harga Jual">
+                                <field name="harga_gula"/>
+                                <field name="harga_tetes"/>
+                            </group>
+                            <group string="Biaya / Pembelian">
+                                <field name="pembelian_spt"/>
+                                <field name="biaya_produksi"/>
+                                <field name="biaya_laba"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_harga_biaya_search" model="ir.ui.view">
+            <field name="name">ka.giling.harga.biaya.search</field>
+            <field name="model">ka.giling.harga.biaya</field>
+            <field name="arch" type="xml">
+                <search string="Cari Harga &amp; Biaya">
+                    <field name="periode_id"/>
+                    <field name="season_id"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_periode" string="Periode" context="{'group_by': 'periode_id'}"/>
+                        <filter name="group_season" string="Musim" context="{'group_by': 'season_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_harga_biaya" model="ir.actions.act_window">
+            <field name="name">Harga &amp; Biaya</field>
+            <field name="res_model">ka.giling.harga.biaya</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_ka_giling_harga_biaya_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Tambah Harga &amp; Biaya</p>
+                <p>Harga gula/tetes, biaya produksi, dan pembelian SPT per periode.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

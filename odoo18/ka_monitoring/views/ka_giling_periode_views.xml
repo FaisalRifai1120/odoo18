@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_periode_list" model="ir.ui.view">
+            <field name="name">ka.giling.periode.list</field>
+            <field name="model">ka.giling.periode</field>
+            <field name="arch" type="xml">
+                <list string="Periode Tutupan">
+                    <field name="code"/>
+                    <field name="season_id"/>
+                    <field name="date_start"/>
+                    <field name="bagi_hasil_rate"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_giling_periode_form" model="ir.ui.view">
+            <field name="name">ka.giling.periode.form</field>
+            <field name="model">ka.giling.periode</field>
+            <field name="arch" type="xml">
+                <form string="Periode Tutupan">
+                    <sheet>
+                        <widget name="web_ribbon" title="Arsip" bg_color="text-bg-danger"
+                                invisible="active"/>
+                        <div class="oe_title">
+                            <label for="code"/>
+                            <h1>
+                                <field name="code" placeholder="1.A"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="season_id"/>
+                                <field name="date_start"/>
+                            </group>
+                            <group>
+                                <field name="bagi_hasil_rate"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="active" widget="boolean_toggle"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Harga &amp; Biaya" name="harga_biaya">
+                                <field name="harga_biaya_ids" context="{'default_company_id': company_id}">
+                                    <list editable="bottom">
+                                        <field name="harga_gula"/>
+                                        <field name="harga_tetes"/>
+                                        <field name="pembelian_spt"/>
+                                        <field name="biaya_produksi"/>
+                                        <field name="biaya_laba"/>
+                                        <field name="company_id" column_invisible="True"/>
+                                    </list>
+                                </field>
+                                <p class="text-muted">
+                                    Harga &amp; biaya yang berlaku pada periode ini. Dipakai untuk perhitungan Monitoring SBH/SPT (Fase berikutnya).
+                                </p>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_periode_search" model="ir.ui.view">
+            <field name="name">ka.giling.periode.search</field>
+            <field name="model">ka.giling.periode</field>
+            <field name="arch" type="xml">
+                <search string="Cari Periode">
+                    <field name="code"/>
+                    <field name="season_id"/>
+                    <filter name="filter_active" string="Aktif" domain="[('active', '=', True)]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_season" string="Musim" context="{'group_by': 'season_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_periode" model="ir.actions.act_window">
+            <field name="name">Periode Tutupan</field>
+            <field name="res_model">ka.giling.periode</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_ka_giling_periode_search"/>
+            <field name="context">{'search_default_group_season': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Buat Periode Tutupan</p>
+                <p>Periode bagi hasil ke petani beserta tarifnya (Kg/Ku).</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

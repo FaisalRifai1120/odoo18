@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="rule_ka_giling_season_company" model="ir.rule">
+            <field name="name">Musim Giling: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_season"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+        <record id="rule_ka_giling_periode_company" model="ir.rule">
+            <field name="name">Periode Tutupan: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_periode"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+        <record id="rule_ka_giling_harga_biaya_company" model="ir.rule">
+            <field name="name">Harga &amp; Biaya: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_harga_biaya"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+        <record id="rule_ka_giling_parameter_company" model="ir.rule">
+            <field name="name">Parameter: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_parameter"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+        <record id="rule_ka_giling_harian_company" model="ir.rule">
+            <field name="name">Laporan Harian Giling: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_harian"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_harian_list" model="ir.ui.view">
+            <field name="name">ka.giling.harian.list</field>
+            <field name="model">ka.giling.harian</field>
+            <field name="arch" type="xml">
+                <list string="Laporan Harian Giling"
+                      decoration-success="labarugi_total_rp &gt; 0"
+                      decoration-danger="labarugi_total_rp &lt; 0">
+                    <field name="date"/>
+                    <field name="gil_ke"/>
+                    <field name="periode_code" optional="show"/>
+                    <field name="tebu_tr_sbh" sum="Total TR-SBH" optional="show"/>
+                    <field name="tebu_ts" sum="Total TS" optional="hide"/>
+                    <field name="tebu_spt" sum="Total SPT" optional="show"/>
+                    <field name="tebu_total" sum="Total Tebu"/>
+                    <field name="rend_rata" optional="show"/>
+                    <field name="kapasitas_brutto" optional="hide"/>
+                    <field name="total_produksi" sum="Total Produksi" optional="show"/>
+                    <field name="labarugi_total_rp" sum="Total Laba/Rugi"/>
+                    <field name="sbh_status" widget="badge"
+                           decoration-success="sbh_status == 'laba'"
+                           decoration-danger="sbh_status == 'rugi'" optional="show"/>
+                    <field name="spt_status" widget="badge"
+                           decoration-success="spt_status == 'laba'"
+                           decoration-danger="spt_status == 'rugi'" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_giling_harian_form" model="ir.ui.view">
+            <field name="name">ka.giling.harian.form</field>
+            <field name="model">ka.giling.harian</field>
+            <field name="arch" type="xml">
+                <form string="Laporan Harian Giling">
+                    <header>
+                        <button name="action_tarik_timbangan" type="object"
+                                string="Tarik Data Timbangan" class="btn-primary"
+                                icon="fa-download"
+                                help="Ambil ulang tebu TR-SBH/TS/SPT dari modul Timbangan untuk tanggal ini"/>
+                        <button name="action_recompute" type="object"
+                                string="Hitung Ulang Monitoring" icon="fa-refresh"
+                                help="Hitung ulang nilai SBH/SPT (mis. setelah ubah Harga/Parameter)"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="date" string="Tanggal Giling"/>
+                            <h1>
+                                <field name="date"/>
+                            </h1>
+                            <div>
+                                <span class="o_form_label">Giling ke-</span>
+                                <field name="gil_ke" class="oe_inline"/>
+                            </div>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="season_id" readonly="1"/>
+                                <field name="periode_id" readonly="1"/>
+                                <field name="periode_code" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="recompute_trigger" invisible="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <!-- ============ TEBU & RENDEMEN ============ -->
+                            <page string="Tebu &amp; Rendemen" name="tebu">
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fa fa-info-circle"/> Tebu TR-SBH / TS / SPT ditarik
+                                    <b>otomatis</b> dari modul Timbangan berdasarkan klasifikasi register.
+                                    Gunakan tombol <b>Tarik Data Timbangan</b> bila ada data baru.
+                                    Nilai masih dapat dikoreksi manual bila perlu.
+                                </div>
+                                <group>
+                                    <group string="Tebu Tergiling (Ton)">
+                                        <field name="tebu_tr_sbh"/>
+                                        <field name="tebu_ts"/>
+                                        <field name="tebu_spt"/>
+                                        <field name="tebu_total" readonly="1"/>
+                                    </group>
+                                    <group string="Rendemen Sementara (%)">
+                                        <field name="rend_tr"/>
+                                        <field name="rend_ts"/>
+                                        <field name="rend_spt"/>
+                                        <field name="rend_rata" readonly="1"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Kapasitas">
+                                        <field name="kapasitas_brutto" readonly="1"/>
+                                        <span class="text-muted" colspan="2">
+                                            Kapasitas dihitung dari Total Tebu &amp; Total Jam Berhenti
+                                            (lihat tab Bahan Bakar &amp; Jam Berhenti).
+                                        </span>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- ============ PRODUKSI ============ -->
+                            <page string="Produksi" name="produksi">
+                                <group>
+                                    <group string="Gula (Ton)">
+                                        <field name="prod_gkp"/>
+                                        <field name="gkp_premium"/>
+                                        <field name="gula_reject"/>
+                                        <field name="total_produksi" readonly="1"/>
+                                        <field name="gula_ex2025"/>
+                                    </group>
+                                    <group string="RS, Tetes &amp; Ampas (Ton)">
+                                        <field name="rs_in"/>
+                                        <field name="produk_rs"/>
+                                        <field name="tetes_ton"/>
+                                        <field name="pct_tetes" readonly="1"/>
+                                        <field name="ampas"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- ============ BAHAN BAKAR & JAM BERHENTI ============ -->
+                            <page string="Bahan Bakar &amp; Jam Berhenti" name="bb_jam">
+                                <group>
+                                    <group string="Bahan Bakar / Listrik / Uap">
+                                        <field name="bb_sekam"/>
+                                        <field name="listrik_pg"/>
+                                        <field name="listrik_pln"/>
+                                        <field name="prod_uap"/>
+                                    </group>
+                                    <group string="Jam Berhenti">
+                                        <field name="jam_riil_pabrik"/>
+                                        <field name="jam_riil_luar"/>
+                                        <field name="jam_total" readonly="1"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Sisa Tebu Emplasemen">
+                                        <field name="sisa_tebu_truck"/>
+                                        <field name="sisa_tebu_ton"/>
+                                    </group>
+                                    <group string="Pengeluaran (Ton)">
+                                        <field name="keluar_shs"/>
+                                        <field name="keluar_tetes"/>
+                                        <field name="keluar_ampas"/>
+                                    </group>
+                                </group>
+                                <separator string="Keterangan Jam Berhenti"/>
+                                <field name="jam_uraian" placeholder="Uraian penyebab berhenti giling..."/>
+                            </page>
+
+                            <!-- ============ MONITORING (SBH & SPT) ============ -->
+                            <page string="Monitoring (SBH &amp; SPT)" name="monitoring">
+                                <div class="alert alert-secondary" role="alert">
+                                    <i class="fa fa-calculator"/> Seluruh nilai di bawah dihitung otomatis
+                                    dari tebu, rendemen, dan konfigurasi Harga/Biaya/Parameter pada periode terkait.
+                                </div>
+                                <group string="Konfigurasi Terpakai">
+                                    <group>
+                                        <field name="periode_code" readonly="1"/>
+                                        <field name="bagi_hasil_rate" readonly="1"/>
+                                        <field name="faktor_gula" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="harga_gula" readonly="1"/>
+                                        <field name="harga_tetes" readonly="1"/>
+                                        <field name="pembelian_spt" readonly="1"/>
+                                        <field name="biaya_produksi" readonly="1"/>
+                                        <field name="biaya_laba" readonly="1"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Hasil SBH (Sistem Bagi Hasil)">
+                                        <field name="rend_sbh" readonly="1"/>
+                                        <field name="sbh_prod_gula" readonly="1"/>
+                                        <field name="sbh_prod_tetes" readonly="1"/>
+                                        <field name="sbh_gula_milik_pg" readonly="1"/>
+                                        <field name="sbh_tetes_milik_pg" readonly="1"/>
+                                        <field name="sbh_bagi_hasil_rp" readonly="1"/>
+                                        <field name="sbh_pendapatan" readonly="1"/>
+                                        <field name="sbh_laba_biaya_ku" readonly="1"/>
+                                        <field name="sbh_laba_biaya_rp" readonly="1"/>
+                                        <field name="sbh_labarugi_ku" readonly="1"/>
+                                        <field name="sbh_labarugi_rp" readonly="1"/>
+                                        <field name="sbh_status" widget="badge"
+                                               decoration-success="sbh_status == 'laba'"
+                                               decoration-danger="sbh_status == 'rugi'"/>
+                                    </group>
+                                    <group string="Hasil SPT (Sewa Per Ton)">
+                                        <field name="spt_prod_gula" readonly="1"/>
+                                        <field name="spt_prod_tetes" readonly="1"/>
+                                        <field name="spt_pendapatan" readonly="1"/>
+                                        <field name="spt_laba_pembelian" readonly="1"/>
+                                        <field name="spt_laba_biaya_ku" readonly="1"/>
+                                        <field name="spt_laba_biaya_rp" readonly="1"/>
+                                        <field name="spt_labarugi_ku" readonly="1"/>
+                                        <field name="spt_labarugi_rp" readonly="1"/>
+                                        <field name="spt_status" widget="badge"
+                                               decoration-success="spt_status == 'laba'"
+                                               decoration-danger="spt_status == 'rugi'"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Total Gabungan">
+                                        <field name="labarugi_total_rp" readonly="1"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- ============ CATATAN ============ -->
+                            <page string="Catatan" name="catatan">
+                                <field name="notes" placeholder="Catatan tambahan untuk hari giling ini..."/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_harian_search" model="ir.ui.view">
+            <field name="name">ka.giling.harian.search</field>
+            <field name="model">ka.giling.harian</field>
+            <field name="arch" type="xml">
+                <search string="Cari Laporan Harian">
+                    <field name="date"/>
+                    <field name="season_id"/>
+                    <field name="periode_id"/>
+                    <filter name="filter_sbh_laba" string="SBH Laba" domain="[('sbh_status', '=', 'laba')]"/>
+                    <filter name="filter_sbh_rugi" string="SBH Rugi" domain="[('sbh_status', '=', 'rugi')]"/>
+                    <separator/>
+                    <filter name="filter_bulan" string="Bulan Ini"
+                            domain="[('date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_season" string="Musim" context="{'group_by': 'season_id'}"/>
+                        <filter name="group_periode" string="Periode" context="{'group_by': 'periode_id'}"/>
+                        <filter name="group_bulan" string="Bulan" context="{'group_by': 'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_harian" model="ir.actions.act_window">
+            <field name="name">Laporan Harian Giling</field>
+            <field name="res_model">ka.giling.harian</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_ka_giling_harian_search"/>
+            <field name="context">{'search_default_group_periode': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Buat Laporan Harian Giling</p>
+                <p>
+                    Pilih tanggal — tebu tergiling akan ditarik otomatis dari Timbangan.
+                    Isi rendemen &amp; data produksi, lalu lihat hasil laba/rugi di tab Monitoring.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
