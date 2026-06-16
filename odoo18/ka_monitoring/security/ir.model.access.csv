@@ -17,3 +17,5 @@ access_ka_giling_monitoring_spt_user,ka.giling.monitoring.spt.user,model_ka_gili
 access_ka_giling_monitoring_spt_manager,ka.giling.monitoring.spt.manager,model_ka_giling_monitoring_spt,group_ka_monitoring_manager,1,0,0,0
 access_ka_giling_rekap_user,ka.giling.rekap.user,model_ka_giling_rekap,group_ka_monitoring_user,1,0,0,0
 access_ka_giling_rekap_manager,ka.giling.rekap.manager,model_ka_giling_rekap,group_ka_monitoring_manager,1,0,0,0
+access_ka_giling_truk_user,ka.giling.truk.user,model_ka_giling_truk,group_ka_monitoring_user,1,0,0,0
+access_ka_giling_truk_manager,ka.giling.truk.manager,model_ka_giling_truk,group_ka_monitoring_manager,1,0,0,0

@@ -237,6 +237,34 @@
                             <page string="Catatan" name="catatan">
                                 <field name="notes" placeholder="Catatan tambahan untuk hari giling ini..."/>
                             </page>
+
+                            <!-- ============ RINCIAN TRUK (laba per truk) ============ -->
+                            <page string="Rincian Truk" name="rincian_truk">
+                                <div class="alert alert-secondary" role="alert">
+                                    <i class="fa fa-truck"/> Rincian per truk yang membentuk angka Tebu Tergiling.
+                                    Digenerate otomatis saat <b>Tarik Data Timbangan</b>.
+                                    Rendemen memakai QC truk bila ada, jika kosong memakai rendemen kategori harian.
+                                </div>
+                                <field name="truk_ids" readonly="1">
+                                    <list string="Rincian Truk" create="false" edit="false" delete="false"
+                                          decoration-success="labarugi_rp &gt; 0"
+                                          decoration-danger="labarugi_rp &lt; 0">
+                                        <field name="no_spta"/>
+                                        <field name="register_id"/>
+                                        <field name="kategori" optional="hide"/>
+                                        <field name="date_out" string="Jam Keluar" optional="hide"/>
+                                        <field name="tebu_ton" sum="Total Tebu"/>
+                                        <field name="rend"/>
+                                        <field name="rend_source" optional="show"/>
+                                        <field name="prod_gula" sum="Total Gula"/>
+                                        <field name="pendapatan_ku"/>
+                                        <field name="labarugi_rp" sum="Total Laba/Rugi"/>
+                                        <field name="status" widget="badge"
+                                               decoration-success="status == 'laba'"
+                                               decoration-danger="status == 'rugi'"/>
+                                    </list>
+                                </field>
+                            </page>
                         </notebook>
                     </sheet>
                     <chatter/>

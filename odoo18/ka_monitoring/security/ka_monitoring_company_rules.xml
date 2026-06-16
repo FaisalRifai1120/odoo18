@@ -55,5 +55,11 @@
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
             <field name="global" eval="True"/>
         </record>
+        <record id="rule_ka_giling_truk_company" model="ir.rule">
+            <field name="name">Rincian Truk: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_giling_truk"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
     </data>
 </odoo>

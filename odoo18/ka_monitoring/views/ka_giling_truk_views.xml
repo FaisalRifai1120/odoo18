@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_giling_truk_list" model="ir.ui.view">
+            <field name="name">ka.giling.truk.list</field>
+            <field name="model">ka.giling.truk</field>
+            <field name="arch" type="xml">
+                <list string="Rincian Truk" create="false" edit="false" delete="false"
+                      decoration-success="labarugi_rp &gt; 0"
+                      decoration-danger="labarugi_rp &lt; 0">
+                    <field name="date"/>
+                    <field name="no_spta"/>
+                    <field name="register_id"/>
+                    <field name="kategori"/>
+                    <field name="tebu_ton" sum="Total Tebu"/>
+                    <field name="rend"/>
+                    <field name="rend_source" optional="show"/>
+                    <field name="prod_gula" sum="Total Gula" optional="show"/>
+                    <field name="pendapatan_ku" optional="hide"/>
+                    <field name="laba_biaya_rp" sum="Laba thd Biaya Produksi" optional="hide"/>
+                    <field name="labarugi_rp" sum="Total Laba/Rugi"/>
+                    <field name="status" widget="badge"
+                           decoration-success="status == 'laba'"
+                           decoration-danger="status == 'rugi'"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ PIVOT ============ -->
+        <record id="view_ka_giling_truk_pivot" model="ir.ui.view">
+            <field name="name">ka.giling.truk.pivot</field>
+            <field name="model">ka.giling.truk</field>
+            <field name="arch" type="xml">
+                <pivot string="Laba per Truk" sample="1">
+                    <field name="register_id" type="row"/>
+                    <field name="tebu_ton" type="measure"/>
+                    <field name="prod_gula" type="measure"/>
+                    <field name="labarugi_rp" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ============ GRAPH ============ -->
+        <record id="view_ka_giling_truk_graph" model="ir.ui.view">
+            <field name="name">ka.giling.truk.graph</field>
+            <field name="model">ka.giling.truk</field>
+            <field name="arch" type="xml">
+                <graph string="Laba per Register" type="bar" sample="1">
+                    <field name="register_id"/>
+                    <field name="labarugi_rp" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_truk_search" model="ir.ui.view">
+            <field name="name">ka.giling.truk.search</field>
+            <field name="model">ka.giling.truk</field>
+            <field name="arch" type="xml">
+                <search string="Cari Rincian Truk">
+                    <field name="no_spta"/>
+                    <field name="register_id"/>
+                    <field name="date"/>
+                    <field name="season_id"/>
+                    <filter name="filter_laba" string="Laba" domain="[('status', '=', 'laba')]"/>
+                    <filter name="filter_rugi" string="Rugi" domain="[('status', '=', 'rugi')]"/>
+                    <separator/>
+                    <filter name="filter_tr_sbh" string="TR-SBH" domain="[('kategori', '=', 'tr_sbh')]"/>
+                    <filter name="filter_ts" string="TS" domain="[('kategori', '=', 'ts')]"/>
+                    <filter name="filter_spt" string="SPT" domain="[('kategori', '=', 'spt')]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_register" string="Register" context="{'group_by': 'register_id'}"/>
+                        <filter name="group_kategori" string="Kategori" context="{'group_by': 'kategori'}"/>
+                        <filter name="group_periode" string="Periode" context="{'group_by': 'periode_id'}"/>
+                        <filter name="group_bulan" string="Bulan" context="{'group_by': 'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_truk" model="ir.actions.act_window">
+            <field name="name">Rincian Truk</field>
+            <field name="res_model">ka.giling.truk</field>
+            <field name="view_mode">list,pivot,graph</field>
+            <field name="search_view_id" ref="view_ka_giling_truk_search"/>
+            <field name="context">{'search_default_group_register': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Belum ada rincian truk</p>
+                <p>Data muncul otomatis dari Laporan Harian Giling setelah Tarik Data Timbangan.
+                   Kelompokkan per Register untuk evaluasi laba per wilayah.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

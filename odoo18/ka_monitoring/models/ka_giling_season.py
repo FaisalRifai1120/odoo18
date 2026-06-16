@@ -79,12 +79,12 @@ class KaGilingSeason(models.Model):
         return True
 
     def action_tarik_semua_timbangan(self):
-        """Tarik ulang data tebu dari ka_timbangan untuk seluruh hari giling musim ini."""
+        """Tarik ulang data tebu + Rincian Truk untuk seluruh hari giling musim ini."""
         self.ensure_one()
         gilings = self.env['ka.giling.harian'].search([('season_id', '=', self.id)])
         for g in gilings:
-            g.write(g._fill_tebu_from_timbangan())
-        return self._notify(_('Data tebu %s hari giling berhasil ditarik ulang.') % len(gilings))
+            g._generate_truk_lines()
+        return self._notify(_('Data tebu & rincian truk %s hari giling berhasil ditarik ulang.') % len(gilings))
 
     def action_open_giling(self):
         self.ensure_one()

@@ -49,6 +49,11 @@
                   parent="menu_ka_monitoring_view"
                   action="action_ka_giling_monitoring_spt"
                   sequence="30"/>
+        <menuitem id="menu_ka_giling_truk"
+                  name="Rincian Truk"
+                  parent="menu_ka_monitoring_view"
+                  action="action_ka_giling_truk"
+                  sequence="40"/>
 
         <!-- ============ KONFIGURASI (Manajer) ============ -->
         <menuitem id="menu_ka_monitoring_config"

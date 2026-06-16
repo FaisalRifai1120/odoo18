@@ -116,6 +116,9 @@ class KaGilingHarian(models.Model):
     # ── Analisa Lab (1 record/hari) ────────────────────────────
     analisa_ids = fields.One2many('ka.giling.analisa', 'giling_id', string='Analisa Lab')
 
+    # ── Rincian Truk (digenerate dari ka_timbangan) ────────────
+    truk_ids = fields.One2many('ka.giling.truk', 'giling_id', string='Rincian Truk')
+
     # ── Snapshot Konfigurasi (computed dari periode/harga/parameter) ──
     bagi_hasil_rate = fields.Float(string='Bagi Hasil (Kg/Ku)', digits=(12, 4),
                                    compute='_compute_financials', store=True)
@@ -403,6 +406,63 @@ class KaGilingHarian(models.Model):
                 res['tebu_tr_sbh'] += ton
         return res
 
+    def _generate_truk_lines(self):
+        """Generate baris Rincian Truk dari ka.timbang.tebu untuk hari giling ini,
+        sekaligus menetapkan tebu_tr_sbh/ts/spt = jumlah per kategori dari baris truk
+        (satu sumber kebenaran). Dipanggil saat Tarik Timbangan / create / cron."""
+        self.ensure_one()
+        Truk = self.env['ka.giling.truk'].sudo()
+        # bersihkan baris lama
+        self.sudo().truk_ids.unlink()
+        if not self.date:
+            self.tebu_tr_sbh = self.tebu_ts = self.tebu_spt = 0.0
+            return
+
+        Timbang = self.env['ka.timbang.tebu'].sudo()
+        # Jendela hari giling: [D 06:00:00 ; (D+1) 06:00:00) WIB → konversi ke UTC.
+        # Setengah-terbuka: truk yang keluar tepat 06:00:00 besok TIDAK ikut hari ini.
+        tz = pytz.timezone(FACTORY_TZ)
+        local_start = tz.localize(datetime.combine(self.date, GILING_DAY_START))
+        local_next = local_start + timedelta(days=1)
+        start = local_start.astimezone(pytz.utc).replace(tzinfo=None)
+        end = local_next.astimezone(pytz.utc).replace(tzinfo=None)
+        domain = [('date_out', '>=', start), ('date_out', '<', end)]
+        if 'active' in Timbang._fields:
+            domain.append(('active', '=', True))
+        if self.company_id and 'company_id' in Timbang._fields:
+            domain.append(('company_id', '=', self.company_id.id))
+
+        recs = Timbang.search(domain, order='date_out asc')
+        sums = {'tr_sbh': 0.0, 'ts': 0.0, 'spt': 0.0}
+        vals_list = []
+        for t in recs:
+            reg = t.register_id
+            if reg and reg.metode == 'SPT':
+                kat = 'spt'
+            elif reg and reg.jenis_register == 'TS':
+                kat = 'ts'
+            else:  # TR + SBH, atau register tak dikenal → default TR-SBH
+                kat = 'tr_sbh'
+            tebu = (t.weight_net or 0.0) / 1000.0
+            sums[kat] += tebu
+            vals_list.append({
+                'giling_id': self.id,
+                'timbang_id': t.id,
+                'no_spta': t.no_spta or t.spta_id or '',
+                'register_id': reg.id if reg else False,
+                'kategori': kat,
+                'date_out': t.date_out,
+                'tebu_ton': tebu,
+                'rend_qc': t.rendemen or 0.0,
+            })
+
+        # set tebu header dulu (agar header recompute), baru buat baris (baris ikut config terbaru)
+        self.tebu_tr_sbh = sums['tr_sbh']
+        self.tebu_ts = sums['ts']
+        self.tebu_spt = sums['spt']
+        if vals_list:
+            Truk.create(vals_list)
+
     @api.onchange('date', 'company_id')
     def _onchange_date_fill_tebu(self):
         if self.date:
@@ -412,15 +472,15 @@ class KaGilingHarian(models.Model):
             self.tebu_spt = vals['tebu_spt']
 
     def action_tarik_timbangan(self):
-        """Tombol: tarik ulang data tebu dari timbangan untuk record terpilih."""
+        """Tombol: tarik ulang data tebu + generate Rincian Truk dari timbangan."""
         for rec in self:
-            rec.write(rec._fill_tebu_from_timbangan())
+            rec._generate_truk_lines()
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('Data Timbangan Ditarik'),
-                'message': _('Tebu tergiling diperbarui dari ka_timbangan.'),
+                'message': _('Tebu tergiling & Rincian Truk diperbarui dari ka_timbangan.'),
                 'type': 'success',
                 'sticky': False,
             }
@@ -451,7 +511,7 @@ class KaGilingHarian(models.Model):
         if not self.env.context.get('skip_tebu_autofill'):
             for rec in records:
                 if rec.date and not (rec.tebu_tr_sbh or rec.tebu_ts or rec.tebu_spt):
-                    rec.write(rec._fill_tebu_from_timbangan())
+                    rec._generate_truk_lines()
         return records
 
     # ════════════════════════════════════════════════════════════
@@ -463,5 +523,5 @@ class KaGilingHarian(models.Model):
         cutoff = fields.Date.today() - timedelta(days=days)
         recs = self.search([('date', '>=', cutoff)])
         for rec in recs:
-            rec.write(rec._fill_tebu_from_timbangan())
+            rec._generate_truk_lines()
         return True
