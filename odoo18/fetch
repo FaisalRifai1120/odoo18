@@ -114,6 +114,7 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/models/ka_giling_parameter.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/models/ka_giling_periode.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/models/ka_giling_season.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/models/ka_giling_truk.py
 SECURITY
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/security/ir.model.access.csv
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/security/ka_monitoring_company_rules.xml
@@ -129,3 +130,4 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/views/ka_giling_monitoring_sbh_views.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/views/ka_giling_monitoring_spt_views.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/views/ka_giling_rekap_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring/views/ka_giling_truk_views.xml

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'KA User Management',
-    'version': '18.0.2.0',
+    'version': '18.0.3.0',
     'category': 'Administration',
     'summary': 'Manajemen User berdasarkan Struktur Organisasi',
     'author': 'PDE KBA',

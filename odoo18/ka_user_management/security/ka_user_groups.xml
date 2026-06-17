@@ -1,136 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
 
-        <record id="module_category_ka" model="ir.module.category">
-            <field name="name">KA Modules</field>
-            <field name="description">Grup akses untuk seluruh modul KA</field>
-            <field name="sequence">100</field>
-        </record>
+    <!-- ══════════════════════════════════════════════════════════
+         KATEGORI per BAGIAN  (tiap bagian = 1 seksi di Settings → Users,
+         urut sesuai 'sequence'). Tanpa noupdate agar penataan ini
+         ikut diterapkan saat Upgrade.
+    ══════════════════════════════════════════════════════════ -->
+    <record id="module_category_ka" model="ir.module.category">
+        <field name="name">KA · Umum</field>
+        <field name="description">Grup umum lintas bagian: Administrator, Pemimpin, KABAG, KASI, KASUBSI, Operator, PPL.</field>
+        <field name="sequence">100</field>
+    </record>
+    <record id="module_category_ka_tanaman" model="ir.module.category">
+        <field name="name">KA · Tanaman</field>
+        <field name="sequence">101</field>
+    </record>
+    <record id="module_category_ka_ta" model="ir.module.category">
+        <field name="name">KA · Tebang Angkut</field>
+        <field name="sequence">102</field>
+    </record>
+    <record id="module_category_ka_teknik" model="ir.module.category">
+        <field name="name">KA · Teknik</field>
+        <field name="sequence">103</field>
+    </record>
+    <record id="module_category_ka_pabrikasi" model="ir.module.category">
+        <field name="name">KA · Pabrikasi</field>
+        <field name="sequence">104</field>
+    </record>
+    <record id="module_category_ka_tuk" model="ir.module.category">
+        <field name="name">KA · TUK</field>
+        <field name="sequence">105</field>
+    </record>
+    <record id="module_category_ka_closing" model="ir.module.category">
+        <field name="name">KA · Closing</field>
+        <field name="sequence">106</field>
+    </record>
+    <record id="module_category_ka_monitoring" model="ir.module.category">
+        <field name="name">KA · Monitoring Giling</field>
+        <field name="sequence">107</field>
+    </record>
 
-        <!-- ── GRUP UMUM (lintas bagian) ─────────────────────── -->
-        <record id="group_ka_ppl" model="res.groups">
-            <field name="name">PPL (Penyuluh Pertanian Lapangan)</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
+    <!-- ══════════════════════ UMUM (lintas bagian) ══════════════════════ -->
+    <record id="group_ka_admin" model="res.groups">
+        <field name="name">Administrator KA</field>
+        <field name="category_id" ref="module_category_ka"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+    <record id="group_ka_pimpinan" model="res.groups">
+        <field name="name">Pemimpin Pabrik</field>
+        <field name="category_id" ref="module_category_ka"/>
+    </record>
+    <record id="group_ka_kabag" model="res.groups">
+        <field name="name">KABAG (Kepala Bagian)</field>
+        <field name="category_id" ref="module_category_ka"/>
+    </record>
+    <record id="group_ka_kasi" model="res.groups">
+        <field name="name">KASI (Kepala Seksi)</field>
+        <field name="category_id" ref="module_category_ka"/>
+    </record>
+    <record id="group_ka_kasubsi" model="res.groups">
+        <field name="name">KASUBSI (Kepala Sub Seksi)</field>
+        <field name="category_id" ref="module_category_ka"/>
+    </record>
+    <record id="group_ka_operator" model="res.groups">
+        <field name="name">Operator</field>
+        <field name="category_id" ref="module_category_ka"/>
+    </record>
+    <record id="group_ka_ppl" model="res.groups">
+        <field name="name">PPL (Penyuluh Pertanian Lapangan)</field>
+        <field name="category_id" ref="module_category_ka"/>
+    </record>
 
-        <record id="group_ka_kasubsi" model="res.groups">
-            <field name="name">KASUBSI (Kepala Sub Seksi)</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
+    <!-- ══════════════════════ TANAMAN ══════════════════════ -->
+    <record id="group_ka_kasi_tanaman" model="res.groups">
+        <field name="name">Kasi Tanaman</field>
+        <field name="category_id" ref="module_category_ka_tanaman"/>
+    </record>
+    <record id="group_ka_kasubsi_tanaman" model="res.groups">
+        <field name="name">Kasubsi Tanaman</field>
+        <field name="category_id" ref="module_category_ka_tanaman"/>
+    </record>
+    <record id="group_ka_operator_tanaman" model="res.groups">
+        <field name="name">Operator Tanaman</field>
+        <field name="category_id" ref="module_category_ka_tanaman"/>
+    </record>
 
-        <record id="group_ka_kasi" model="res.groups">
-            <field name="name">KASI (Kepala Seksi)</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
+    <!-- ══════════════════════ TEBANG ANGKUT ══════════════════════ -->
+    <record id="group_ka_kasi_ta" model="res.groups">
+        <field name="name">Kasi Tebang Angkut</field>
+        <field name="category_id" ref="module_category_ka_ta"/>
+    </record>
+    <record id="group_ka_kasubsi_ta" model="res.groups">
+        <field name="name">Kasubsi Tebang Angkut</field>
+        <field name="category_id" ref="module_category_ka_ta"/>
+    </record>
+    <record id="group_ka_operator_ta" model="res.groups">
+        <field name="name">Operator Tebang Angkut</field>
+        <field name="category_id" ref="module_category_ka_ta"/>
+    </record>
 
-        <record id="group_ka_kabag" model="res.groups">
-            <field name="name">KABAG (Kepala Bagian)</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
+    <!-- ══════════════════════ TEKNIK ══════════════════════ -->
+    <record id="group_ka_kasi_teknik" model="res.groups">
+        <field name="name">Kasi Teknik</field>
+        <field name="category_id" ref="module_category_ka_teknik"/>
+    </record>
+    <record id="group_ka_kasubsi_teknik" model="res.groups">
+        <field name="name">Kasubsi Teknik</field>
+        <field name="category_id" ref="module_category_ka_teknik"/>
+    </record>
+    <record id="group_ka_operator_teknik" model="res.groups">
+        <field name="name">Operator Teknik</field>
+        <field name="category_id" ref="module_category_ka_teknik"/>
+    </record>
 
-        <record id="group_ka_pimpinan" model="res.groups">
-            <field name="name">Pemimpin Pabrik</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
+    <!-- ══════════════════════ PABRIKASI ══════════════════════ -->
+    <record id="group_ka_kasi_pabrikasi" model="res.groups">
+        <field name="name">Kasi Pabrikasi</field>
+        <field name="category_id" ref="module_category_ka_pabrikasi"/>
+    </record>
+    <record id="group_ka_kasubsi_pabrikasi" model="res.groups">
+        <field name="name">Kasubsi Pabrikasi</field>
+        <field name="category_id" ref="module_category_ka_pabrikasi"/>
+    </record>
+    <record id="group_ka_operator_pabrikasi" model="res.groups">
+        <field name="name">Operator Pabrikasi</field>
+        <field name="category_id" ref="module_category_ka_pabrikasi"/>
+    </record>
 
-        <record id="group_ka_operator" model="res.groups">
-            <field name="name">Operator</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
+    <!-- ══════════════════════ TUK ══════════════════════ -->
+    <record id="group_ka_kasi_tuk" model="res.groups">
+        <field name="name">Kasi TUK</field>
+        <field name="category_id" ref="module_category_ka_tuk"/>
+    </record>
+    <record id="group_ka_kasubsi_tuk" model="res.groups">
+        <field name="name">Kasubsi TUK</field>
+        <field name="category_id" ref="module_category_ka_tuk"/>
+    </record>
+    <record id="group_ka_operator_tuk" model="res.groups">
+        <field name="name">Operator TUK</field>
+        <field name="category_id" ref="module_category_ka_tuk"/>
+    </record>
 
-        <record id="group_ka_admin" model="res.groups">
-            <field name="name">Administrator KA</field>
-            <field name="category_id" ref="module_category_ka"/>
-            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
-        </record>
+    <!-- ══════════════════════ CLOSING ══════════════════════ -->
+    <record id="group_ka_closing" model="res.groups">
+        <field name="name">Akses Menu Closing</field>
+        <field name="category_id" ref="module_category_ka_closing"/>
+        <field name="comment">Centang grup ini agar user dapat mengakses menu Closing (Relaksasi, Ketentuan, NTP). Tidak mengikuti hirarki.</field>
+    </record>
 
-        <!-- ── TANAMAN ────────────────────────────────────────── -->
-        <record id="group_ka_operator_tanaman" model="res.groups">
-            <field name="name">Operator Tanaman</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasubsi_tanaman" model="res.groups">
-            <field name="name">Kasubsi Tanaman</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasi_tanaman" model="res.groups">
-            <field name="name">Kasi Tanaman</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <!-- ── TEBANG ANGKUT (TA) ─────────────────────────────── -->
-        <record id="group_ka_operator_ta" model="res.groups">
-            <field name="name">Operator Tebang Angkut</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasubsi_ta" model="res.groups">
-            <field name="name">Kasubsi Tebang Angkut</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasi_ta" model="res.groups">
-            <field name="name">Kasi Tebang Angkut</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <!-- ── TEKNIK ─────────────────────────────────────────── -->
-        <record id="group_ka_operator_teknik" model="res.groups">
-            <field name="name">Operator Teknik</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasubsi_teknik" model="res.groups">
-            <field name="name">Kasubsi Teknik</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasi_teknik" model="res.groups">
-            <field name="name">Kasi Teknik</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <!-- ── PABRIKASI ──────────────────────────────────────── -->
-        <record id="group_ka_operator_pabrikasi" model="res.groups">
-            <field name="name">Operator Pabrikasi</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasubsi_pabrikasi" model="res.groups">
-            <field name="name">Kasubsi Pabrikasi</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasi_pabrikasi" model="res.groups">
-            <field name="name">Kasi Pabrikasi</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <!-- ── TUK ───────────────────────────────────────────── -->
-        <record id="group_ka_operator_tuk" model="res.groups">
-            <field name="name">Operator TUK</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasubsi_tuk" model="res.groups">
-            <field name="name">Kasubsi TUK</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <record id="group_ka_kasi_tuk" model="res.groups">
-            <field name="name">Kasi TUK</field>
-            <field name="category_id" ref="module_category_ka"/>
-        </record>
-
-        <!-- ── GRUP AKSES KHUSUS: CLOSING ─────────────────────── -->
-        <record id="group_ka_closing" model="res.groups">
-            <field name="name">Akses Menu Closing</field>
-            <field name="category_id" ref="module_category_ka"/>
-            <field name="comment">Centang grup ini agar user dapat mengakses menu Closing (Relaksasi, Ketentuan, NTP). Tidak mengikuti hirarki.</field>
-        </record>
-
-    </data>
 </odoo>
