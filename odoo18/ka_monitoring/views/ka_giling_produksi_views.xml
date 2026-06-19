@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST (qty dapat dikoreksi inline) ============ -->
+        <record id="view_ka_giling_produksi_list" model="ir.ui.view">
+            <field name="name">ka.giling.produksi.list</field>
+            <field name="model">ka.giling.produksi</field>
+            <field name="arch" type="xml">
+                <list string="Rincian Produksi" editable="bottom"
+                      create="false" delete="false">
+                    <field name="date" readonly="1"/>
+                    <field name="gil_ke" readonly="1" optional="show"/>
+                    <field name="name" readonly="1"/>
+                    <field name="kategori" readonly="1" optional="hide"/>
+                    <field name="qty" sum="Total (Ton)"/>
+                    <field name="uom_name" readonly="1" optional="hide"/>
+                    <field name="pct_tebu" readonly="1" optional="show"/>
+                    <field name="periode_id" readonly="1" optional="hide"/>
+                    <field name="season_id" readonly="1" optional="hide"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM (koreksi qty + riwayat di chatter) ============ -->
+        <record id="view_ka_giling_produksi_form" model="ir.ui.view">
+            <field name="name">ka.giling.produksi.form</field>
+            <field name="model">ka.giling.produksi</field>
+            <field name="arch" type="xml">
+                <form string="Rincian Produksi">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Produk"/>
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="giling_id" readonly="1"/>
+                                <field name="date" readonly="1"/>
+                                <field name="gil_ke" readonly="1"/>
+                                <field name="kategori" readonly="1"/>
+                            </group>
+                            <group>
+                                <label for="qty"/>
+                                <div class="o_row">
+                                    <field name="qty"/>
+                                    <field name="uom_name" nolabel="1" readonly="1"/>
+                                </div>
+                                <field name="pct_tebu" readonly="1"/>
+                                <field name="periode_id" readonly="1"/>
+                                <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-info" role="alert">
+                            <i class="fa fa-info-circle"/> Koreksi <b>Jumlah</b> akan tercatat di
+                            riwayat dan otomatis menyesuaikan field Produksi pada Laporan Harian Giling.
+                        </div>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ PIVOT ============ -->
+        <record id="view_ka_giling_produksi_pivot" model="ir.ui.view">
+            <field name="name">ka.giling.produksi.pivot</field>
+            <field name="model">ka.giling.produksi</field>
+            <field name="arch" type="xml">
+                <pivot string="Produksi Gula" sample="1">
+                    <field name="name" type="row"/>
+                    <field name="date" interval="month" type="col"/>
+                    <field name="qty" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ============ GRAPH ============ -->
+        <record id="view_ka_giling_produksi_graph" model="ir.ui.view">
+            <field name="name">ka.giling.produksi.graph</field>
+            <field name="model">ka.giling.produksi</field>
+            <field name="arch" type="xml">
+                <graph string="Produksi per Jenis" type="bar" sample="1">
+                    <field name="name"/>
+                    <field name="qty" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_giling_produksi_search" model="ir.ui.view">
+            <field name="name">ka.giling.produksi.search</field>
+            <field name="model">ka.giling.produksi</field>
+            <field name="arch" type="xml">
+                <search string="Cari Produksi">
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="season_id"/>
+                    <field name="periode_id"/>
+                    <separator/>
+                    <filter name="filter_gula" string="Gula" domain="[('kategori', '=', 'gula')]"/>
+                    <filter name="filter_rta" string="RS, Tetes &amp; Ampas"
+                            domain="[('kategori', '=', 'rs_tetes_ampas')]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_produk" string="Produk" context="{'group_by': 'name'}"/>
+                        <filter name="group_kategori" string="Kategori" context="{'group_by': 'kategori'}"/>
+                        <filter name="group_periode" string="Periode" context="{'group_by': 'periode_id'}"/>
+                        <filter name="group_tanggal" string="Tanggal" context="{'group_by': 'date'}"/>
+                        <filter name="group_bulan" string="Bulan" context="{'group_by': 'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_giling_produksi" model="ir.actions.act_window">
+            <field name="name">Produksi Gula</field>
+            <field name="res_model">ka.giling.produksi</field>
+            <field name="view_mode">list,pivot,graph,form</field>
+            <field name="search_view_id" ref="view_ka_giling_produksi_search"/>
+            <field name="context">{'search_default_group_produk': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Belum ada rincian produksi</p>
+                <p>Baris muncul otomatis dari <b>Laporan Harian Giling</b> (tab Produksi).
+                   Kelompokkan per Produk untuk melihat tren GKP, GKP-Premium, Tetes, dan lainnya.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

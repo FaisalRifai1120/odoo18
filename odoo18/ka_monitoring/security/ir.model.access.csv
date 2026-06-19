@@ -19,3 +19,5 @@ access_ka_giling_rekap_user,ka.giling.rekap.user,model_ka_giling_rekap,group_ka_
 access_ka_giling_rekap_manager,ka.giling.rekap.manager,model_ka_giling_rekap,group_ka_monitoring_manager,1,0,0,0
 access_ka_giling_truk_user,ka.giling.truk.user,model_ka_giling_truk,group_ka_monitoring_user,1,0,0,0
 access_ka_giling_truk_manager,ka.giling.truk.manager,model_ka_giling_truk,group_ka_monitoring_manager,1,0,0,0
+access_ka_giling_produksi_user,ka.giling.produksi.user,model_ka_giling_produksi,group_ka_monitoring_user,1,1,1,0
+access_ka_giling_produksi_manager,ka.giling.produksi.manager,model_ka_giling_produksi,group_ka_monitoring_manager,1,1,1,1

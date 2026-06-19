@@ -46,6 +46,9 @@
                         <button name="action_recompute" type="object"
                                 string="Hitung Ulang Monitoring" icon="fa-refresh"
                                 help="Hitung ulang nilai SBH/SPT (mis. setelah ubah Harga/Parameter)"/>
+                        <button name="action_tarik_produksi" type="object"
+                                string="Tarik Produksi" icon="fa-cubes"
+                                help="Bangun ulang Rincian Produksi dari field Produksi hari ini"/>
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -122,6 +125,24 @@
                                         <field name="ampas"/>
                                     </group>
                                 </group>
+                            </page>
+
+                            <!-- ============ RINCIAN PRODUKSI ============ -->
+                            <page string="Rincian Produksi" name="rincian_produksi">
+                                <div class="alert alert-secondary" role="alert">
+                                    <i class="fa fa-cubes"/> Rincian per jenis keluaran, diselaraskan
+                                    otomatis dengan field di tab <b>Produksi</b>. Untuk koreksi yang
+                                    tercatat di riwayat, buka menu <b>Monitoring → Produksi Gula</b>.
+                                </div>
+                                <field name="produksi_ids" readonly="1">
+                                    <list string="Rincian Produksi" create="false" edit="false" delete="false">
+                                        <field name="name"/>
+                                        <field name="kategori"/>
+                                        <field name="qty" sum="Total (Ton)"/>
+                                        <field name="uom_name"/>
+                                        <field name="pct_tebu"/>
+                                    </list>
+                                </field>
                             </page>
 
                             <!-- ============ BAHAN BAKAR & JAM BERHENTI ============ -->

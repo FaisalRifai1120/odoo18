@@ -10,6 +10,7 @@ from . import ka_giling_season
 from . import ka_giling_periode
 from . import ka_giling_harga_biaya
 from . import ka_giling_parameter
+from . import ka_giling_produksi    # FASE 6 — Rincian Produksi (sebelum harian: dipakai konstanta)
 from . import ka_giling_harian
 from . import ka_giling_analisa
 from . import ka_giling_truk

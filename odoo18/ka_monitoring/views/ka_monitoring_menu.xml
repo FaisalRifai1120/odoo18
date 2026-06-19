@@ -54,6 +54,11 @@
                   parent="menu_ka_monitoring_view"
                   action="action_ka_giling_truk"
                   sequence="40"/>
+        <menuitem id="menu_ka_giling_produksi"
+                  name="Produksi Gula"
+                  parent="menu_ka_monitoring_view"
+                  action="action_ka_giling_produksi"
+                  sequence="45"/>
 
         <!-- ============ KONFIGURASI (Manajer) ============ -->
         <menuitem id="menu_ka_monitoring_config"

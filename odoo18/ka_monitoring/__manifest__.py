@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'KA Monitoring Giling',
-    'version': '18.0.5.0',
+    'version': '18.0.6.0',
     'category': 'Manufacturing',
     'summary': 'Monitoring Giling & SBH PG Kebon Agung — Laporan Harian, SBH/SPT, Dashboard',
     'description': """
@@ -35,6 +35,7 @@
         'views/ka_giling_monitoring_spt_views.xml',
         'views/ka_giling_rekap_views.xml',
         'views/ka_giling_truk_views.xml',
+        'views/ka_giling_produksi_views.xml',
         # Views — Konfigurasi
         'views/ka_giling_season_views.xml',
         'views/ka_giling_periode_views.xml',
@@ -47,4 +48,5 @@
     'auto_install': False,
     'application': True,
     'license': 'LGPL-3',
+    'post_init_hook': '_init_produksi_lines',
 }

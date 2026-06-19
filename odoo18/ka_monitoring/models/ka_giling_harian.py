@@ -3,6 +3,7 @@ import pytz
 from datetime import datetime, time as dtime, timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from .ka_giling_produksi import PRODUKSI_MAP, KEY_TO_FIELD
 
 # Definisi "hari giling" untuk agregasi data Timbangan:
 # dimulai pukul 06:00:00 dan berakhir 05:59:59 keesokan harinya, WAKTU PABRIK.
@@ -118,6 +119,9 @@ class KaGilingHarian(models.Model):
 
     # ── Rincian Truk (digenerate dari ka_timbangan) ────────────
     truk_ids = fields.One2many('ka.giling.truk', 'giling_id', string='Rincian Truk')
+
+    # ── Rincian Produksi (digenerate dari field Produksi, sinkron dua arah) ──
+    produksi_ids = fields.One2many('ka.giling.produksi', 'giling_id', string='Rincian Produksi')
 
     # ── Snapshot Konfigurasi (computed dari periode/harga/parameter) ──
     bagi_hasil_rate = fields.Float(string='Bagi Hasil (Kg/Ku)', digits=(12, 4),
@@ -492,6 +496,65 @@ class KaGilingHarian(models.Model):
         return True
 
     # ════════════════════════════════════════════════════════════
+    #  RINCIAN PRODUKSI — generate/sinkron dari field Produksi
+    # ════════════════════════════════════════════════════════════
+    def _sync_produksi_lines(self, only_fields=None):
+        """Bangun/selaraskan baris ka.giling.produksi dari field Produksi induk.
+
+        UPSERT berbasis product_key: baris yang sudah ada di-update (riwayat &
+        chatter terjaga), baris yang belum ada dibuat. Tulisan ke baris memakai
+        konteks skip_giling_sync agar tidak memicu sinkron balik (anti-loop).
+        Bila only_fields diberikan, hanya produk yang field sumbernya berubah
+        yang ikut diselaraskan — koreksi manual pada baris lain tetap aman.
+        """
+        Prod = self.env['ka.giling.produksi'].sudo()
+        for rec in self:
+            existing = {l.product_key: l for l in rec.produksi_ids}
+            new_vals = []
+            for key, fname, label, kategori, seq in PRODUKSI_MAP:
+                if only_fields is not None and fname not in only_fields:
+                    continue
+                qty = rec[fname] or 0.0
+                line = existing.get(key)
+                if line:
+                    if (line.qty or 0.0) != qty or line.name != label or line.sequence != seq:
+                        line.with_context(skip_giling_sync=True).write({
+                            'name': label, 'kategori': kategori,
+                            'sequence': seq, 'qty': qty,
+                        })
+                else:
+                    new_vals.append({
+                        'giling_id': rec.id, 'product_key': key, 'name': label,
+                        'kategori': kategori, 'sequence': seq, 'qty': qty,
+                    })
+            if new_vals:
+                Prod.create(new_vals)
+
+    def action_tarik_produksi(self):
+        """Tombol: bangun ulang Rincian Produksi dari field Produksi hari ini."""
+        for rec in self:
+            rec._sync_produksi_lines()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Rincian Produksi Diperbarui'),
+                'message': _('Baris produksi diselaraskan dengan field Produksi.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    # ── Sinkron dua arah: ubah field Produksi induk → perbarui baris ──
+    def write(self, vals):
+        res = super().write(vals)
+        if not self.env.context.get('skip_produksi_sync'):
+            changed = {KEY_TO_FIELD[k] for k in KEY_TO_FIELD}.intersection(vals.keys())
+            if changed:
+                self._sync_produksi_lines(only_fields=changed)
+        return res
+
+    # ════════════════════════════════════════════════════════════
     #  CREATE — auto gil_ke & auto tarik tebu
     # ════════════════════════════════════════════════════════════
     @api.model_create_multi
@@ -512,6 +575,9 @@ class KaGilingHarian(models.Model):
             for rec in records:
                 if rec.date and not (rec.tebu_tr_sbh or rec.tebu_ts or rec.tebu_spt):
                     rec._generate_truk_lines()
+        # Bangun baris Rincian Produksi (skeleton + nilai awal dari field Produksi)
+        for rec in records:
+            rec._sync_produksi_lines()
         return records
 
     # ════════════════════════════════════════════════════════════
