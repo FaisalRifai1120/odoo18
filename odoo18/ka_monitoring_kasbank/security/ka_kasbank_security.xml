@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ============================================================
+             KATEGORI TERSENDIRI (tidak nempel ke ka_user_management)
+             ============================================================ -->
+        <record id="module_category_ka_kasbank" model="ir.module.category">
+            <field name="name">KA · Kas Bank &amp; Persediaan</field>
+            <field name="description">Hak akses Monitoring Kas/Bank, Persediaan &amp; Penjualan Gula.</field>
+            <field name="sequence">110</field>
+        </record>
+
+        <!--
+            Dua grup TANPA implied_ids → tampil sebagai CHECKBOX terpisah
+            di form user. Hak tiap grup didefinisikan di ir.model.access.csv.
+        -->
+        <record id="group_ka_kasbank_user" model="res.groups">
+            <field name="name">Kas/Bank &amp; Persediaan — Pengguna</field>
+            <field name="category_id" ref="module_category_ka_kasbank"/>
+            <field name="comment">Dapat melihat &amp; input transaksi kas/bank, persediaan, penjualan.</field>
+        </record>
+
+        <record id="group_ka_kasbank_manager" model="res.groups">
+            <field name="name">Kas/Bank &amp; Persediaan — Manajer</field>
+            <field name="category_id" ref="module_category_ka_kasbank"/>
+            <field name="comment">Akses penuh: kelola master data, ubah &amp; hapus transaksi.</field>
+        </record>
+
+    </data>
+</odoo>

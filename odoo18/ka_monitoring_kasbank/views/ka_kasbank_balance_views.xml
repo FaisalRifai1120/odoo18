@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_kasbank_balance_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.balance.form</field>
+            <field name="model">ka.kasbank.balance</field>
+            <field name="arch" type="xml">
+                <form string="Saldo Kas/Bank Harian">
+                    <header>
+                        <button name="action_populate_lines" type="object"
+                                string="Muat Akun" icon="fa-refresh"
+                                help="Tambahkan akun Kas/Bank aktif yang belum ada ke rincian"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="date" string="Tanggal"/>
+                            <h1><field name="date"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                            </group>
+                        </group>
+                        <field name="line_ids">
+                            <list string="Rincian Saldo" editable="bottom">
+                                <field name="account_id"/>
+                                <field name="account_type" optional="show"/>
+                                <field name="balance" sum="Total Saldo"/>
+                                <field name="currency_id" column_invisible="1"/>
+                            </list>
+                        </field>
+                        <group class="oe_subtotal_footer">
+                            <field name="total_balance" widget="monetary"/>
+                        </group>
+                        <field name="note" placeholder="Catatan..."/>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_kasbank_balance_list" model="ir.ui.view">
+            <field name="name">ka.kasbank.balance.list</field>
+            <field name="model">ka.kasbank.balance</field>
+            <field name="arch" type="xml">
+                <list string="Saldo Kas/Bank">
+                    <field name="date"/>
+                    <field name="total_balance" sum="Total"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ GRAPH ============ -->
+        <record id="view_ka_kasbank_balance_graph" model="ir.ui.view">
+            <field name="name">ka.kasbank.balance.graph</field>
+            <field name="model">ka.kasbank.balance</field>
+            <field name="arch" type="xml">
+                <graph string="Tren Saldo" type="line" sample="1">
+                    <field name="date" interval="day"/>
+                    <field name="total_balance" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_kasbank_balance_search" model="ir.ui.view">
+            <field name="name">ka.kasbank.balance.search</field>
+            <field name="model">ka.kasbank.balance</field>
+            <field name="arch" type="xml">
+                <search string="Cari Saldo">
+                    <field name="date"/>
+                    <filter name="filter_month" string="Bulan Ini"
+                            domain="[('date', '&gt;=', datetime.date.today().replace(day=1))]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_month" string="Bulan" context="{'group_by': 'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_kasbank_balance" model="ir.actions.act_window">
+            <field name="name">Saldo Kas/Bank</field>
+            <field name="res_model">ka.kasbank.balance</field>
+            <field name="view_mode">list,form,graph</field>
+            <field name="search_view_id" ref="view_ka_kasbank_balance_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Catat saldo Kas/Bank harian pertama</p>
+                <p>Buat tanggal baru — baris akun akan otomatis termuat dari master Akun Kas/Bank,
+                   tinggal isi nominal saldonya.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

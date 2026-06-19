@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_kasbank_loan_list" model="ir.ui.view">
+            <field name="name">ka.kasbank.loan.list</field>
+            <field name="model">ka.kasbank.loan</field>
+            <field name="arch" type="xml">
+                <list string="Hutang Bank"
+                      decoration-muted="state == 'paid'"
+                      decoration-warning="state == 'outstanding'">
+                    <field name="bank_id"/>
+                    <field name="name" optional="show"/>
+                    <field name="amount" sum="Total Hutang"/>
+                    <field name="due_date"/>
+                    <field name="state" widget="badge"
+                           decoration-warning="state == 'outstanding'"
+                           decoration-success="state == 'paid'"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_kasbank_loan_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.loan.form</field>
+            <field name="model">ka.kasbank.loan</field>
+            <field name="arch" type="xml">
+                <form string="Hutang Bank">
+                    <header>
+                        <button name="action_set_paid" type="object" string="Tandai Lunas"
+                                class="btn-primary" invisible="state == 'paid'"/>
+                        <button name="action_set_outstanding" type="object" string="Set Outstanding"
+                                invisible="state == 'outstanding'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="outstanding,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="bank_id" string="Bank"/>
+                            <h1><field name="bank_id" placeholder="Pilih bank..."/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="amount"/>
+                            </group>
+                            <group>
+                                <field name="due_date"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <field name="note" placeholder="Catatan..."/>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_kasbank_loan_search" model="ir.ui.view">
+            <field name="name">ka.kasbank.loan.search</field>
+            <field name="model">ka.kasbank.loan</field>
+            <field name="arch" type="xml">
+                <search string="Cari Hutang">
+                    <field name="bank_id"/>
+                    <field name="name"/>
+                    <filter name="filter_outstanding" string="Outstanding" domain="[('state', '=', 'outstanding')]"/>
+                    <filter name="filter_paid" string="Lunas" domain="[('state', '=', 'paid')]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_bank" string="Bank" context="{'group_by': 'bank_id'}"/>
+                        <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_kasbank_loan" model="ir.actions.act_window">
+            <field name="name">Hutang Bank</field>
+            <field name="res_model">ka.kasbank.loan</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_ka_kasbank_loan_search"/>
+            <field name="context">{'search_default_filter_outstanding': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Catat hutang bank pertama</p>
+                <p>Pinjaman/hutang per bank beserta tanggal jatuh tempo &amp; statusnya.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

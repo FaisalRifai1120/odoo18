@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ka_kasbank_account_user,ka.kasbank.account.user,model_ka_kasbank_account,group_ka_kasbank_user,1,0,0,0
+access_ka_kasbank_account_manager,ka.kasbank.account.manager,model_ka_kasbank_account,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_product_user,ka.kasbank.product.user,model_ka_kasbank_product,group_ka_kasbank_user,1,0,0,0
+access_ka_kasbank_product_manager,ka.kasbank.product.manager,model_ka_kasbank_product,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_balance_user,ka.kasbank.balance.user,model_ka_kasbank_balance,group_ka_kasbank_user,1,1,1,0
+access_ka_kasbank_balance_manager,ka.kasbank.balance.manager,model_ka_kasbank_balance,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_balance_line_user,ka.kasbank.balance.line.user,model_ka_kasbank_balance_line,group_ka_kasbank_user,1,1,1,1
+access_ka_kasbank_balance_line_manager,ka.kasbank.balance.line.manager,model_ka_kasbank_balance_line,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_deposito_user,ka.kasbank.deposito.user,model_ka_kasbank_deposito,group_ka_kasbank_user,1,1,1,0
+access_ka_kasbank_deposito_manager,ka.kasbank.deposito.manager,model_ka_kasbank_deposito,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_loan_user,ka.kasbank.loan.user,model_ka_kasbank_loan,group_ka_kasbank_user,1,1,1,0
+access_ka_kasbank_loan_manager,ka.kasbank.loan.manager,model_ka_kasbank_loan,group_ka_kasbank_manager,1,1,1,1

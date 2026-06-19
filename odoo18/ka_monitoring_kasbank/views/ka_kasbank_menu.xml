@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ MENU ROOT ============ -->
+        <menuitem id="menu_ka_kasbank_root"
+                  name="Monitoring Kas/Bank"
+                  web_icon="ka_monitoring_kasbank,static/description/icon.png"
+                  sequence="51"
+                  groups="group_ka_kasbank_user,group_ka_kasbank_manager"/>
+
+        <!-- ============ KAS & BANK (Pengguna + Manajer) ============ -->
+        <menuitem id="menu_ka_kasbank_transaksi"
+                  name="Kas &amp; Bank"
+                  parent="menu_ka_kasbank_root"
+                  sequence="10"
+                  groups="group_ka_kasbank_user,group_ka_kasbank_manager"/>
+
+        <menuitem id="menu_ka_kasbank_balance"
+                  name="Saldo Kas/Bank"
+                  parent="menu_ka_kasbank_transaksi"
+                  action="action_ka_kasbank_balance"
+                  sequence="10"/>
+        <menuitem id="menu_ka_kasbank_deposito"
+                  name="Deposito"
+                  parent="menu_ka_kasbank_transaksi"
+                  action="action_ka_kasbank_deposito"
+                  sequence="20"/>
+        <menuitem id="menu_ka_kasbank_loan"
+                  name="Hutang Bank"
+                  parent="menu_ka_kasbank_transaksi"
+                  action="action_ka_kasbank_loan"
+                  sequence="30"/>
+
+        <!-- ============ KONFIGURASI (Manajer) ============ -->
+        <menuitem id="menu_ka_kasbank_config"
+                  name="Konfigurasi"
+                  parent="menu_ka_kasbank_root"
+                  sequence="90"
+                  groups="group_ka_kasbank_manager"/>
+
+        <menuitem id="menu_ka_kasbank_account"
+                  name="Akun Kas/Bank"
+                  parent="menu_ka_kasbank_config"
+                  action="action_ka_kasbank_account"
+                  sequence="10"/>
+        <menuitem id="menu_ka_kasbank_product"
+                  name="Produk Gula"
+                  parent="menu_ka_kasbank_config"
+                  action="action_ka_kasbank_product"
+                  sequence="20"/>
+
+    </data>
+</odoo>

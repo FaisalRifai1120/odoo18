@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_kasbank_product_list" model="ir.ui.view">
+            <field name="name">ka.kasbank.product.list</field>
+            <field name="model">ka.kasbank.product</field>
+            <field name="arch" type="xml">
+                <list string="Produk Gula">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="code" optional="hide"/>
+                    <field name="category"/>
+                    <field name="satuan"/>
+                    <field name="active" widget="boolean_toggle" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_kasbank_product_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.product.form</field>
+            <field name="model">ka.kasbank.product</field>
+            <field name="arch" type="xml">
+                <form string="Produk Gula">
+                    <sheet>
+                        <widget name="web_ribbon" title="Arsip" bg_color="text-bg-danger"
+                                invisible="active"/>
+                        <div class="oe_title">
+                            <label for="name" string="Nama Produk"/>
+                            <h1><field name="name" placeholder="mis. GKP 50 Kg"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="category"/>
+                                <field name="satuan"/>
+                            </group>
+                            <group>
+                                <field name="code"/>
+                                <field name="active" invisible="1"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="note" placeholder="Keterangan tambahan..."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_kasbank_product_search" model="ir.ui.view">
+            <field name="name">ka.kasbank.product.search</field>
+            <field name="model">ka.kasbank.product</field>
+            <field name="arch" type="xml">
+                <search string="Cari Produk">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <filter name="filter_gkp" string="GKP" domain="[('category', '=', 'gkp')]"/>
+                    <filter name="filter_ritel" string="Ritel" domain="[('category', '=', 'ritel')]"/>
+                    <filter name="filter_sip" string="SIP" domain="[('category', '=', 'sip')]"/>
+                    <separator/>
+                    <filter name="filter_archived" string="Diarsip" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_category" string="Kategori" context="{'group_by': 'category'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_kasbank_product" model="ir.actions.act_window">
+            <field name="name">Produk Gula</field>
+            <field name="res_model">ka.kasbank.product</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_ka_kasbank_product_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Tambahkan produk gula pertama</p>
+                <p>Master jenis gula (GKP, GKP Premium, Ritel, Setengah Jadi, SIP)
+                   untuk Persediaan &amp; Penjualan.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
