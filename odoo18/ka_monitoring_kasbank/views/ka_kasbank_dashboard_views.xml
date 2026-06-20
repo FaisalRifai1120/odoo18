@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_ka_kasbank_dashboard_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.dashboard.form</field>
+            <field name="model">ka.kasbank.dashboard</field>
+            <field name="arch" type="xml">
+                <form string="Dashboard Kas/Bank" create="false" delete="false">
+                    <header>
+                        <button name="action_refresh" type="object" string="Segarkan"
+                                class="btn-primary" icon="fa-refresh"/>
+                    </header>
+                    <sheet>
+                        <field name="currency_id" invisible="1"/>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+
+                        <!-- ===== LIKUIDITAS ===== -->
+                        <h2 class="mt-2">Kas, Bank &amp; Likuiditas</h2>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Saldo Kas/Bank</div>
+                                        <h3 class="mb-1 text-primary"><field name="kas_bank_total" widget="monetary"/></h3>
+                                        <div class="text-muted small">per <field name="as_of_date"/></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Deposito Aktif</div>
+                                        <h3 class="mb-1"><field name="deposito_aktif_total" widget="monetary"/></h3>
+                                        <div class="small text-muted"><field name="deposito_aktif_count"/> deposito</div>
+                                        <button name="action_open_deposito_aktif" type="object"
+                                                string="Lihat detail →" class="btn btn-link btn-sm p-0"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0 bg-light">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Kas + Deposito</div>
+                                        <h3 class="mb-1 text-success"><field name="kas_plus_deposito" widget="monetary"/></h3>
+                                        <div class="text-muted small">total likuiditas</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Hutang Outstanding</div>
+                                        <h3 class="mb-1 text-danger"><field name="hutang_outstanding_total" widget="monetary"/></h3>
+                                        <div class="small text-muted"><field name="hutang_count"/> pinjaman</div>
+                                        <button name="action_open_hutang" type="object"
+                                                string="Lihat detail →" class="btn btn-link btn-sm p-0"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== PIUTANG ===== -->
+                        <h2 class="mt-3">Piutang Penjualan</h2>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Piutang Bulk (Open)</div>
+                                        <h3 class="mb-1"><field name="piutang_bulk_open" widget="monetary"/></h3>
+                                        <div class="small text-muted"><field name="bulk_open_count"/> kontrak</div>
+                                        <button name="action_open_bulk_open" type="object"
+                                                string="Lihat detail →" class="btn btn-link btn-sm p-0"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Ritel Open</div>
+                                        <h3 class="mb-1 text-warning"><field name="ritel_open" widget="monetary"/></h3>
+                                        <button name="action_open_ritel_open" type="object"
+                                                string="Lihat detail →" class="btn btn-link btn-sm p-0"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0 border-start border-danger border-4">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Ritel Overdue</div>
+                                        <h3 class="mb-1 text-danger"><field name="ritel_overdue" widget="monetary"/></h3>
+                                        <div class="small text-danger">
+                                            <field name="ritel_overdue_count"/> invoice ·
+                                            <field name="ritel_overdue_pct" widget="float" digits="[16,1]"/>% piutang
+                                        </div>
+                                        <button name="action_open_ritel_overdue" type="object"
+                                                string="Lihat detail →" class="btn btn-link btn-sm p-0 text-danger"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Ritel Paid</div>
+                                        <h3 class="mb-1 text-success"><field name="ritel_paid" widget="monetary"/></h3>
+                                        <div class="text-muted small">sudah lunas</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== PERSEDIAAN ===== -->
+                        <h2 class="mt-3">Persediaan Gula (Stok Terkini)</h2>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Stok Eks <field name="persediaan_year_now_label"/></div>
+                                        <h3 class="mb-1"><field name="persediaan_year_now" widget="float" digits="[16,3]"/> <span class="fs-6 text-muted">Ton</span></h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="text-muted small text-uppercase">Stok Eks <field name="persediaan_year_prev_label"/></div>
+                                        <h3 class="mb-1"><field name="persediaan_year_prev" widget="float" digits="[16,3]"/> <span class="fs-6 text-muted">Ton</span></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ka_kasbank_dashboard" model="ir.actions.act_window">
+            <field name="name">Dashboard</field>
+            <field name="res_model">ka.kasbank.dashboard</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+        </record>
+
+    </data>
+</odoo>

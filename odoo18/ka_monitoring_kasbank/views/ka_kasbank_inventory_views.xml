@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_kasbank_inventory_list" model="ir.ui.view">
+            <field name="name">ka.kasbank.inventory.list</field>
+            <field name="model">ka.kasbank.inventory</field>
+            <field name="arch" type="xml">
+                <list string="Persediaan Gula" decoration-danger="is_anomaly">
+                    <field name="date"/>
+                    <field name="product_id"/>
+                    <field name="production_year"/>
+                    <field name="saldo_awal"/>
+                    <field name="produksi"/>
+                    <field name="penjualan"/>
+                    <field name="saldo_akhir" sum="Total Saldo Akhir"/>
+                    <field name="is_anomaly" optional="hide"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_kasbank_inventory_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.inventory.form</field>
+            <field name="model">ka.kasbank.inventory</field>
+            <field name="arch" type="xml">
+                <form string="Persediaan Gula">
+                    <sheet>
+                        <div class="alert alert-warning" role="alert" invisible="not is_anomaly">
+                            <i class="fa fa-exclamation-triangle"/> Saldo akhir negatif — mohon ditinjau.
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date"/>
+                                <field name="product_id"/>
+                                <field name="production_year"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group>
+                                <field name="saldo_awal"/>
+                                <field name="produksi"/>
+                                <field name="penjualan"/>
+                                <field name="saldo_akhir" readonly="1"/>
+                                <field name="is_anomaly" invisible="1"/>
+                            </group>
+                        </group>
+                        <field name="note" placeholder="Keterangan..."/>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ PIVOT ============ -->
+        <record id="view_ka_kasbank_inventory_pivot" model="ir.ui.view">
+            <field name="name">ka.kasbank.inventory.pivot</field>
+            <field name="model">ka.kasbank.inventory</field>
+            <field name="arch" type="xml">
+                <pivot string="Persediaan" sample="1">
+                    <field name="product_id" type="row"/>
+                    <field name="production_year" type="col"/>
+                    <field name="saldo_akhir" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ============ GRAPH ============ -->
+        <record id="view_ka_kasbank_inventory_graph" model="ir.ui.view">
+            <field name="name">ka.kasbank.inventory.graph</field>
+            <field name="model">ka.kasbank.inventory</field>
+            <field name="arch" type="xml">
+                <graph string="Persediaan per Produk" type="bar" sample="1">
+                    <field name="product_id"/>
+                    <field name="saldo_akhir" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_kasbank_inventory_search" model="ir.ui.view">
+            <field name="name">ka.kasbank.inventory.search</field>
+            <field name="model">ka.kasbank.inventory</field>
+            <field name="arch" type="xml">
+                <search string="Cari Persediaan">
+                    <field name="product_id"/>
+                    <field name="date"/>
+                    <field name="production_year"/>
+                    <filter name="filter_anomaly" string="Anomali (saldo &lt; 0)"
+                            domain="[('is_anomaly', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_2025" string="Eks 2025" domain="[('production_year', '=', 2025)]"/>
+                    <filter name="filter_2026" string="Eks 2026" domain="[('production_year', '=', 2026)]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_product" string="Produk" context="{'group_by': 'product_id'}"/>
+                        <filter name="group_year" string="Tahun Produksi" context="{'group_by': 'production_year'}"/>
+                        <filter name="group_date" string="Tanggal" context="{'group_by': 'date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_kasbank_inventory" model="ir.actions.act_window">
+            <field name="name">Persediaan Gula</field>
+            <field name="res_model">ka.kasbank.inventory</field>
+            <field name="view_mode">list,pivot,graph,form</field>
+            <field name="search_view_id" ref="view_ka_kasbank_inventory_search"/>
+            <field name="context">{'search_default_group_product': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Catat persediaan gula pertama</p>
+                <p>Saldo akhir = saldo awal + produksi − penjualan. Baris merah menandai saldo negatif.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

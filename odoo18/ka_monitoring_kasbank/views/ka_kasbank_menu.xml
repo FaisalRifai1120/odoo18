@@ -9,6 +9,13 @@
                   sequence="51"
                   groups="group_ka_kasbank_user,group_ka_kasbank_manager"/>
 
+        <!-- ============ DASHBOARD (paling atas) ============ -->
+        <menuitem id="menu_ka_kasbank_dashboard"
+                  name="Dashboard"
+                  parent="menu_ka_kasbank_root"
+                  action="action_ka_kasbank_dashboard"
+                  sequence="1"/>
+
         <!-- ============ KAS & BANK (Pengguna + Manajer) ============ -->
         <menuitem id="menu_ka_kasbank_transaksi"
                   name="Kas &amp; Bank"
@@ -32,6 +39,34 @@
                   action="action_ka_kasbank_loan"
                   sequence="30"/>
 
+        <!-- ============ PERSEDIAAN & PENJUALAN (Pengguna + Manajer) ============ -->
+        <menuitem id="menu_ka_kasbank_persediaan_jual"
+                  name="Persediaan &amp; Penjualan"
+                  parent="menu_ka_kasbank_root"
+                  sequence="20"
+                  groups="group_ka_kasbank_user,group_ka_kasbank_manager"/>
+
+        <menuitem id="menu_ka_kasbank_inventory"
+                  name="Persediaan Gula"
+                  parent="menu_ka_kasbank_persediaan_jual"
+                  action="action_ka_kasbank_inventory"
+                  sequence="10"/>
+        <menuitem id="menu_ka_kasbank_sales_bulk"
+                  name="Penjualan Bulk"
+                  parent="menu_ka_kasbank_persediaan_jual"
+                  action="action_ka_kasbank_sales_bulk"
+                  sequence="20"/>
+        <menuitem id="menu_ka_kasbank_sales_retail"
+                  name="Penjualan Ritel"
+                  parent="menu_ka_kasbank_persediaan_jual"
+                  action="action_ka_kasbank_sales_retail"
+                  sequence="30"/>
+        <menuitem id="menu_ka_kasbank_produksi_pull"
+                  name="Tarik Produksi dari Giling"
+                  parent="menu_ka_kasbank_persediaan_jual"
+                  action="action_ka_kasbank_produksi_pull"
+                  sequence="40"/>
+
         <!-- ============ KONFIGURASI (Manajer) ============ -->
         <menuitem id="menu_ka_kasbank_config"
                   name="Konfigurasi"
@@ -49,6 +84,11 @@
                   parent="menu_ka_kasbank_config"
                   action="action_ka_kasbank_product"
                   sequence="20"/>
+        <menuitem id="menu_ka_kasbank_import"
+                  name="Import dari Excel"
+                  parent="menu_ka_kasbank_config"
+                  action="action_ka_kasbank_import_wizard"
+                  sequence="50"/>
 
     </data>
 </odoo>

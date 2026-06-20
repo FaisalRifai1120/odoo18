@@ -35,6 +35,7 @@
                             <group>
                                 <field name="category"/>
                                 <field name="satuan"/>
+                                <field name="giling_key"/>
                             </group>
                             <group>
                                 <field name="code"/>

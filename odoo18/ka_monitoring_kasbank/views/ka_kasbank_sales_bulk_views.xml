@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_kasbank_sales_bulk_list" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.bulk.list</field>
+            <field name="model">ka.kasbank.sales.bulk</field>
+            <field name="arch" type="xml">
+                <list string="Penjualan Bulk"
+                      decoration-success="state == 'lunas'"
+                      decoration-warning="state == 'open'">
+                    <field name="sp_number"/>
+                    <field name="date"/>
+                    <field name="partner_id"/>
+                    <field name="product_id" optional="show"/>
+                    <field name="production_year" optional="show"/>
+                    <field name="quantity" sum="Total Kuantum"/>
+                    <field name="price_unit" optional="hide"/>
+                    <field name="amount" sum="Total Nilai"/>
+                    <field name="payment_date" optional="hide"/>
+                    <field name="state" widget="badge"
+                           decoration-success="state == 'lunas'"
+                           decoration-warning="state == 'open'"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_kasbank_sales_bulk_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.bulk.form</field>
+            <field name="model">ka.kasbank.sales.bulk</field>
+            <field name="arch" type="xml">
+                <form string="Penjualan Bulk">
+                    <header>
+                        <button name="action_set_lunas" type="object" string="Tandai Lunas"
+                                class="btn-primary" invisible="state == 'lunas'"/>
+                        <button name="action_set_open" type="object" string="Set Belum Lunas"
+                                invisible="state == 'open'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="open,lunas"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="sp_number" string="No. SP"/>
+                            <h1><field name="sp_number" placeholder="mis. 01/GUL.25-KBA/01/2026"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date"/>
+                                <field name="partner_id"/>
+                                <field name="product_id"/>
+                                <field name="production_year"/>
+                            </group>
+                            <group>
+                                <field name="quantity"/>
+                                <field name="price_unit"/>
+                                <field name="amount"/>
+                                <field name="payment_date"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <field name="note" placeholder="Catatan..."/>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ PIVOT ============ -->
+        <record id="view_ka_kasbank_sales_bulk_pivot" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.bulk.pivot</field>
+            <field name="model">ka.kasbank.sales.bulk</field>
+            <field name="arch" type="xml">
+                <pivot string="Penjualan Bulk" sample="1">
+                    <field name="partner_id" type="row"/>
+                    <field name="date" interval="month" type="col"/>
+                    <field name="amount" type="measure"/>
+                    <field name="quantity" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_kasbank_sales_bulk_search" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.bulk.search</field>
+            <field name="model">ka.kasbank.sales.bulk</field>
+            <field name="arch" type="xml">
+                <search string="Cari Penjualan Bulk">
+                    <field name="sp_number"/>
+                    <field name="partner_id"/>
+                    <field name="product_id"/>
+                    <filter name="filter_open" string="Belum Lunas" domain="[('state', '=', 'open')]"/>
+                    <filter name="filter_lunas" string="Lunas" domain="[('state', '=', 'lunas')]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_partner" string="Pembeli" context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_product" string="Jenis Gula" context="{'group_by': 'product_id'}"/>
+                        <filter name="group_year" string="Tahun Produksi" context="{'group_by': 'production_year'}"/>
+                        <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                        <filter name="group_month" string="Bulan" context="{'group_by': 'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_kasbank_sales_bulk" model="ir.actions.act_window">
+            <field name="name">Penjualan Bulk</field>
+            <field name="res_model">ka.kasbank.sales.bulk</field>
+            <field name="view_mode">list,form,pivot</field>
+            <field name="search_view_id" ref="view_ka_kasbank_sales_bulk_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Catat kontrak penjualan bulk pertama</p>
+                <p>Penjualan gula per No. SP. Pivot untuk lihat nilai per pembeli/bulan.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

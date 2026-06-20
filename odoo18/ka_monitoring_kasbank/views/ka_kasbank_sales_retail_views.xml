@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============ LIST ============ -->
+        <record id="view_ka_kasbank_sales_retail_list" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.retail.list</field>
+            <field name="model">ka.kasbank.sales.retail</field>
+            <field name="arch" type="xml">
+                <list string="Penjualan Ritel"
+                      decoration-danger="is_overdue"
+                      decoration-success="payment_status == 'paid'">
+                    <field name="invoice_number"/>
+                    <field name="invoice_date"/>
+                    <field name="partner_id"/>
+                    <field name="segment" optional="show"/>
+                    <field name="so_number" optional="hide"/>
+                    <field name="delivery_order" optional="hide"/>
+                    <field name="driver" optional="hide"/>
+                    <field name="due_date" optional="show"/>
+                    <field name="qty_kg" sum="Total Kg"/>
+                    <field name="price_unit" optional="hide"/>
+                    <field name="invoice_value" sum="Total Nilai"/>
+                    <field name="amount_paid" optional="hide"/>
+                    <field name="is_overdue" column_invisible="1"/>
+                    <field name="payment_status" widget="badge"
+                           decoration-success="payment_status == 'paid'"
+                           decoration-warning="payment_status == 'open'"
+                           decoration-danger="payment_status == 'overdue'"/>
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- ============ FORM ============ -->
+        <record id="view_ka_kasbank_sales_retail_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.retail.form</field>
+            <field name="model">ka.kasbank.sales.retail</field>
+            <field name="arch" type="xml">
+                <form string="Penjualan Ritel">
+                    <header>
+                        <button name="action_mark_paid" type="object" string="Tandai Lunas"
+                                class="btn-primary" invisible="payment_status == 'paid'"/>
+                        <field name="payment_status" widget="statusbar"
+                               statusbar_visible="open,overdue,paid"/>
+                    </header>
+                    <sheet>
+                        <widget name="web_ribbon" title="Lewat Tempo" bg_color="text-bg-danger"
+                                invisible="not is_overdue"/>
+                        <div class="oe_title">
+                            <label for="invoice_number" string="Nomor Invoice"/>
+                            <h1><field name="invoice_number" placeholder="mis. 001/GUL-PMS/01/2026"/></h1>
+                        </div>
+                        <group>
+                            <group string="Pelanggan">
+                                <field name="partner_id"/>
+                                <field name="customer_code"/>
+                                <field name="segment"/>
+                                <field name="so_number"/>
+                                <field name="delivery_order"/>
+                                <field name="driver"/>
+                            </group>
+                            <group string="Invoice &amp; Pembayaran">
+                                <field name="invoice_date"/>
+                                <field name="due_date"/>
+                                <field name="qty_kg"/>
+                                <field name="price_unit"/>
+                                <field name="invoice_value"/>
+                                <field name="amount_paid"/>
+                                <field name="payment_date"/>
+                                <field name="is_overdue" invisible="1"/>
+                                <field name="currency_id" groups="base.group_multi_currency"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="sale_month"/>
+                                <field name="paid_month"/>
+                            </group>
+                        </group>
+                        <field name="note" placeholder="Catatan..."/>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- ============ PIVOT ============ -->
+        <record id="view_ka_kasbank_sales_retail_pivot" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.retail.pivot</field>
+            <field name="model">ka.kasbank.sales.retail</field>
+            <field name="arch" type="xml">
+                <pivot string="Penjualan Ritel" sample="1">
+                    <field name="segment" type="row"/>
+                    <field name="invoice_date" interval="month" type="col"/>
+                    <field name="invoice_value" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- ============ GRAPH ============ -->
+        <record id="view_ka_kasbank_sales_retail_graph" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.retail.graph</field>
+            <field name="model">ka.kasbank.sales.retail</field>
+            <field name="arch" type="xml">
+                <graph string="Piutang Ritel per Status" type="bar" sample="1">
+                    <field name="payment_status"/>
+                    <field name="invoice_value" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- ============ SEARCH ============ -->
+        <record id="view_ka_kasbank_sales_retail_search" model="ir.ui.view">
+            <field name="name">ka.kasbank.sales.retail.search</field>
+            <field name="model">ka.kasbank.sales.retail</field>
+            <field name="arch" type="xml">
+                <search string="Cari Penjualan Ritel">
+                    <field name="invoice_number"/>
+                    <field name="partner_id"/>
+                    <field name="customer_code"/>
+                    <field name="so_number"/>
+                    <filter name="filter_open" string="Open" domain="[('payment_status', '=', 'open')]"/>
+                    <filter name="filter_overdue" string="Overdue" domain="[('payment_status', '=', 'overdue')]"/>
+                    <filter name="filter_paid" string="Paid" domain="[('payment_status', '=', 'paid')]"/>
+                    <separator/>
+                    <filter name="filter_is_overdue" string="Lewat Jatuh Tempo" domain="[('is_overdue', '=', True)]"/>
+                    <group expand="0" string="Kelompokkan">
+                        <filter name="group_segment" string="Segmen" context="{'group_by': 'segment'}"/>
+                        <filter name="group_status" string="Status Bayar" context="{'group_by': 'payment_status'}"/>
+                        <filter name="group_partner" string="Pelanggan" context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_month" string="Bulan Invoice" context="{'group_by': 'invoice_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ============ ACTION ============ -->
+        <record id="action_ka_kasbank_sales_retail" model="ir.actions.act_window">
+            <field name="name">Penjualan Ritel</field>
+            <field name="res_model">ka.kasbank.sales.retail</field>
+            <field name="view_mode">list,form,pivot,graph</field>
+            <field name="search_view_id" ref="view_ka_kasbank_sales_retail_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Catat penjualan ritel pertama</p>
+                <p>Penjualan gula ritel per invoice. Baris merah = lewat jatuh tempo,
+                   hijau = lunas. Pivot untuk piutang per segmen/bulan.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

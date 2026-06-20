@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_ka_kasbank_produksi_pull_form" model="ir.ui.view">
+            <field name="name">ka.kasbank.produksi.pull.form</field>
+            <field name="model">ka.kasbank.produksi.pull.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Tarik Produksi dari Giling">
+                    <group invisible="state == 'done'">
+                        <div class="alert alert-info" colspan="2" role="alert">
+                            <i class="fa fa-info-circle"/> Mengisi kolom <b>Produksi / Diolah</b> pada
+                            Persediaan dari <b>Rincian Produksi</b> harian giling (ka_monitoring),
+                            dijumlahkan per tanggal &amp; produk sesuai pemetaan di master Produk.
+                        </div>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="production_year"/>
+                            <field name="create_missing"/>
+                        </group>
+                    </group>
+
+                    <group invisible="state != 'done'">
+                        <div class="alert alert-success" colspan="2" role="alert">
+                            <i class="fa fa-check-circle"/> Selesai.
+                        </div>
+                        <field name="result_summary" nolabel="1" readonly="1"/>
+                    </group>
+
+                    <footer>
+                        <button name="action_pull" type="object" string="Tarik"
+                                class="btn-primary" invisible="state == 'done'"/>
+                        <button special="cancel" string="Tutup" class="btn-secondary"
+                                invisible="state != 'done'"/>
+                        <button special="cancel" string="Batal" class="btn-secondary"
+                                invisible="state == 'done'"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_ka_kasbank_produksi_pull" model="ir.actions.act_window">
+            <field name="name">Tarik Produksi dari Giling</field>
+            <field name="res_model">ka.kasbank.produksi.pull.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

@@ -11,3 +11,15 @@ access_ka_kasbank_deposito_user,ka.kasbank.deposito.user,model_ka_kasbank_deposi
 access_ka_kasbank_deposito_manager,ka.kasbank.deposito.manager,model_ka_kasbank_deposito,group_ka_kasbank_manager,1,1,1,1
 access_ka_kasbank_loan_user,ka.kasbank.loan.user,model_ka_kasbank_loan,group_ka_kasbank_user,1,1,1,0
 access_ka_kasbank_loan_manager,ka.kasbank.loan.manager,model_ka_kasbank_loan,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_inventory_user,ka.kasbank.inventory.user,model_ka_kasbank_inventory,group_ka_kasbank_user,1,1,1,0
+access_ka_kasbank_inventory_manager,ka.kasbank.inventory.manager,model_ka_kasbank_inventory,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_sales_bulk_user,ka.kasbank.sales.bulk.user,model_ka_kasbank_sales_bulk,group_ka_kasbank_user,1,1,1,0
+access_ka_kasbank_sales_bulk_manager,ka.kasbank.sales.bulk.manager,model_ka_kasbank_sales_bulk,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_sales_retail_user,ka.kasbank.sales.retail.user,model_ka_kasbank_sales_retail,group_ka_kasbank_user,1,1,1,0
+access_ka_kasbank_sales_retail_manager,ka.kasbank.sales.retail.manager,model_ka_kasbank_sales_retail,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_import_wizard_user,ka.kasbank.import.wizard.user,model_ka_kasbank_import_wizard,group_ka_kasbank_user,1,1,1,1
+access_ka_kasbank_import_wizard_manager,ka.kasbank.import.wizard.manager,model_ka_kasbank_import_wizard,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_dashboard_user,ka.kasbank.dashboard.user,model_ka_kasbank_dashboard,group_ka_kasbank_user,1,1,1,0
+access_ka_kasbank_dashboard_manager,ka.kasbank.dashboard.manager,model_ka_kasbank_dashboard,group_ka_kasbank_manager,1,1,1,1
+access_ka_kasbank_produksi_pull_user,ka.kasbank.produksi.pull.user,model_ka_kasbank_produksi_pull_wizard,group_ka_kasbank_user,1,1,1,1
+access_ka_kasbank_produksi_pull_manager,ka.kasbank.produksi.pull.manager,model_ka_kasbank_produksi_pull_wizard,group_ka_kasbank_manager,1,1,1,1

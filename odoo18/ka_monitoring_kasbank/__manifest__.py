@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'KA Monitoring Kas/Bank & Persediaan',
-    'version': '18.0.2.0.0',
+    'version': '18.0.6.0.0',
     'category': 'Accounting/Inventory',
     'summary': 'Monitoring Kas/Bank, Deposito, Hutang, Persediaan & Penjualan Gula PG Kebon Agung',
     'description': """
@@ -22,7 +22,11 @@
     'depends': [
         'base',
         'mail',
+        'ka_monitoring',  # Fase 5b: tarik produksi giling → persediaan
     ],
+    'external_dependencies': {
+        'python': ['openpyxl'],
+    },
     'data': [
         # Security
         'security/ka_kasbank_security.xml',
@@ -35,6 +39,16 @@
         'views/ka_kasbank_balance_views.xml',
         'views/ka_kasbank_deposito_views.xml',
         'views/ka_kasbank_loan_views.xml',
+        # Views — Persediaan & Penjualan (Fase 3)
+        'views/ka_kasbank_inventory_views.xml',
+        'views/ka_kasbank_sales_bulk_views.xml',
+        'views/ka_kasbank_sales_retail_views.xml',
+        # Wizard Import (Fase 4)
+        'wizard/ka_kasbank_import_wizard_views.xml',
+        # Wizard Tarik Produksi (Fase 5b)
+        'wizard/ka_kasbank_produksi_pull_views.xml',
+        # Dashboard (Fase 5)
+        'views/ka_kasbank_dashboard_views.xml',
         # Menu (terakhir)
         'views/ka_kasbank_menu.xml',
     ],

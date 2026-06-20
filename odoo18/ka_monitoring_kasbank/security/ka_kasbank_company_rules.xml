@@ -30,5 +30,26 @@
             <field name="global" eval="True"/>
         </record>
 
+        <record id="rule_ka_kasbank_inventory_company" model="ir.rule">
+            <field name="name">Persediaan: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_kasbank_inventory"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_ka_kasbank_sales_bulk_company" model="ir.rule">
+            <field name="name">Penjualan Bulk: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_kasbank_sales_bulk"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="rule_ka_kasbank_sales_retail_company" model="ir.rule">
+            <field name="name">Penjualan Ritel: aturan multi-company</field>
+            <field name="model_id" ref="model_ka_kasbank_sales_retail"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
     </data>
 </odoo>
