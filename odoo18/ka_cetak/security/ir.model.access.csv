@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ka_cetak_ngp_batch_user,ka.cetak.ngp.batch.user,model_ka_cetak_ngp_batch,group_ka_cetak_user,1,1,1,0
+access_ka_cetak_ngp_batch_manager,ka.cetak.ngp.batch.manager,model_ka_cetak_ngp_batch,group_ka_cetak_manager,1,1,1,1
+access_ka_cetak_ngp_line_user,ka.cetak.ngp.line.user,model_ka_cetak_ngp_line,group_ka_cetak_user,1,1,1,0
+access_ka_cetak_ngp_line_manager,ka.cetak.ngp.line.manager,model_ka_cetak_ngp_line,group_ka_cetak_manager,1,1,1,1
+access_ka_cetak_print_job_user,ka.cetak.print.job.user,model_ka_cetak_print_job,group_ka_cetak_user,1,1,1,1
+access_ka_cetak_print_job_manager,ka.cetak.print.job.manager,model_ka_cetak_print_job,group_ka_cetak_manager,1,1,1,1

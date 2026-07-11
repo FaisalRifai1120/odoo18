@@ -144,6 +144,10 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/models/ka_kasbank_deposito.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/models/ka_kasbank_loan.py
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/models/ka_kasbank_product.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/models/ka_kasbank_dashboard.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/models/ka_kasbank_inventory.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/models/ka_kasbank_sales_bulk.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/models/ka_kasbank_sales_retail.py
 SECURITY
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/security/ir.model.access.csv
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/security/ka_kasbank_company_rules.xml
@@ -155,3 +159,13 @@ https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/views/ka_kasbank_loan_views.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/views/ka_kasbank_menu.xml
 https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/views/ka_kasbank_product_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/views/ka_kasbank_inventory_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/views/ka_kasbank_dashboard_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/views/ka_kasbank_sales_bulk_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/views/ka_kasbank_sales_retail_views.xml
+WIZARD
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/wizard/__init__.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/wizard/ka_kasbank_import_wizard.py
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/wizard/ka_kasbank_import_wizard_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/wizard/ka_kasbank_produksi_pull_views.xml
+https://raw.githubusercontent.com/FaisalRifai1120/odoo18/refs/heads/main/odoo18/ka_monitoring_kasbank/wizard/ka_kasbank_produksi_pull_wizard.py

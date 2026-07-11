@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_ka_cetak_root" name="Cetak NGP"
+              sequence="65"
+              groups="ka_cetak.group_ka_cetak_user,ka_cetak.group_ka_cetak_manager"/>
+
+    <menuitem id="menu_ka_cetak_ngp_batch" name="Batch Cetak NGP"
+              parent="menu_ka_cetak_root" sequence="10"
+              action="action_ka_cetak_ngp_batch"/>
+
+    <menuitem id="menu_ka_cetak_ngp_line" name="Semua Baris NGP"
+              parent="menu_ka_cetak_root" sequence="20"
+              action="action_ka_cetak_ngp_line"/>
+
+</odoo>

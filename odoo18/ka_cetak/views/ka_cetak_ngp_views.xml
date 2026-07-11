@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════
+         BATCH — TREE
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_cetak_ngp_batch_tree" model="ir.ui.view">
+        <field name="name">ka.cetak.ngp.batch.tree</field>
+        <field name="model">ka.cetak.ngp.batch</field>
+        <field name="arch" type="xml">
+            <list string="Batch Cetak NGP">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="periode"/>
+                <field name="tanggal_cetak"/>
+                <field name="line_count"/>
+                <field name="matched_count"/>
+                <field name="unmatched_count"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'validated'"
+                       decoration-info="state == 'imported'"
+                       decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         BATCH — FORM
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_cetak_ngp_batch_form" model="ir.ui.view">
+        <field name="name">ka.cetak.ngp.batch.form</field>
+        <field name="model">ka.cetak.ngp.batch</field>
+        <field name="arch" type="xml">
+            <form string="Batch Cetak NGP">
+                <header>
+                    <button name="action_import_excel" type="object" string="Import Excel"
+                            class="oe_highlight" invisible="not file"/>
+                    <button name="action_validasi_register" type="object" string="Validasi Register"
+                            class="oe_highlight" invisible="state == 'draft'"/>
+                    <button name="action_print_all_valid" type="object" string="Cetak Semua (Valid)"
+                            class="oe_highlight" invisible="state != 'validated'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,imported,validated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nama Batch, misal: NGP Periode II B 2026"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="periode"/>
+                            <field name="tanggal_cetak"/>
+                            <field name="tanggal_batas_pengambilan"/>
+                        </group>
+                        <group>
+                            <field name="tempat"/>
+                            <field name="pejabat_nama"/>
+                            <field name="pejabat_jabatan"/>
+                            <field name="tahun_qr" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Upload Excel">
+                        <field name="file" filename="filename"/>
+                        <field name="filename" invisible="1"/>
+                    </group>
+                    <group string="Ringkasan" invisible="line_count == 0">
+                        <field name="line_count"/>
+                        <field name="matched_count"/>
+                        <field name="unmatched_count"/>
+                    </group>
+                    <notebook>
+                        <page string="Daftar NGP">
+                            <field name="line_ids">
+                                <list string="Daftar NGP" editable="bottom" decoration-danger="not is_valid">
+                                    <field name="ngp_nomor"/>
+                                    <field name="nomor_do"/>
+                                    <field name="register_kode"/>
+                                    <field name="register_id" column_invisible="1"/>
+                                    <field name="is_valid" widget="boolean_toggle"/>
+                                    <field name="nama"/>
+                                    <field name="kecamatan"/>
+                                    <field name="desa"/>
+                                    <field name="cair"/>
+                                    <field name="gula_jual" sum="Total"/>
+                                    <field name="kode_qr"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ka_cetak_ngp_batch" model="ir.actions.act_window">
+        <field name="name">Batch Cetak NGP</field>
+        <field name="res_model">ka.cetak.ngp.batch</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         LINE — TREE (untuk cetak sebagian/filter langsung)
+    ══════════════════════════════════════════ -->
+    <record id="view_ka_cetak_ngp_line_tree" model="ir.ui.view">
+        <field name="name">ka.cetak.ngp.line.tree</field>
+        <field name="model">ka.cetak.ngp.line</field>
+        <field name="arch" type="xml">
+            <list string="Daftar NGP" decoration-danger="not is_valid">
+                <field name="batch_id"/>
+                <field name="ngp_nomor"/>
+                <field name="nomor_do"/>
+                <field name="register_kode"/>
+                <field name="is_valid" widget="boolean_toggle"/>
+                <field name="nama"/>
+                <field name="kecamatan"/>
+                <field name="desa"/>
+                <field name="cair"/>
+                <field name="gula_jual" sum="Total"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ka_cetak_ngp_line_search" model="ir.ui.view">
+        <field name="name">ka.cetak.ngp.line.search</field>
+        <field name="model">ka.cetak.ngp.line</field>
+        <field name="arch" type="xml">
+            <search string="Cari NGP">
+                <field name="ngp_nomor"/>
+                <field name="register_kode"/>
+                <field name="nama"/>
+                <field name="kecamatan"/>
+                <field name="desa"/>
+                <field name="cair"/>
+                <field name="batch_id"/>
+                <filter string="Register Valid" name="valid" domain="[('is_valid', '=', True)]"/>
+                <filter string="Register Tidak Ditemukan" name="invalid" domain="[('is_valid', '=', False)]"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter string="Batch" name="group_batch" context="{'group_by': 'batch_id'}"/>
+                    <filter string="Kecamatan" name="group_kecamatan" context="{'group_by': 'kecamatan'}"/>
+                    <filter string="Desa" name="group_desa" context="{'group_by': 'desa'}"/>
+                    <filter string="Kode Cair" name="group_cair" context="{'group_by': 'cair'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ka_cetak_ngp_line" model="ir.actions.act_window">
+        <field name="name">Cetak NGP (Semua Baris)</field>
+        <field name="res_model">ka.cetak.ngp.line</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_ka_cetak_ngp_line_search"/>
+        <field name="context">{'search_default_group_batch': 1}</field>
+        <field name="help">
+            Pilih semua/beberapa baris (checkbox), atau gunakan filter (Kecamatan/Desa/Kode Cair),
+            lalu jalankan "Cetak NGP (PDF)" dari menu Action untuk mencetak.
+        </field>
+    </record>
+
+    <!-- Server action: cetak baris terpilih (chunked + merge, aman batch besar).
+         Muncul di dropdown "Action" saat ada baris tercentang di list view. -->
+    <record id="action_server_cetak_ngp" model="ir.actions.server">
+        <field name="name">Cetak NGP (PDF)</field>
+        <field name="model_id" ref="model_ka_cetak_ngp_line"/>
+        <field name="binding_model_id" ref="model_ka_cetak_ngp_line"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cetak_terpilih()</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ══════════════════════════════════════════
+         PAPERFORMAT — A5 Landscape, 1 NGP per halaman
+    ══════════════════════════════════════════ -->
+    <record id="paperformat_ka_cetak_ngp" model="report.paperformat">
+        <field name="name">KA Cetak NGP A5 Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A5</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">6</field>
+        <field name="margin_right">6</field>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         REPORT ACTION (bound ke ka.cetak.ngp.line)
+    ══════════════════════════════════════════ -->
+    <record id="action_report_ka_cetak_ngp" model="ir.actions.report">
+        <field name="name">Cetak NGP (Nota Gula Petani)</field>
+        <field name="model">ka.cetak.ngp.line</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ka_cetak.report_ka_cetak_ngp</field>
+        <field name="report_file">ka_cetak.report_ka_cetak_ngp</field>
+        <field name="paperformat_id" ref="paperformat_ka_cetak_ngp"/>
+        <field name="print_report_name">'NGP'</field>
+    </record>
+
+    <!-- ══════════════════════════════════════════
+         STYLE
+         ► Untuk mengubah UKURAN TEKS & TATA LETAK, edit di blok <style> ini.
+    ══════════════════════════════════════════ -->
+    <template id="report_ka_cetak_ngp_style">
+        <style>
+            /* ── Ukuran teks dasar ── */
+            .ka-ngp        { font-family: Arial, sans-serif; font-size: 11px; color:#000; }
+            .ka-ngp .title { text-align:center; font-weight:bold; font-size:15px; text-transform:uppercase; letter-spacing:0.5px; }
+            .ka-ngp .subtitle { text-align:center; font-size:10px; }
+            .ka-ngp .small { font-size:9px; }
+
+            /* ── Bingkai luar dokumen (gaya formal) ── */
+            .ka-frame      { border:1.5px solid #000; box-sizing:border-box;
+                             padding: 4mm 5mm; height: 136mm; position:relative; }
+
+            /* ── Tabel data (Nama/Register/Kecamatan/Desa) ── */
+            .ka-ngp table       { width:100%; border-collapse:collapse; }
+            .ka-ngp td, .ka-ngp th { padding:2px 5px; vertical-align:top; }
+            .ka-ngp .box-table th, .ka-ngp .box-table td { border:1px solid #000; }
+            .ka-ngp .box-table th { background:#f0f0f0; }
+            .ka-ngp .center { text-align:center; }
+            .ka-ngp .no-border td { border:0; padding:0; }
+
+            /* ── QR ── ubah lebar/tinggi QR di sini ── */
+            .ka-qr svg { width: 20mm; height: 20mm; }
+
+            /* ── Blok tanda tangan ── */
+            .ka-ttd { text-align:center; }
+            .ka-ttd .space { height: 14mm; }
+        </style>
+    </template>
+
+    <!-- ══════════════════════════════════════════
+         SATU NGP (sub-template "half"). Butuh: l = ka.cetak.ngp.line
+    ══════════════════════════════════════════ -->
+    <template id="report_ka_cetak_ngp_half">
+        <t t-set="batch" t-value="l.batch_id"/>
+        <div class="ka-frame">
+
+            <!-- Header: judul di tengah, QR + Nomor di kanan -->
+            <table class="no-border">
+                <tr>
+                    <td style="width:78%; vertical-align:top; padding-top:6px;">
+                        <div class="title">Surat Penyerahan Gula</div>
+                        <div class="subtitle">Periode : <span t-out="batch.periode"/></div>
+                    </td>
+                    <td style="width:22%; text-align:right; vertical-align:top;" class="ka-qr">
+                        <t t-if="l.qr_svg" t-out="l.qr_svg"/>
+                        <div style="font-size:10px;"><strong>Nomor : <span t-out="l.nomor_do"/></strong></div>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="margin-top:4px;">Harap diserahkan gula kepada :</div>
+            <table class="box-table" style="margin-top:3px;">
+                <tr>
+                    <th style="width:30%;">Nama</th>
+                    <th style="width:24%;">Nomor Register</th>
+                    <th style="width:23%;">Kecamatan</th>
+                    <th style="width:23%;">Desa</th>
+                </tr>
+                <tr>
+                    <td t-out="l.nama"/>
+                    <td t-out="l.register_kode"/>
+                    <td t-out="l.kecamatan"/>
+                    <td t-out="l.desa"/>
+                </tr>
+            </table>
+
+            <div style="margin-top:5px;">
+                Jumlah Gula :
+                <strong><span t-out="'{:,.0f}'.format(l.gula_jual or 0.0).replace(',', '.')"/> Kg</strong>
+            </div>
+            <div class="small" t-out="l.terbilang"/>
+
+            <!-- Bagian bawah: catatan di kiri, tanda tangan di kanan -->
+            <table class="no-border" style="margin-top:6px;">
+                <tr>
+                    <td style="width:60%; vertical-align:top;">
+                        <div>Penyerahan hanya dapat dilakukan setelah dibayar lunas</div>
+                        <div class="small" style="margin-left:10px;">- Hutang kepada pabrik.</div>
+                        <div class="small" style="margin-left:10px;">- Kewajiban-kewajiban antara lain : Karung dll.</div>
+                        <div style="margin-top:5px;">
+                            Pengambilan selambat-lambatnya s.d Tanggal :
+                            <strong t-out="batch.tanggal_batas_pengambilan and batch.tanggal_batas_pengambilan.strftime('%d-%m-%Y') or ''"/>
+                        </div>
+                        <div class="small">
+                            Apabila pengambilan melewati batas tanggal tersebut, dikenakan sewa
+                            gudang dan biaya administrasi sesuai peraturan perusahaan.
+                        </div>
+                    </td>
+                    <td style="width:40%; vertical-align:top;" class="ka-ttd">
+                        <div t-out="(batch.tempat or '') + ', ' + (batch.tanggal_cetak and batch.tanggal_cetak.strftime('%d-%m-%Y') or '')"/>
+                        <div t-out="batch.pejabat_jabatan or ''"/>
+                        <div class="space"></div>
+                        <div><strong t-out="batch.pejabat_nama or '________________'"/></div>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </template>
+
+    <!-- ══════════════════════════════════════════
+         REPORT UTAMA — 1 NGP per halaman A5
+    ══════════════════════════════════════════ -->
+    <template id="report_ka_cetak_ngp">
+        <t t-call="web.html_container">
+            <t t-call="ka_cetak.report_ka_cetak_ngp_style"/>
+            <t t-foreach="docs" t-as="l">
+                <div class="page ka-ngp">
+                    <t t-call="ka_cetak.report_ka_cetak_ngp_half"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

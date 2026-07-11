@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="module_category_ka_cetak" model="ir.module.category">
+            <field name="name">KA · Cetak NGP</field>
+            <field name="description">Hak akses cetak Surat Penyerahan Gula (NGP).</field>
+            <field name="sequence">120</field>
+        </record>
+
+        <!--
+            Dua grup TANPA implied_ids -> tampil sebagai CHECKBOX terpisah
+            di form user. Hak tiap grup didefinisikan di ir.model.access.csv.
+        -->
+        <record id="group_ka_cetak_user" model="res.groups">
+            <field name="name">Cetak NGP — Pengguna</field>
+            <field name="category_id" ref="module_category_ka_cetak"/>
+            <field name="comment">Dapat import Excel, validasi register, dan cetak NGP.</field>
+        </record>
+
+        <record id="group_ka_cetak_manager" model="res.groups">
+            <field name="name">Cetak NGP — Manajer</field>
+            <field name="category_id" ref="module_category_ka_cetak"/>
+            <field name="comment">Akses penuh termasuk hapus batch/baris NGP.</field>
+        </record>
+
+    </data>
+</odoo>
